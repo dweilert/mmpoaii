@@ -258,6 +258,18 @@ body {
 .wb-right { text-align: right; font-size: 12px; opacity: .7; }
 .wb-right .wr-date { font-size: 14px; font-weight: 600; opacity: .9; }
 
+/* ── PAGE TOOLBAR (print buttons, inputs below banner) ── */
+.page-toolbar {
+  display: flex; align-items: center; justify-content: flex-end; gap: 10px;
+  margin-bottom: 20px; flex-wrap: wrap;
+}
+.page-toolbar .btn-print {
+  background: var(--purple-600); color: #fff; border: none;
+  padding: 7px 14px; border-radius: var(--r); font-size: 12.5px;
+  cursor: pointer; font-family: var(--sans); transition: background .13s;
+}
+.page-toolbar .btn-print:hover { background: var(--purple-800); }
+
 /* ── BACK BUTTON (shared across all pages) ── */
 .back-btn {
   background: rgba(255,255,255,.12);
