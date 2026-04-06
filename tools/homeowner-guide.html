@@ -33,9 +33,7 @@ body { font-family: var(--sans); background: var(--gray-50); color: var(--text);
 .page-wrap { max-width: 1200px; margin: 0 auto; padding: 0; }
 
 /* Page hero */
-.page-hero { background: linear-gradient(135deg, var(--purple-800), var(--purple-900)); color: #fff; padding: 16px 12px; text-align: center; border-bottom: 1px solid var(--border); }
-.page-hero h1 { font-family: var(--serif); font-size: 28px; font-weight: 700; margin-bottom: 8px; }
-.page-hero p { font-size: 15px; opacity: .85; max-width: 700px; margin: 0 auto 16px; line-height: 1.7; }
+/* welcome-banner styles now in site.css */
 
 
 
@@ -138,17 +136,17 @@ body { font-family: var(--sans); background: var(--gray-50); color: var(--text);
   .comparison-grid { grid-template-columns: 1fr; }
   .process-table { font-size: 12px; }
   .process-table td { padding: 10px 8px; }
-  .page-hero h1 { font-size: 22px; }
-  .page-hero p { font-size: 14px; }
+  .welcome-banner h1 { font-size: 22px; }
+  .welcome-banner p { font-size: 14px; }
   .page-content { padding: 20px 16px 48px; }
   .section-header { padding: 16px; }
   .section-body { padding: 16px; }
 }
 
 @media(max-width: 480px) {
-  .page-hero { padding: 20px 16px; }
-  .page-hero h1 { font-size: 20px; }
-  .page-hero p { font-size: 13px; }
+  .welcome-banner { padding: 20px 16px; }
+  .welcome-banner h1 { font-size: 20px; }
+  .welcome-banner p { font-size: 13px; }
   .section-nav-scroll { font-size: 12px; }
   .section-nav-scroll a { padding: 9px 12px; }
 }
@@ -282,9 +280,12 @@ body { font-family: var(--sans); background: var(--gray-50); color: var(--text);
 </header>
 
 <!-- PAGE HERO -->
-<div class="page-hero">
-  <h1>Homeowner Communication Guide</h1>
-  <p>Know your rights. Understand your templates. Learn exactly what to do — and when — in every situation.</p>
+<div class="welcome-banner">
+  <div class="wb-left">
+    <h2>Homeowner Communication Guide</h2>
+    <p>Know your rights. Understand your templates. Learn exactly what to do — and when — in every situation.</p>
+  </div>
+  <a href="/homeowners/index.html" class="back-btn">← Back to Portal</a>
 </div>
 
 <!-- MAIN CONTENT -->

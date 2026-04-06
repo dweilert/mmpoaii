@@ -51,9 +51,7 @@ body{font-family:var(--sans);background:var(--gray-50);color:var(--text);font-si
 
 /* main content */
 .main-content{}
-.page-hero{background:var(--purple-800);color:#fff;border-radius:var(--r3);padding:22px 26px;margin-bottom:24px}
-.page-hero h1{font-size:22px;font-weight:700;margin-bottom:5px}
-.page-hero p{font-size:13px;opacity:.75;line-height:1.6;max-width:580px}
+/* welcome-banner styles now in site.css */
 .hero-badges{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
 .hbadge{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:3px 10px;font-size:11px}
 
@@ -138,7 +136,6 @@ body{font-family:var(--sans);background:var(--gray-50);color:var(--text);font-si
         <div class="ls">Texas Residential Property Owners Protection Act</div>
       </div>
     </a>
-    <a href="#" id="back-link" class="back-btn">← Back to Portal</a>
     <button class="btn-print" onclick="window.print()">🖨 Print / PDF</button>
   </div>
 </header>
@@ -170,15 +167,18 @@ body{font-family:var(--sans);background:var(--gray-50);color:var(--text);font-si
   <!-- MAIN -->
   <div class="main-content">
 
-    <div class="page-hero">
-      <h1>Texas Property Code Chapter 209</h1>
-      <p>Plain-language explanations of every major provision of the Texas Residential Property Owners Protection Act. This guide is for educational purposes — not legal advice. Verify all references at statutes.capitol.texas.gov before taking action.</p>
-      <div class="hero-badges">
-        <span class="hbadge">Texas Property Code Title 11</span>
-        <span class="hbadge">Mandatory HOAs — Single Family</span>
-        <span class="hbadge">Attorney Review Recommended</span>
-        <span class="hbadge"><a href="https://statutes.capitol.texas.gov/Docs/PR/htm/PR.209.htm" target="_blank" style="color:#fff">View Full Statute ↗</a></span>
+    <div class="welcome-banner">
+      <div class="wb-left">
+        <h2>Texas Property Code Chapter 209</h2>
+        <p>Plain-language explanations of every major provision of the Texas Residential Property Owners Protection Act. This guide is for educational purposes — not legal advice.</p>
+        <div class="hero-badges">
+          <span class="hbadge">Texas Property Code Title 11</span>
+          <span class="hbadge">Mandatory HOAs — Single Family</span>
+          <span class="hbadge">Attorney Review Recommended</span>
+          <span class="hbadge"><a href="https://statutes.capitol.texas.gov/Docs/PR/htm/PR.209.htm" target="_blank" style="color:#fff">View Full Statute ↗</a></span>
+        </div>
       </div>
+      <a href="#" id="back-link" class="back-btn">← Back to Portal</a>
     </div>
 
     <!-- SECTION 1 -->
