@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Texas HOA Board Member Training Program</title>
+<link rel="stylesheet" href="/css/site.css">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -39,10 +40,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 
 /* ── LAYOUT ── */
 .app{display:flex;flex-direction:column;min-height:100vh}
-.top-bar{background:var(--purple-800);color:#fff;padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:100;border-bottom:2px solid var(--purple-600)}
-.top-bar-left h1{font-size:16px;font-weight:600;letter-spacing:-.2px}
-.top-bar-left .sub{font-size:10px;opacity:.55;margin-top:1px}
-.top-bar-right{display:flex;align-items:center;gap:10px}
+/* header styles now in site.css */
 .prog-wrap{display:flex;align-items:center;gap:7px;font-size:11px;opacity:.85}
 .prog-outer{width:110px;height:5px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden}
 .prog-inner{height:100%;background:#CECBF6;border-radius:3px;transition:width .4s}
@@ -53,7 +51,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .body-wrap{display:flex;flex:1}
 
 /* ── SIDEBAR ── */
-.sidebar{width:265px;flex-shrink:0;background:var(--surf);border-right:1px solid var(--border);overflow-y:auto;position:sticky;top:58px;height:calc(100vh - 58px)}
+.sidebar{width:265px;flex-shrink:0;background:var(--surf);border-right:1px solid var(--border);overflow-y:auto;position:sticky;top:64px;height:calc(100vh - 64px)}
 .sidebar-inner{padding:14px 0 32px}
 .sec-lbl{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);padding:12px 14px 4px;margin-top:4px}
 .nav-item{display:flex;align-items:center;gap:9px;padding:6px 14px;cursor:pointer;border-left:3px solid transparent;transition:all .13s;user-select:none}
@@ -256,7 +254,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 
 /* ── PRINT ── */
 @media print{
-  .top-bar,.sidebar,.mod-nav,.quiz-wrap,.cl-wrap,.cert-actions,.tbtn{display:none!important}
+  .site-header,.sidebar,.mod-nav,.quiz-wrap,.cl-wrap,.cert-actions,.tbtn{display:none!important}
   .body-wrap{display:block}
   .main{padding:0}
   .panel:not(.active){display:none}
@@ -281,22 +279,35 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   </div>
 </div>
 
-<!-- TOP BAR -->
-<div class="top-bar">
-  <div class="top-bar-left">
-    <div style="font-size:10px;opacity:.45;margin-bottom:1px">TEXAS HOA</div>
-    <h1>Board Member Training Program</h1>
+<header class="site-header">
+  <div class="inner">
+    <a href="/" class="site-logo">
+      <div class="logo-mark">🏡</div>
+      <div class="logo-text">
+        <div class="logo-name" data-hoa-name>MMPOAII HOA</div>
+        <div class="logo-sub">Board Training</div>
+      </div>
+    </a>
+    <nav class="site-nav"></nav>
   </div>
-  <div class="top-bar-right">
-    <a href="/board/index.html" class="tbtn" style="text-decoration:none">← Board Portal</a>
-    <div class="prog-wrap">
-      <span id="prog-label">0 / 12</span>
-      <div class="prog-outer"><div class="prog-inner" id="prog-bar" style="width:0%"></div></div>
+</header>
+
+<div id="page-content">
+<div class="page-wrap" style="max-width:none;padding:0">
+  <div class="welcome-banner" style="border-radius:0;margin-bottom:0">
+    <div class="wb-left">
+      <h2>Board Member Training Program</h2>
+      <p>12-module interactive training covering fiduciary duties, Chapter 209, meetings, budgets, and more.</p>
     </div>
-    <button class="tbtn" onclick="show('cert')">🎓 Certificate</button>
-    <button class="tbtn danger" onclick="openReset()">↺ Reset</button>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="prog-wrap">
+        <span id="prog-label">0 / 12</span>
+        <div class="prog-outer"><div class="prog-inner" id="prog-bar"></div></div>
+      </div>
+      <a href="/board/index.html" class="back-btn">← Board Portal</a>
+      <button class="tbtn danger" onclick="if(confirm('Reset all progress?')){localStorage.removeItem('hoa_training');location.reload()}">↺ Reset</button>
+    </div>
   </div>
-</div>
 
 <div class="body-wrap">
 <!-- SIDEBAR -->
@@ -930,6 +941,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 
 </div><!-- /main -->
 </div><!-- /body-wrap -->
+</div><!-- /page-wrap -->
+</div><!-- /page-content -->
 </div><!-- /app -->
 
 <script>

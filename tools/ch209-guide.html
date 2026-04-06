@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Chapter 209 Plain-Language Guide — Texas HOA</title>
+<link rel="stylesheet" href="/css/site.css">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -27,23 +28,16 @@
 html{scroll-behavior:smooth}
 body{font-family:var(--sans);background:var(--gray-50);color:var(--text);font-size:15px;line-height:1.65}
 
-/* header */
-.site-header{background:var(--purple-800);border-bottom:3px solid var(--teal-600);padding:0 24px;position:sticky;top:0;z-index:100}
-.header-inner{max-width:1000px;margin:0 auto;height:60px;display:flex;align-items:center;justify-content:space-between}
-.logo{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none}
-.logo-icon{width:36px;height:36px;background:var(--teal-600);border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:18px}
-.logo-text .ln{font-size:14px;font-weight:600}
-.logo-text .ls{font-size:10px;opacity:.6}
+/* header styles now in site.css */
+/* back-btn styles now in site.css */
 .btn-print{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;padding:6px 13px;border-radius:var(--r);font-size:12px;cursor:pointer;font-family:var(--sans)}
 .btn-print:hover{background:rgba(255,255,255,.22)}
-.back-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;padding:7px 14px;border-radius:var(--r);font-size:12.5px;cursor:pointer;font-family:var(--sans);text-decoration:none;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;transition:background .15s}
-.back-btn:hover{background:rgba(255,255,255,.22);color:#fff}
 
 /* layout */
-.page{max-width:1000px;margin:0 auto;padding:28px 24px 64px;display:grid;grid-template-columns:220px 1fr;gap:24px;align-items:start}
+.page{max-width:1000px;margin:0 auto;padding:0 0 64px;display:grid;grid-template-columns:220px 1fr;gap:24px;align-items:start}
 
 /* sidebar nav */
-.sidebar{position:sticky;top:76px;background:var(--surf);border:1px solid var(--border);border-radius:var(--r3);overflow:hidden}
+.sidebar{position:sticky;top:92px;background:var(--surf);border:1px solid var(--border);border-radius:var(--r3);overflow:hidden}
 .sb-head{background:var(--purple-800);color:#fff;padding:11px 14px;font-size:12px;font-weight:600;letter-spacing:.03em}
 .sb-nav a{display:block;padding:8px 14px;font-size:12.5px;color:var(--text2);text-decoration:none;border-bottom:1px solid var(--border);transition:all .12s}
 .sb-nav a:hover{background:var(--purple-50);color:var(--purple-800)}
@@ -128,19 +122,37 @@ body{font-family:var(--sans);background:var(--gray-50);color:var(--text);font-si
 <body>
 
 <header class="site-header">
-  <div class="header-inner">
-    <a href="#" class="logo">
-      <div class="logo-icon">⚖</div>
+  <div class="inner">
+    <a href="/" class="site-logo">
+      <div class="logo-mark">🏡</div>
       <div class="logo-text">
-        <div class="ln">Chapter 209 Plain-Language Guide</div>
-        <div class="ls">Texas Residential Property Owners Protection Act</div>
+        <div class="logo-name" data-hoa-name>MMPOAII HOA</div>
+        <div class="logo-sub">Chapter 209 Guide</div>
       </div>
     </a>
-    <button class="btn-print" onclick="window.print()">🖨 Print / PDF</button>
+    <nav class="site-nav"></nav>
   </div>
 </header>
 
-<div class="page">
+<div id="page-content">
+<div class="page-wrap">
+  <div class="welcome-banner">
+    <div class="wb-left">
+      <h2>Texas Property Code Chapter 209</h2>
+      <p>Plain-language explanations of every major provision of the Texas Residential Property Owners Protection Act. This guide is for educational purposes — not legal advice.</p>
+      <div class="hero-badges">
+        <span class="hbadge">Texas Property Code Title 11</span>
+        <span class="hbadge">Mandatory HOAs — Single Family</span>
+        <span class="hbadge">Attorney Review Recommended</span>
+        <span class="hbadge"><a href="https://statutes.capitol.texas.gov/Docs/PR/htm/PR.209.htm" target="_blank" style="color:#fff">View Full Statute ↗</a></span>
+      </div>
+    </div>
+    <a href="#" id="back-link" class="back-btn">← Back to Portal</a>
+  </div>
+  <div class="page-toolbar">
+    <button class="btn-print" onclick="window.print()">🖨 Print / PDF</button>
+  </div>
+  <div class="page">
 
   <!-- SIDEBAR -->
   <div class="sidebar">
@@ -166,20 +178,6 @@ body{font-family:var(--sans);background:var(--gray-50);color:var(--text);font-si
 
   <!-- MAIN -->
   <div class="main-content">
-
-    <div class="welcome-banner">
-      <div class="wb-left">
-        <h2>Texas Property Code Chapter 209</h2>
-        <p>Plain-language explanations of every major provision of the Texas Residential Property Owners Protection Act. This guide is for educational purposes — not legal advice.</p>
-        <div class="hero-badges">
-          <span class="hbadge">Texas Property Code Title 11</span>
-          <span class="hbadge">Mandatory HOAs — Single Family</span>
-          <span class="hbadge">Attorney Review Recommended</span>
-          <span class="hbadge"><a href="https://statutes.capitol.texas.gov/Docs/PR/htm/PR.209.htm" target="_blank" style="color:#fff">View Full Statute ↗</a></span>
-        </div>
-      </div>
-      <a href="#" id="back-link" class="back-btn">← Back to Portal</a>
-    </div>
 
     <!-- SECTION 1 -->
     <div class="guide-section" id="s-overview">
@@ -511,6 +509,8 @@ body{font-family:var(--sans);background:var(--gray-50);color:var(--text);font-si
 
   </div><!-- /main-content -->
 </div><!-- /page -->
+</div><!-- /page-wrap -->
+</div><!-- /page-content -->
 
 <footer class="site-footer">
   <div>Texas Property Code Chapter 209 — Texas Residential Property Owners Protection Act</div>

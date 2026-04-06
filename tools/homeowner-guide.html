@@ -15,19 +15,7 @@
 html { scroll-behavior: smooth; }
 body { font-family: var(--sans); background: var(--gray-50); color: var(--text); font-size: 15px; line-height: 1.65; }
 
-/* Header */
-.site-header { background: var(--purple-800); border-bottom: 3px solid var(--purple-600); padding: 0 24px; position: sticky; top: 0; z-index: 100; }
-.header-inner { max-width: 1200px; margin: 0 auto; height: 60px; display: flex; align-items: center; justify-content: space-between; }
-.logo { display: flex; align-items: center; gap: 10px; color: #fff; text-decoration: none; }
-.logo-icon { width: 36px; height: 36px; background: rgba(255,255,255,.2); border-radius: var(--r); display: flex; align-items: center; justify-content: center; font-size: 18px; }
-.logo-text .ln { font-size: 14px; font-weight: 600; }
-.logo-text .ls { font-size: 10px; opacity: .6; }
-.header-nav-right { display: flex; align-items: center; gap: 14px; }
-/* back-btn styles now in site.css */
-.nav-user { display: flex; align-items: center; gap: 8px; color: #fff; font-size: 12px; }
-.avatar { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; }
-.logout-btn { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.2); color: #fff; padding: 5px 11px; border-radius: var(--r); font-size: 11px; cursor: pointer; font-family: var(--sans); transition: background .15s; }
-.logout-btn:hover { background: rgba(255,255,255,.25); }
+/* site-header styles now in site.css */
 
 /* Page layout */
 .page-wrap { max-width: 1200px; margin: 0 auto; padding: 0; }
@@ -257,27 +245,29 @@ body { font-family: var(--sans); background: var(--gray-50); color: var(--text);
 
 <!-- HEADER -->
 <header class="site-header">
-  <div class="header-inner">
-    <a href="/" class="logo">
-      <div class="logo-icon">🏡</div>
+  <div class="inner">
+    <a href="/" class="site-logo">
+      <div class="logo-mark">🏡</div>
       <div class="logo-text">
-        <div class="ln">Homeowner Guide</div>
-        <div class="ls">Communication Templates & Rights</div>
+        <div class="logo-name" data-hoa-name>MMPOAII HOA</div>
+        <div class="logo-sub">Homeowner Guide</div>
       </div>
     </a>
-    <div class="header-nav-right">
-      <a href="/homeowners/index.html" class="back-btn">← Back to Portal</a>
-      <div class="nav-user" style="display: none;" id="nav-user-info">
+    <nav class="site-nav">
+      <div class="nav-user" id="nav-user-info">
         <div class="avatar" id="nav-avatar">H</div>
-        <div style="color: #fff; font-size: 12px;">
-          <div data-user-name style="font-weight: 600;">Loading…</div>
-          <div style="opacity: .7;">Homeowner</div>
+        <div>
+          <div class="uname" data-user-name>Loading…</div>
+          <div class="urole">Homeowner</div>
         </div>
       </div>
-      <button class="logout-btn" onclick="HoaGuard.logout()" style="display: none;" id="logout-visible">Sign Out</button>
-    </div>
+      <button class="logout-btn" onclick="HoaGuard.logout()">Sign Out</button>
+    </nav>
   </div>
 </header>
+
+<!-- PAGE CONTENT -->
+<div id="page-content"><div class="page-wrap">
 
 <!-- PAGE HERO -->
 <div class="welcome-banner">
@@ -289,7 +279,6 @@ body { font-family: var(--sans); background: var(--gray-50); color: var(--text);
 </div>
 
 <!-- MAIN CONTENT -->
-<div class="page-content">
 <div class="guide-layout">
 <div class="guide-main">
 
@@ -1140,6 +1129,7 @@ body { font-family: var(--sans); background: var(--gray-50); color: var(--text);
       <a href="#s-general" class="snav-link">Account &amp; General</a>
     </div>
 </div><!-- /guide-layout -->
+</div><!-- /page-wrap -->
 </div><!-- /page-content -->
 
 <!-- FOOTER -->
