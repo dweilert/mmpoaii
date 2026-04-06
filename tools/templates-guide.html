@@ -18,26 +18,7 @@
 .doc-pink-50  { padding:5px; margin: 5px;width: 50%;background: var(--pink-50) !important; }
 
 /* Page-specific styles */
-.templates-header {
-  background: linear-gradient(135deg, var(--purple-800), var(--purple-600));
-  color: #fff;
-  padding: 32px 28px;
-  margin-bottom: 28px;
-  border-radius: var(--r-xl);
-}
-
-.templates-header h1 {
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-
-.templates-header .th-subtitle {
-  font-size: 14px;
-  opacity: 0.85;
-  max-width: 700px;
-  line-height: 1.6;
-}
+/* welcome-banner styles now in site.css */
 
 /* Two-column layout for main + sticky nav */
 .templates-layout {
@@ -419,11 +400,11 @@
 }
 
 @media (max-width: 768px) {
-  .templates-header {
+  .welcome-banner {
     padding: 20px 16px;
   }
 
-  .templates-header h1 {
+  .welcome-banner h1 {
     font-size: 22px;
   }
 
@@ -531,10 +512,12 @@
 
   <!-- Back link -->
 <!-- Hero section -->
-  <div class="templates-header" style="position:relative">
-    <a href="/board/index.html" class="back-btn" style="position:absolute;top:20px;right:20px">← Back to Portal</a>
-    <h1>Communication Templates Guide</h1>
-    <p class="th-subtitle">Board Member Operational Reference — Complete enforcement sequences, assessment collection procedures, ARC timelines, delivery methods, record retention requirements, and compliance checklists.</p>
+  <div class="welcome-banner">
+    <div class="wb-left">
+      <h2>Communication Templates Guide</h2>
+      <p>Board Member Operational Reference — Complete enforcement sequences, assessment collection procedures, ARC timelines, delivery methods, record retention requirements, and compliance checklists.</p>
+    </div>
+    <a href="/board/index.html" class="back-btn">← Back to Portal</a>
   </div>
 
 

@@ -29,10 +29,7 @@ body { font-family: var(--sans); background: var(--gray-50); color: var(--text);
 .logout-btn:hover { background: rgba(255,255,255,.25); }
 
 /* Page hero */
-.page-hero { background: linear-gradient(135deg, var(--purple-800) 0%, var(--purple-900) 100%); color: #fff; padding: 36px 24px 32px; }
-.page-hero-inner { max-width: 1200px; margin: 0 auto; }
-.page-hero h1 { font-size: 26px; font-weight: 700; margin: 0 0 8px; }
-.page-hero p { font-size: 14px; opacity: .85; margin: 0; max-width: 700px; }
+/* welcome-banner styles now in site.css */
 .source-badge { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25); border-radius: 20px; padding: 5px 12px; font-size: 12px; font-weight: 600; }
 .source-badge span { opacity: .8; font-weight: 400; }
 
@@ -156,8 +153,8 @@ body { font-family: var(--sans); background: var(--gray-50); color: var(--text);
   .terms-grid { grid-template-columns: 1fr; }
   .section-body { padding: 16px; }
   .section-header { padding: 16px; }
-  .page-hero { padding: 24px 16px; }
-  .page-hero h1 { font-size: 22px; }
+  .welcome-banner { padding: 24px 16px; }
+  .welcome-banner h1 { font-size: 22px; }
 }
 @media print {
   .site-header, .section-nav-sidebar, .back-btn, .logout-btn { display: none !important; }
@@ -190,14 +187,13 @@ body { font-family: var(--sans); background: var(--gray-50); color: var(--text);
 </header>
 
 <!-- PAGE HERO -->
-<div class="page-hero">
-  <div class="page-hero-inner">
-    <h1>Assessment Payment Plan</h1>
+<div class="welcome-banner" style="max-width:1200px;margin:0 auto 28px">
+  <div class="wb-left">
+    <h2>Assessment Payment Plan</h2>
     <p>Your right to a structured payment arrangement before the Association may file an assessment lien — defined in the CC&Rs and required by Texas law.</p>
-    <div class="source-badge">
-      📋 CC&Rs Art. IV § 14 <span>· Texas Property Code § 209.0093</span>
-    </div>
+    <div style="margin-top:8px;font-size:12px;opacity:.7">📋 CC&Rs Art. IV § 14 · Texas Property Code § 209.0093</div>
   </div>
+  <a href="/homeowners/" class="back-btn">← Back to Portal</a>
 </div>
 
 <!-- MAIN LAYOUT -->
