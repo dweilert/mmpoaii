@@ -13,7 +13,7 @@
   --purple-50:#EEEDFE;--purple-100:#CECBF6;--purple-200:#AFA9EC;--purple-600:#534AB7;--purple-800:#3C3489;
   --amber-50:#FAEEDA;--amber-100:#FAC775;--amber-400:#BA7517;--amber-600:#854F0B;
   --coral-50:#FAECE7;--coral-100:#F5C4B3;--coral-600:#993C1D;
-  --teal-50:#E1F5EE;--teal-100:#9FE1CB;--teal-600:#0F6E56;
+  --teal-50:#EEEDFE;--teal-100:#CECBF6;--teal-600:#534AB7;
   --pink-50:#FBEAF0;--pink-100:#F4C0D1;--pink-600:#993556;
   --red-50:#FCEBEB;--red-100:#F7C1C1;--red-600:#A32D2D;
   --text-primary:#1a1a1a;--text-secondary:#555;--text-muted:#888;
@@ -21,8 +21,8 @@
   --bg:#f9f8f5;--surface:#ffffff;--surface-alt:#f3f2ed;
   --radius-sm:6px;--radius-md:8px;--radius-lg:12px
 }
-.back-to-portal{display:inline-flex;align-items:center;gap:6px;margin-top:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.85);padding:5px 14px;border-radius:20px;font-size:12px;text-decoration:none;transition:background .15s;font-family:inherit}
-.back-to-portal:hover{background:rgba(255,255,255,.22);color:#fff}
+.back-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;padding:7px 14px;border-radius:var(--radius-md);font-size:12.5px;text-decoration:none;transition:background .15s;font-family:inherit;white-space:nowrap;cursor:pointer}
+.back-btn:hover{background:rgba(255,255,255,.22);color:#fff}
 @media(prefers-color-scheme:dark){
   :root{
     --text-primary:#e8e6df;--text-secondary:#aaa;--text-muted:#666;
@@ -34,7 +34,7 @@
     --purple-50:#1a1830;--purple-100:#2d2a52;--purple-200:#3d3870;
     --amber-50:#2a2010;--amber-100:#3d2f10;
     --coral-50:#2a1810;--coral-100:#3d2210;
-    --teal-50:#0a1f18;--teal-100:#143328;
+    --teal-50:#1a1828;--teal-100:#2a2545;
     --pink-50:#250d18;--pink-100:#3d1628;
     --red-50:#1f0d0d;--red-100:#3a1818
   }
@@ -42,7 +42,7 @@
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text-primary);line-height:1.5;font-size:14px}
 
 /* HEADER */
-.page-header{background:var(--purple-800);color:#fff;padding:20px 28px 18px;border-bottom:3px solid var(--purple-600)}
+.page-header{background:var(--purple-800);color:#fff;padding:20px 28px 18px;border-bottom:3px solid var(--purple-600);position:relative}
 .page-header h1{font-size:20px;font-weight:600;letter-spacing:-.3px}
 .page-header p{font-size:12px;opacity:.7;margin-top:5px}
 .page-header .sub{font-size:11px;opacity:.5;margin-top:3px}
@@ -157,7 +157,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   <h1>Texas HOA Law — Complete Legal Structure &amp; Relationships <span class="version-badge">v2.0</span></h1>
   <p>An interactive reference map for homeowners, board members, and property managers</p>
   <p class="sub">Click any box to learn more &nbsp;·&nbsp; Use the search box in the right panel &nbsp;·&nbsp; For informational purposes only — not legal advice. Verify with a licensed Texas attorney.</p>
-  <a href="#" id="back-link" class="back-to-portal">← Back to Portal</a>
+  <a href="#" id="back-link" class="back-btn" style="position:absolute;top:20px;right:28px">← Back to Portal</a>
 </div>
 
 <div class="main">
