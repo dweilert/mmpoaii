@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Texas HOA Law Structure — Complete Interactive Reference</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue-50:#E6F1FB;--blue-100:#B5D4F4;--blue-200:#85B7EB;--blue-600:#185FA5;--blue-800:#0C447C;
+  --green-50:#EAF3DE;--green-100:#C0DD97;--green-600:#3B6D11;--green-800:#27500A;
+  --gray-50:#F1EFE8;--gray-100:#D3D1C7;--gray-400:#888780;--gray-600:#5F5E5A;
+  --purple-50:#EEEDFE;--purple-100:#CECBF6;--purple-200:#AFA9EC;--purple-600:#534AB7;--purple-800:#3C3489;
+  --amber-50:#FAEEDA;--amber-100:#FAC775;--amber-400:#BA7517;--amber-600:#854F0B;
+  --coral-50:#FAECE7;--coral-100:#F5C4B3;--coral-600:#993C1D;
+  --teal-50:#E1F5EE;--teal-100:#9FE1CB;--teal-600:#0F6E56;
+  --pink-50:#FBEAF0;--pink-100:#F4C0D1;--pink-600:#993556;
+  --red-50:#FCEBEB;--red-100:#F7C1C1;--red-600:#A32D2D;
+  --text-primary:#1a1a1a;--text-secondary:#555;--text-muted:#888;
+  --border:#d0cfc8;--border-light:#e8e7e0;
+  --bg:#f9f8f5;--surface:#ffffff;--surface-alt:#f3f2ed;
+  --radius-sm:6px;--radius-md:8px;--radius-lg:12px
+}
+.back-to-portal{display:inline-flex;align-items:center;gap:6px;margin-top:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.85);padding:5px 14px;border-radius:20px;font-size:12px;text-decoration:none;transition:background .15s;font-family:inherit}
+.back-to-portal:hover{background:rgba(255,255,255,.22);color:#fff}
+@media(prefers-color-scheme:dark){
+  :root{
+    --text-primary:#e8e6df;--text-secondary:#aaa;--text-muted:#666;
+    --border:#3a3936;--border-light:#2e2d2a;
+    --bg:#1a1918;--surface:#232220;--surface-alt:#2a2927;
+    --blue-50:#0c2035;--blue-100:#1a3a5c;
+    --green-50:#0d2010;--green-100:#1a3c1e;
+    --gray-50:#1e1d1a;--gray-100:#2e2d2a;
+    --purple-50:#1a1830;--purple-100:#2d2a52;--purple-200:#3d3870;
+    --amber-50:#2a2010;--amber-100:#3d2f10;
+    --coral-50:#2a1810;--coral-100:#3d2210;
+    --teal-50:#0a1f18;--teal-100:#143328;
+    --pink-50:#250d18;--pink-100:#3d1628;
+    --red-50:#1f0d0d;--red-100:#3a1818
+  }
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text-primary);line-height:1.5;font-size:14px}
+
+/* HEADER */
+.page-header{background:var(--purple-800);color:#fff;padding:20px 28px 18px;border-bottom:3px solid var(--purple-600)}
+.page-header h1{font-size:20px;font-weight:600;letter-spacing:-.3px}
+.page-header p{font-size:12px;opacity:.7;margin-top:5px}
+.page-header .sub{font-size:11px;opacity:.5;margin-top:3px}
+.version-badge{display:inline-block;background:rgba(255,255,255,.15);border-radius:20px;padding:2px 10px;font-size:10px;margin-left:10px;vertical-align:middle}
+
+/* LAYOUT */
+.main{display:flex;height:calc(100vh - 100px)}
+.diagram-col{flex:1 1 0;overflow-y:auto;padding:16px 14px 40px;border-right:1px solid var(--border)}
+.detail-col{width:350px;flex-shrink:0;overflow-y:auto;background:var(--surface);padding:18px 16px}
+
+/* LAYERS */
+.layer-wrap{margin-bottom:5px}
+.layer-label{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;padding-left:2px;display:flex;align-items:center;gap:6px}
+.layer-label .count{background:var(--surface-alt);border-radius:20px;padding:1px 6px;font-size:9px;color:var(--text-muted)}
+.layer{border-radius:var(--radius-lg);border:1px solid var(--border);padding:8px}
+.layer.federal{background:var(--blue-50);border-color:var(--blue-100)}
+.layer.constitution{background:var(--green-50);border-color:var(--green-100)}
+.layer.codes{background:var(--gray-50);border-color:var(--gray-100)}
+.layer.title11{background:var(--purple-50);border-color:var(--purple-100)}
+.layer.title5{background:var(--teal-50);border-color:var(--teal-100)}
+.layer.other-tx{background:var(--pink-50);border-color:var(--pink-100)}
+.layer.hoadocs{background:var(--amber-50);border-color:var(--amber-100)}
+
+/* GRIDS */
+.grid{display:grid;gap:5px}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:1fr 1fr 1fr}
+.g4{grid-template-columns:1fr 1fr 1fr 1fr}
+.g5{grid-template-columns:1fr 1fr 1fr 1fr 1fr}
+.mt4{margin-top:5px}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border-light);border-radius:var(--radius-md);padding:7px 9px;cursor:pointer;transition:border-color .15s,box-shadow .15s;user-select:none}
+.card:hover{border-color:var(--purple-600);box-shadow:0 1px 5px rgba(83,74,183,.1)}
+.card.active{border-color:var(--purple-600);border-width:2px;background:var(--purple-50)}
+.card .cn{font-size:11px;font-weight:600;color:var(--text-primary)}
+.card .cs{font-size:10.5px;color:var(--text-secondary);margin-top:2px;line-height:1.4}
+.badge{display:inline-block;font-size:9.5px;padding:1px 7px;border-radius:20px;margin-top:4px;font-weight:500}
+.b-fed{background:var(--blue-50);color:var(--blue-600);border:1px solid var(--blue-100)}
+.b-const{background:var(--green-50);color:var(--green-600);border:1px solid var(--green-100)}
+.b-all{background:var(--teal-50);color:var(--teal-600);border:1px solid var(--teal-100)}
+.b-condo{background:var(--coral-50);color:var(--coral-600);border:1px solid var(--coral-100)}
+.b-disc{background:var(--amber-50);color:var(--amber-600);border:1px solid var(--amber-100)}
+.b-core{background:var(--purple-50);color:var(--purple-800);border:1px solid var(--purple-100)}
+.b-lien{background:var(--teal-50);color:var(--teal-600);border:1px solid var(--teal-100)}
+.b-limit{background:var(--red-50);color:var(--red-600);border:1px solid var(--red-100)}
+.b-county{background:var(--gray-50);color:var(--gray-600);border:1px solid var(--gray-100)}
+
+/* CH209 INNER BOX */
+.ch209-box{border:2px solid var(--purple-600);border-radius:var(--radius-md);padding:7px 9px;margin:5px 0;background:var(--surface)}
+.ch209-title{font-size:10px;font-weight:600;color:var(--purple-800);margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.ch209-title::before{content:'★';font-size:11px}
+.ch209-inner .card{border-color:var(--purple-200)}
+.ch209-inner .card:hover{border-color:var(--purple-600)}
+.ch209-inner .card.active{border-color:var(--purple-600);background:var(--purple-50)}
+
+/* ARROWS */
+.arrow-row{display:flex;align-items:center;justify-content:center;gap:7px;padding:2px 0;color:var(--text-muted);font-size:10px;font-style:italic}
+.arrow-row svg{flex-shrink:0}
+
+/* DETAIL PANEL */
+.detail-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:calc(100% - 40px);color:var(--text-muted);text-align:center;padding:20px;gap:10px}
+.detail-placeholder p{font-size:12px;line-height:1.6}
+.detail-content{display:none}
+.detail-content.visible{display:block}
+.detail-layer-tag{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--purple-600);margin-bottom:8px;display:block}
+.detail-content h2{font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:8px;line-height:1.4}
+.detail-content p{font-size:12px;color:var(--text-secondary);line-height:1.7;margin-bottom:10px}
+.detail-content h3{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px}
+.rels{display:flex;flex-direction:column;gap:4px}
+.rel-item{font-size:11.5px;color:var(--text-secondary);background:var(--surface-alt);border-radius:var(--radius-sm);padding:5px 9px;border-left:3px solid var(--purple-200);line-height:1.4}
+
+/* SEARCH */
+.search-wrap{margin-bottom:14px}
+#search{width:100%;padding:7px 10px;font-size:12px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--surface);color:var(--text-primary)}
+#search:focus{outline:none;border-color:var(--purple-600)}
+.search-results{margin-top:8px;display:none;flex-direction:column;gap:3px}
+.search-result{padding:6px 10px;border-radius:var(--radius-sm);background:var(--surface-alt);cursor:pointer;font-size:12px;color:var(--text-secondary)}
+.search-result:hover{background:var(--purple-50);color:var(--purple-800)}
+.search-result strong{color:var(--text-primary)}
+
+/* LEGEND */
+.legend{display:flex;flex-wrap:wrap;gap:8px;padding:9px 14px;border-top:1px solid var(--border);background:var(--surface);font-size:10.5px;color:var(--text-muted)}
+.leg{display:flex;align-items:center;gap:4px}
+.leg-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.leg-note{margin-left:auto;font-style:italic;color:var(--text-muted);font-size:10px}
+
+/* SECTION DIVIDER */
+.sec-div{font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--purple-600);padding:3px 4px 2px;margin-top:4px;margin-bottom:2px;border-bottom:1px solid var(--purple-100)}
+
+@media(max-width:900px){
+  .main{flex-direction:column;height:auto}
+  .detail-col{width:100%;border-top:1px solid var(--border)}
+  .g4,.g5{grid-template-columns:1fr 1fr}
+  .diagram-col{border-right:none}
+}
+@media(max-width:580px){
+  .g3,.g4,.g5{grid-template-columns:1fr 1fr}
+  .g2{grid-template-columns:1fr}
+}
+@media print{
+  .main{height:auto;flex-direction:column}
+  .detail-col{display:none}
+  .diagram-col{overflow:visible;border:none;padding:8px}
+  .card.active{border-color:var(--border-light)!important;background:var(--surface)!important}
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Texas HOA Law — Complete Legal Structure &amp; Relationships <span class="version-badge">v2.0</span></h1>
+  <p>An interactive reference map for homeowners, board members, and property managers</p>
+  <p class="sub">Click any box to learn more &nbsp;·&nbsp; Use the search box in the right panel &nbsp;·&nbsp; For informational purposes only — not legal advice. Verify with a licensed Texas attorney.</p>
+  <a href="#" id="back-link" class="back-to-portal">← Back to Portal</a>
+</div>
+
+<div class="main">
+<!-- ═══ LEFT DIAGRAM ════════════════════════════════════════ -->
+<div class="diagram-col">
+
+  <!-- FEDERAL -->
+  <div class="layer-wrap">
+    <div class="layer-label">Federal law — overrides all state and local rules <span class="count">6 provisions</span></div>
+    <div class="layer federal">
+      <div class="grid g3">
+        <div class="card" onclick="show(this,'fha')"><div class="cn">Fair Housing Act (FHA)</div><div class="cs">Anti-discrimination in housing &amp; HOA rule enforcement. Cannot be waived by any CC&R.</div><span class="badge b-fed">Federal</span></div>
+        <div class="card" onclick="show(this,'fdcpa')"><div class="cn">FDCPA (15 U.S.C. §1692)</div><div class="cs">Limits third-party collectors hired by HOA. Debt validation, no harassment, no false statements.</div><span class="badge b-fed">Federal</span></div>
+        <div class="card" onclick="show(this,'ada')"><div class="cn">ADA / FHA Amendments Act</div><div class="cs">Reasonable accommodation for disability — overrides CC&R provisions that deny access.</div><span class="badge b-fed">Federal</span></div>
+        <div class="card" onclick="show(this,'bkcy')"><div class="cn">Bankruptcy Code (11 U.S.C.)</div><div class="cs">Automatic stay immediately halts all HOA collection, lien enforcement &amp; foreclosure.</div><span class="badge b-fed">Federal</span></div>
+        <div class="card" onclick="show(this,'scra')"><div class="cn">Servicemembers Civil Relief Act (SCRA)</div><div class="cs">Active-duty military receive foreclosure &amp; collection protections. HOA must halt proceedings.</div><span class="badge b-fed">Federal</span></div>
+        <div class="card" onclick="show(this,'scm')"><div class="cn">Secretary of State / IRS</div><div class="cs">HOA non-profit incorporation with TX Secretary of State; IRS 501(c)(4) tax-exempt status.</div><span class="badge b-fed">Federal/State</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow-row"><svg width="12" height="18" viewBox="0 0 12 18"><path d="M6 0L6 11M2 8L6 16L10 8" stroke="#aaa" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>sets a floor — Texas law cannot go below this</div>
+
+  <!-- TEXAS CONSTITUTION -->
+  <div class="layer-wrap">
+    <div class="layer-label">Texas Constitution — foundational state protections <span class="count">3 provisions</span></div>
+    <div class="layer constitution">
+      <div class="grid g3">
+        <div class="card" onclick="show(this,'homestead')"><div class="cn">Art. XVI §50 — Homestead Protection</div><div class="cs">HOA must get a court order to foreclose on a homestead. Direct source of §209.0092.</div><span class="badge b-const">TX Constitution</span></div>
+        <div class="card" onclick="show(this,'dueprocess')"><div class="cn">Art. I §19 — Due Course of Law</div><div class="cs">No property deprivation without due process. Constitutional basis for all §209.006 notice requirements.</div><span class="badge b-const">TX Constitution</span></div>
+        <div class="card" onclick="show(this,'txart1s17')"><div class="cn">Art. I §17 — Taking of Property</div><div class="cs">Private property shall not be taken for public use without just compensation. Limits HOA easement authority.</div><span class="badge b-const">TX Constitution</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow-row"><svg width="12" height="18" viewBox="0 0 12 18"><path d="M6 0L6 11M2 8L6 16L10 8" stroke="#aaa" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>state statutes must conform to the constitution</div>
+
+  <!-- OTHER TX STATUTES — BOC, FINANCE, ELECTIONS, GOV CODE -->
+  <div class="layer-wrap">
+    <div class="layer-label">Other Texas statutes — cross-cutting rules that also apply to HOAs <span class="count">8 provisions</span></div>
+    <div class="layer codes">
+      <div class="sec-div">Corporate, Tax &amp; Debt Collection</div>
+      <div class="grid g4">
+        <div class="card" onclick="show(this,'boc22')"><div class="cn">Bus. Org. Code Ch. 22</div><div class="cs">Non-profit corp law. Board fiduciary duties, liability protection, corporate formalities.</div><span class="badge b-all">All HOAs</span></div>
+        <div class="card" onclick="show(this,'boc251')"><div class="cn">Bus. Org. Code Ch. 251</div><div class="cs">Texas Cooperative Association Act. Governs co-ops that function like HOAs but are structured as cooperatives.</div><span class="badge b-all">Co-ops</span></div>
+        <div class="card" onclick="show(this,'tdca')"><div class="cn">Finance Code Ch. 392 (TDCA)</div><div class="cs">Texas Debt Collection Act. Applies alongside FDCPA to HOA management companies and in-house collection.</div><span class="badge b-all">All HOAs</span></div>
+        <div class="card" onclick="show(this,'taxcode')"><div class="cn">Tax Code §11.13 / §11.28</div><div class="cs">Homestead tax exemption reduces taxable value — relevant to HOA foreclosure analysis. HOA non-profit tax exemption.</div><span class="badge b-all">All Owners</span></div>
+      </div>
+      <div class="sec-div mt4">Government Transparency &amp; Political Rights</div>
+      <div class="grid g4">
+        <div class="card" onclick="show(this,'govopen')"><div class="cn">Gov. Code Ch. 551 — Open Meetings</div><div class="cs">Open Meetings Act. §209.0051 carves out large HOAs governed by §552.0036. Rarely applies but important when it does.</div><span class="badge b-limit">Large HOAs only</span></div>
+        <div class="card" onclick="show(this,'govpub')"><div class="cn">Gov. Code Ch. 552 — Public Info Act</div><div class="cs">§209.005 carves out HOAs subject to §552.0036. HOAs meeting that threshold become quasi-public bodies.</div><span class="badge b-limit">Large HOAs only</span></div>
+        <div class="card" onclick="show(this,'elec259')"><div class="cn">Election Code §259.002</div><div class="cs">HOA cannot prohibit political signs from 90 days before to 10 days after an election. Works with §202.009.</div><span class="badge b-all">All HOAs</span></div>
+        <div class="card" onclick="show(this,'trec')"><div class="cn">Occ. Code / TREC Rules</div><div class="cs">TREC caps resale cert fees ($375 cert / $75 update) and publishes official forms for Ch. 207 compliance.</div><span class="badge b-disc">Disclosure</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow-row"><svg width="12" height="18" viewBox="0 0 12 18"><path d="M6 0L6 11M2 8L6 16L10 8" stroke="#aaa" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>litigation, limitations &amp; remedies available alongside Property Code rights</div>
+
+  <!-- CIVIL PRACTICE & REMEDIES + LOCAL GOV -->
+  <div class="layer-wrap">
+    <div class="layer-label">Texas Civil Practice &amp; Remedies Code + Local Gov. Code — enforcement &amp; procedure <span class="count">5 provisions</span></div>
+    <div class="layer other-tx">
+      <div class="grid g5">
+        <div class="card" onclick="show(this,'cprc16')"><div class="cn">CPRC §16.035</div><div class="cs">4-year statute of limitations on real property liens — HOA has 4 years to foreclose before the lien expires.</div><span class="badge b-limit">Limitations</span></div>
+        <div class="card" onclick="show(this,'cprc65')"><div class="cn">CPRC Ch. 65 — Injunctions</div><div class="cs">TRO / Temporary Injunction to stop a wrongful foreclosure sale. Homeowner's fastest emergency legal tool.</div><span class="badge b-limit">Remedies</span></div>
+        <div class="card" onclick="show(this,'cprc154')"><div class="cn">CPRC Ch. 154 — ADR</div><div class="cs">Alternative Dispute Resolution framework. §209.007 references ADR — this chapter sets the rules and procedures.</div><span class="badge b-all">All Disputes</span></div>
+        <div class="card" onclick="show(this,'cprcatty')"><div class="cn">CPRC Ch. 38 — Attorney's Fees</div><div class="cs">Statutory basis for recovering attorney's fees in contract &amp; property disputes. Supplements §209.008.</div><span class="badge b-all">Litigation</span></div>
+        <div class="card" onclick="show(this,'lgc')"><div class="cn">Local Gov. Code §§192–193</div><div class="cs">County clerk recording requirements. Liens and dedicatory instruments must be properly recorded here to be legally effective.</div><span class="badge b-county">County Clerks</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow-row"><svg width="12" height="18" viewBox="0 0 12 18"><path d="M6 0L6 11M2 8L6 16L10 8" stroke="#aaa" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>all layers above set the outer limits for Texas Property Code</div>
+
+  <!-- TITLE 5 — LIENS & HOMESTEAD -->
+  <div class="layer-wrap">
+    <div class="layer-label">Texas Property Code — Title 5 (Exempt Property &amp; Liens) — lien mechanics <span class="count">2 chapters</span></div>
+    <div class="layer title5">
+      <div class="grid g2">
+        <div class="card" onclick="show(this,'pc41')"><div class="cn">Ch. 41 — Homestead Exemptions</div><div class="cs">Property Code definition of "homestead." Implements Art. XVI §50 in statute form. Defines what qualifies for homestead foreclosure protection under §209.0092.</div><span class="badge b-lien">Homestead</span></div>
+        <div class="card" onclick="show(this,'pc51')"><div class="cn">Ch. 51 — Lien Foreclosure Procedures</div><div class="cs">The actual mechanics of non-judicial foreclosure: courthouse-steps sale, posting &amp; filing of notice, trustee sale rules. Used by HOAs after a §209.0092 court order authorizes the sale.</div><span class="badge b-lien">Foreclosure Mechanics</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow-row"><svg width="12" height="18" viewBox="0 0 12 18"><path d="M6 0L6 11M2 8L6 16L10 8" stroke="#aaa" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>Title 11 builds on the lien and homestead framework established in Title 5</div>
+
+  <!-- TITLE 11 -->
+  <div class="layer-wrap">
+    <div class="layer-label">Texas Property Code — Title 11 (Restrictive Covenants) — the HOA-specific statutes <span class="count">15+ chapters</span></div>
+    <div class="layer title11">
+
+      <div class="sec-div">Foundational chapters — apply broadly across subdivisions</div>
+      <div class="grid g5">
+        <div class="card" onclick="show(this,'ch201')"><div class="cn">Ch. 201 — Definitions</div><div class="cs">Dictionary for all of Title 11. Defines "restrictions" and "subdivision."</div><span class="badge b-core">Foundation</span></div>
+        <div class="card" onclick="show(this,'ch202')"><div class="cn">★ Ch. 202 — Restrictive Covenants</div><div class="cs">Applies to ALL Texas subdivisions. Defines dedicatory instrument. Requires county recordation. Prohibits many restrictive covenant types.</div><span class="badge b-all">Applies to all</span></div>
+        <div class="card" onclick="show(this,'ch203')"><div class="cn">Ch. 203 — Certain Counties</div><div class="cs">Land use restriction enforcement in specific Texas counties. Supplements Ch. 202 in those jurisdictions.</div><span class="badge b-county">Select Counties</span></div>
+        <div class="card" onclick="show(this,'ch204')"><div class="cn">Ch. 204 — Assessment Powers</div><div class="cs">Assessment authority for subdivisions outside Ch. 209. Defines "regular" and "special" assessment used by Ch. 207.</div><span class="badge b-core">Assessments</span></div>
+        <div class="card" onclick="show(this,'ch205')"><div class="cn">Ch. 205 — Revised Subdivisions</div><div class="cs">Restrictive covenants applicable to revised or replatted subdivisions in certain counties.</div><span class="badge b-county">Select Counties</span></div>
+      </div>
+      <div class="grid g5 mt4">
+        <div class="card" onclick="show(this,'ch206')"><div class="cn">Ch. 206 — Extension of Restrictions</div><div class="cs">Extends restrictions imposing regular assessments in certain subdivisions. Prevents restriction expiration.</div><span class="badge b-core">Extensions</span></div>
+        <div class="card" onclick="show(this,'ch207')"><div class="cn">★ Ch. 207 — Disclosure / Resale</div><div class="cs">Required on every home sale. HOA must deliver CC&Rs, bylaws, rules &amp; resale certificate within 10 business days.</div><span class="badge b-disc">Disclosure</span></div>
+        <div class="card" onclick="show(this,'ch208')"><div class="cn">Ch. 208 — Historic Neighborhoods</div><div class="cs">Amendment and termination of restrictive covenants in designated historic neighborhoods. Special procedures apply.</div><span class="badge b-county">Historic Areas</span></div>
+        <div class="card" onclick="show(this,'ch210')"><div class="cn">Ch. 210 — Covenant Extension by Petition</div><div class="cs">Allows residential covenant extension or modification through petition process in certain subdivisions.</div><span class="badge b-core">Extensions</span></div>
+        <div class="card" onclick="show(this,'ch211')"><div class="cn">Ch. 211 — Certain Subdivision Restrictions</div><div class="cs">Amendment and enforcement of restrictions in certain subdivisions. Supplement to Ch. 209 in those cases.</div><span class="badge b-core">Amendments</span></div>
+      </div>
+
+      <!-- CH. 209 INNER BOX -->
+      <div class="ch209-box">
+        <div class="ch209-title">Chapter 209 — Texas Residential Property Owners Protection Act (single-family HOAs only)</div>
+        <div class="grid g4 ch209-inner">
+          <div class="card" onclick="show(this,'ch209gov')"><div class="cn">§§209.002–.0051</div><div class="cs">Governance: Definitions, Applicability, Management Cert., Records Access, Open Meetings</div></div>
+          <div class="card" onclick="show(this,'ch209enforce')"><div class="cn">§§209.006–.008</div><div class="cs">Enforcement: Pre-Action Notice, Hearing Rights, Fine Policy, Attorney's Fees</div></div>
+          <div class="card" onclick="show(this,'ch209collect')"><div class="cn">§§209.0061–.0065</div><div class="cs">Collection: Fine Schedules, Payment Plans (min. 3 months), Lien Priority, Credit Reporting</div></div>
+          <div class="card" onclick="show(this,'ch209fore')"><div class="cn">§§209.009–.011</div><div class="cs">Foreclosure: Restrictions, Judicial Requirement (homestead), 180-day Redemption Right</div></div>
+          <div class="card" onclick="show(this,'ch209vote')"><div class="cn">§§209.0055–.00594</div><div class="cs">Voting &amp; Elections: Ballots, Board Membership, Quorum, Recount Rights, Vote Transparency</div></div>
+          <div class="card" onclick="show(this,'ch209arc')"><div class="cn">§209.00505</div><div class="cs">Architectural Review: Written denials required; reasons must be stated; right to appeal to board</div></div>
+          <div class="card" onclick="show(this,'ch209lien')"><div class="cn">§209.0094</div><div class="cs">Assessment Lien Filing: How and when a lien can be filed; notice required; prompt release on payment</div></div>
+          <div class="card" onclick="show(this,'ch209ops')"><div class="cn">§§209.012–.017</div><div class="cs">Operations: Easements, Amendments, Forced Elections, Rental Limits, Land Use, Justice Court Jurisdiction</div></div>
+        </div>
+      </div>
+
+      <div class="sec-div mt4">Condominium chapters — parallel to Ch. 209 but for condos</div>
+      <div class="grid g3">
+        <div class="card" onclick="show(this,'ch82')"><div class="cn">Ch. 82 — TUCA (condos post-Jan 1, 1994)</div><div class="cs">Texas Uniform Condominium Act. Ch. 209 equivalent for condos. §82.157 = condo resale certificate. §82.1141 = condo records access.</div><span class="badge b-condo">Condos post-1994</span></div>
+        <div class="card" onclick="show(this,'ch81')"><div class="cn">Ch. 81 — Original Condo Act (pre-1994)</div><div class="cs">Older law for condos with pre-1994 declarations. Less comprehensive than TUCA. Ch. 202 still applies.</div><span class="badge b-condo">Condos pre-1994</span></div>
+        <div class="card" onclick="show(this,'ch5ch12')"><div class="cn">Ch. 5 (Conveyances) &amp; Ch. 12 (Recording)</div><div class="cs">Foundational property law. Deed restriction contract law (Ch. 5) and county deed records recording rules (Ch. 12) that make HOA documents legally effective.</div><span class="badge b-core">Foundation</span></div>
+      </div>
+
+    </div><!-- /title11 -->
+  </div>
+
+  <div class="arrow-row"><svg width="12" height="18" viewBox="0 0 12 18"><path d="M6 0L6 11M2 8L6 16L10 8" stroke="#aaa" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>all statutes above set limits for these HOA-specific governing documents</div>
+
+  <!-- HOA DOCS -->
+  <div class="layer-wrap">
+    <div class="layer-label">HOA governing documents — your community's own rulebook (most specific layer) <span class="count">4 documents</span></div>
+    <div class="layer hoadocs">
+      <div class="grid g4">
+        <div class="card" onclick="show(this,'plat')"><div class="cn">Subdivision Plat</div><div class="cs">Recorded survey map. Defines lots, common areas, easements, setbacks. The first dedicatory instrument.</div></div>
+        <div class="card" onclick="show(this,'ccrs')"><div class="cn">CC&Rs / Declaration</div><div class="cs">Founding community contract. Sets assessments, restrictions, interest rates. Must be filed under §202.006.</div></div>
+        <div class="card" onclick="show(this,'bylaws')"><div class="cn">Bylaws</div><div class="cs">Internal operating manual: meetings, elections, board powers. Must conform to Ch. 209 &amp; BOC Ch. 22.</div></div>
+        <div class="card" onclick="show(this,'rules')"><div class="cn">Rules &amp; Regulations</div><div class="cs">Day-to-day rules. Must be adopted via §209.0041 process. Fine schedule required by §209.0061 lives here.</div></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /diagram-col -->
+
+<!-- ═══ RIGHT DETAIL PANEL ══════════════════════════════ -->
+<div class="detail-col">
+
+  <div class="search-wrap">
+    <input type="text" id="search" placeholder="Search laws, sections, topics..." oninput="doSearch(this.value)">
+    <div class="search-results" id="search-results"></div>
+  </div>
+
+  <div class="detail-placeholder" id="placeholder">
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="16" stroke="#ccc" stroke-width="1.5"/><path d="M18 10v10M18 24v1" stroke="#ccc" stroke-width="2" stroke-linecap="round"/></svg>
+    <p>Click any box in the diagram to see a plain-language explanation and its connections to other laws.<br><br>Or use the search box above to find a specific law or topic.</p>
+  </div>
+
+  <div class="detail-content" id="detail-content">
+    <span class="detail-layer-tag" id="d-layer"></span>
+    <h2 id="d-title"></h2>
+    <p id="d-body"></p>
+    <h3>Cross-references &amp; connections</h3>
+    <div class="rels" id="d-rels"></div>
+  </div>
+
+</div>
+</div><!-- /main -->
+
+<div class="legend">
+  <div class="leg"><div class="leg-dot" style="background:#B5D4F4"></div>Federal law</div>
+  <div class="leg"><div class="leg-dot" style="background:#C0DD97"></div>TX Constitution</div>
+  <div class="leg"><div class="leg-dot" style="background:#D3D1C7"></div>Other TX statutes</div>
+  <div class="leg"><div class="leg-dot" style="background:#F4C0D1"></div>CPRC + Local Gov. Code</div>
+  <div class="leg"><div class="leg-dot" style="background:#9FE1CB"></div>TX Prop. Code Title 5 (Liens)</div>
+  <div class="leg"><div class="leg-dot" style="background:#CECBF6"></div>TX Prop. Code Title 11</div>
+  <div class="leg"><div class="leg-dot" style="background:#AFA9EC;border:1.5px solid #534AB7"></div>Chapter 209 sub-sections</div>
+  <div class="leg"><div class="leg-dot" style="background:#FAC775"></div>HOA governing documents</div>
+  <div class="leg-note">v2.0 — Updated with Ch. 41, Ch. 51, CPRC, Election Code §259, SCRA, Gov. Code Ch. 551/552 &amp; full Title 11 inventory</div>
+</div>
+
+<script>
+const DATA = {
+  fha:{layer:'Federal Law',title:'Fair Housing Act (42 U.S.C. §3604)',body:'Prohibits HOAs from enforcing rules that discriminate based on race, color, religion, sex, national origin, disability, or familial status. A rule that seems neutral but produces a discriminatory effect ("disparate impact") can still violate the FHA. HOAs must make reasonable accommodations for residents with disabilities — for example, allowing a wheelchair ramp, service animal, or reserved parking space even if the CC&Rs do not expressly permit it.',rels:['Overrides conflicting CC&R provisions — no HOA opt-out','Applies to enforcement of §209.006 fines and §209.00505 ARC decisions','Reasonable accommodation must be granted even without a CC&R provision allowing it','Violations: HUD complaint, private lawsuit, actual + punitive damages','Disparate impact claims do not require proof of discriminatory intent']},
+  fdcpa:{layer:'Federal Law',title:'FDCPA — Fair Debt Collection Practices Act (15 U.S.C. §1692)',body:'When an HOA hires a third-party collection firm or attorney to collect unpaid assessments, that party is a "debt collector" under the FDCPA. They cannot harass, make false statements, or use unfair practices. The law requires a written debt validation notice within 5 days of first contact and prohibits contact at inconvenient times. Works alongside Texas Finance Code §392 (TDCA). The FDCPA applies to third-party collectors; the TDCA may apply to the HOA itself.',rels:['Applies to third-party collectors hired under §209.0064','Works alongside TX Finance Code Ch. 392 (TDCA)','Requires debt validation notice within 5 days of first contact','Violations: actual damages + up to $1,000 statutory damages + attorney\'s fees','Does NOT apply to the HOA itself collecting its own debt (that\'s TDCA)']},
+  ada:{layer:'Federal Law',title:'ADA / Fair Housing Amendments Act',body:'The Fair Housing Amendments Act of 1988 extended civil rights protections to housing. HOAs must provide reasonable accommodations (policy changes) and allow reasonable modifications (physical changes) for residents with disabilities. An HOA cannot refuse to allow a wheelchair ramp, grab bar, or emotional support animal based solely on CC&R provisions that prohibit alterations or pets. Cost of modifications is generally borne by the resident requesting them.',rels:['Overrides CC&R provisions that deny disability accommodations','Affects every §209.00505 architectural review decision involving disability','Cannot be waived by any HOA document at any level','FHA "reasonable accommodation" is a request for rule change; "modification" is a physical change','Distinct from ADA Title III (public accommodation) — FHA Amendments govern HOAs']},
+  bkcy:{layer:'Federal Law',title:'U.S. Bankruptcy Code (11 U.S.C.)',body:'When a homeowner files for bankruptcy, an automatic stay (§362) immediately halts all HOA collection — liens, foreclosures, lawsuits, phone calls. The HOA must file a proof of claim for pre-petition debt. Post-petition assessments (dues accruing after filing) may be treated as administrative expenses and have different priority. Chapter 13 allows homeowners to cure HOA arrearage over a 3-5 year plan, which can halt a pending foreclosure.',rels:['Automatically stays any §209.009 foreclosure proceeding — no exceptions','Automatically stays §209.0094 lien enforcement and all collection calls','HOA must file proof of claim for all pre-petition assessments','Chapter 13 allows cure of HOA arrearage — can permanently stop foreclosure','Post-petition dues may be recoverable as administrative expenses in Ch. 7']},
+  scra:{layer:'Federal Law',title:'Servicemembers Civil Relief Act (50 U.S.C. §3901 et seq.)',body:'Provides important protections for active-duty military members. An HOA generally cannot foreclose on the property of an active-duty servicemember without a court order, regardless of whether the property would otherwise qualify for non-judicial foreclosure. Interest rates on pre-service debt may be capped at 6%. HOA boards and collection attorneys must check SCRA status before initiating any foreclosure, as violations carry significant penalties.',rels:['Requires court order for foreclosure regardless of homestead status','Pre-service HOA assessment debt — interest may be capped at 6%','Violation of SCRA carries civil and criminal penalties','Works alongside §209.0092 judicial foreclosure requirement','Service must be verified through Department of Defense SCRA database']},
+  scm:{layer:'Federal / Texas',title:'Secretary of State Incorporation & IRS Tax Status',body:'Most Texas HOAs must incorporate as non-profit corporations by filing Articles of Incorporation with the Texas Secretary of State under BOC Ch. 22. Once incorporated, the HOA may apply for federal tax-exempt status (typically IRS 501(c)(4) as a social welfare organization). The Comptroller\'s website allows anyone to look up an HOA\'s corporate status, registered agent, and current board officers.',rels:['Incorporation required before most Ch. 209 protections apply to the board','IRS 501(c)(4) status allows HOA to avoid federal income tax on assessments','Texas Comptroller database: verify HOA corporate status and registered agent','Revoked corporate status may expose board members to personal liability','BOC Ch. 22 fiduciary duties attach upon incorporation']},
+  homestead:{layer:'Texas Constitution',title:'Art. XVI §50 — Homestead Protection',body:'One of the strongest homeowner protections in the country. A Texas homestead cannot be forced-sold to pay most debts. HOA assessments are one narrow exception — but even then, the constitution requires a court order before a homestead can be foreclosed. This is the direct constitutional source of §209.0092 (Judicial Foreclosure Required). "Homestead" is further defined in Property Code Ch. 41.',rels:['Direct constitutional source of §209.0092 (judicial foreclosure required)','Implemented in statute by TX Property Code Ch. 41','Cannot be waived by CC&Rs or any HOA document','Limits §209.009 and §209.0094 HOA lien authority on homestead property','SCRA adds additional layer of protection for active-duty military homesteads']},
+  dueprocess:{layer:'Texas Constitution',title:'Art. I §19 — Due Course of Law',body:'No citizen shall be deprived of life, liberty, or property except by due course of law. This is the constitutional foundation for all of Chapter 209\'s notice requirements — the 30-day cure notices, the pre-enforcement hearing rights, and the foreclosure procedures. An HOA that bypasses required notices may face not just a statutory challenge under §209.006 but a constitutional due process challenge.',rels:['Constitutional basis for §209.006 pre-enforcement notice requirements','Underpins the §209.007 hearing right before fines','Supports the §209.011 redemption right after foreclosure','Provides grounds to challenge HOA action taken without proper notice','CPRC Ch. 65 injunctions are the procedural tool to enforce this right']},
+  txart1s17:{layer:'Texas Constitution',title:'Art. I §17 — Taking of Property',body:'Private property shall not be taken or damaged for or applied to public use without adequate compensation and the consent of the owner. While this provision primarily governs government takings, it is relevant to HOA easement authority: an HOA amendment that purports to grant the association an easement over private lots without owner consent implicates this provision, which is reinforced by §209.012.',rels:['Reinforces §209.012 (HOA cannot grant itself easements over lots without consent)','Limits what the HOA can do to your property through CC&R amendments','More typically invoked when a municipality or public utility seeks access through an HOA subdivision','Works alongside TX Prop. Code Ch. 5 deed restriction and easement law']},
+  boc22:{layer:'Business Organizations Code',title:'TX Business Organizations Code Ch. 22 — Non-Profit Corporations',body:'Most Texas HOAs are incorporated as Texas non-profit corporations. This means board members owe fiduciary duties (duty of care, loyalty, obedience) to the membership. BOC Ch. 22 provides limited liability protection to volunteer board members acting in good faith within their authority. The corporate formalities required here — annual meetings, recorded minutes, proper elections — overlap with and supplement Chapter 209\'s open meeting and voting requirements.',rels:['Board fiduciary duties operate alongside §209.0051 open meetings','Provides liability shield for board members acting in good faith','Corporate records supplement §209.005 records access rights','Board elections must satisfy both BOC Ch. 22 and §§209.00591–.00594','Revocation of non-profit status exposes board to personal liability']},
+  boc251:{layer:'Business Organizations Code',title:'TX Business Organizations Code Ch. 251 — Texas Cooperative Association Act',body:'Recognizes and provides a legal framework for cooperative associations in Texas, including those organized for the purpose of purchasing and maintaining real estate. While most Texas communities are organized as non-profit corporations under Ch. 22, some older or unique developments — particularly in large cities — are organized as cooperatives. The governance structure differs significantly from a standard HOA: members own shares in the co-op rather than individual lots.',rels:['Governs co-ops organized for real estate maintenance — distinct from HOA structure','Members own shares, not individual lots — different from Ch. 209 structure','Ch. 209 does not apply to cooperatives — different statutory framework','FHA and FDCPA protections still apply to co-op residents','Relevant to some older Texas urban developments in Houston and Dallas']},
+  tdca:{layer:'Texas Finance Code',title:'TX Finance Code Ch. 392 — Texas Debt Collection Act (TDCA)',body:'The state-level companion to the FDCPA. Unlike the FDCPA, the TDCA applies to first-party collectors (the HOA collecting its own debt directly), not just third-party collectors. It prohibits oppressive tactics, false representations, and unfair means. This means the HOA management company and the board itself — not just hired collection attorneys — must comply with TDCA when pursuing delinquent accounts.',rels:['Applies to HOA itself (first-party) AND third-party collectors — broader than FDCPA','Works alongside FDCPA when third-party collectors are involved','Penalties: actual damages + injunctive relief + attorney\'s fees','Applies to all collection letters, calls, and notices sent by or on behalf of the HOA','§209.0064 (Third Party Collections) cross-references TDCA compliance']},
+  taxcode:{layer:'Texas Tax Code',title:'TX Tax Code §11.13 (Homestead Exemption) & §11.28 (Non-Profit Exemption)',body:'§11.13 provides the residential homestead exemption that reduces a homeowner\'s taxable value — relevant to the HOA foreclosure analysis because a property with a homestead exemption has homestead status, triggering §209.0092. §11.28 provides property tax exemption for qualifying non-profit HOA property (common areas, amenity centers). The HOA\'s own common area land may be exempt from ad valorem taxes if the HOA qualifies.',rels:['§11.13 homestead exemption confirms homestead status → triggers §209.0092 judicial foreclosure req.','§11.28 common area tax exemption for qualifying non-profit HOAs','Tax exemption for HOA non-profit status parallels IRS 501(c)(4) analysis','Property tax records at the county appraisal district identify homestead status','County CAD records are often used to verify homestead status in foreclosure proceedings']},
+  govopen:{layer:'Texas Government Code',title:'Government Code Ch. 551 — Texas Open Meetings Act',body:'The Open Meetings Act requires governmental bodies to hold open public meetings. Section §209.0051 of Ch. 209 expressly states it does NOT apply to an HOA that is already subject to Ch. 551 — because Ch. 551 would impose even stricter requirements. HOAs subject to Ch. 551 (via §552.0036) are typically very large associations with quasi-governmental characteristics. For most private HOAs, §209.0051 is the governing open meeting rule.',rels:['§209.0051 expressly carves out HOAs already subject to Ch. 551','An HOA subject to Ch. 551 has stricter open meeting requirements than §209.0051','Most private HOAs are NOT subject to Ch. 551 — §209.0051 governs instead','Large master-planned or tax-district-adjacent HOAs should verify their status','If Ch. 551 applies, the AG\'s Open Meetings hotline has jurisdiction']},
+  govpub:{layer:'Texas Government Code',title:'Government Code Ch. 552 — Texas Public Information Act',body:'The Public Information Act requires governmental bodies to make records publicly available. §209.005 expressly states it does NOT apply to an HOA that is subject to Ch. 552 via §552.0036 — because Ch. 552 imposes even more comprehensive disclosure requirements. An HOA subject to Ch. 552 would need to respond to public information requests from anyone, not just its own members. This typically applies to associations that have taken on quasi-governmental functions (e.g., providing municipal-like services in large unincorporated areas).',rels:['§209.005 records access explicitly carves out HOAs already subject to Ch. 552','Ch. 552 HOAs must respond to PIA requests from the general public, not just members','Majority of Texas HOAs are private and NOT subject to Ch. 552','Violation of Ch. 552 can be referred to the Texas Attorney General','Large special district-adjacent HOAs in Harris County: verify your status']},
+  elec259:{layer:'Texas Election Code',title:'Election Code §259.002 — Regulation of Political Signs by HOA',body:'Expressly limits how long an HOA can prohibit political signs on private property. The HOA cannot forbid political signs during the period beginning 90 days before an election through 10 days after the election. Outside that window, the HOA may regulate signs, but cannot impose restrictions that go beyond reasonable regulations on size, number, and placement. This section works alongside §202.009 of the Property Code, which contains a parallel provision.',rels:['HOA cannot prohibit political signs from 90 days before to 10 days after election','Works alongside and supplements TX Prop. Code §202.009','HOA may still regulate: size, number (max 1 per candidate), and ground mounting','Sign prohibition outside election window may still be valid if in CC&Rs','Violation: homeowner may display sign despite HOA rule — rule is void during protected window']},
+  trec:{layer:'Texas Occupations Code / TREC',title:'Texas Real Estate Commission — Rules & Fee Caps',body:'TREC does not regulate HOAs directly but regulates the resale certificate process under Chapter 207. TREC caps the fee at $375 for a resale certificate and $75 for an updated certificate. TREC also publishes the official resale certificate form (Form 37-5). Sellers\' agents and title companies rely on TREC timelines and forms. An HOA that charges above the cap or fails to deliver on time may face penalties or be required to refund the excess fee.',rels:['Sets fee caps for §207.003 resale certificates ($375 cert / $75 update)','Publishes official resale certificate form (TREC Form 37-5)','HOA overcharging: excess fees must be refunded; failure to produce: owner may sue for up to $5,000','Regulates real estate agents who order and deliver Ch. 207 disclosures','Title companies rely on TREC-compliant resale certs for clear-title closings']},
+  cprc16:{layer:'TX Civil Practice & Remedies Code',title:'CPRC §16.035 — 4-Year Statute of Limitations on Real Property Liens',body:'A party must bring suit to enforce a real property lien — including an HOA assessment lien — no later than 4 years after the cause of action accrues. If an HOA files a lien and then does nothing for more than 4 years, the lien may become time-barred and unenforceable. This is a critical protection for homeowners who are disputing old or stale lien claims. The clock may be reset by the HOA taking action (filing suit, sending a new notice of acceleration) before limitations runs.',rels:['HOA assessment lien must be enforced within 4 years of accrual','Stale liens filed years ago may be legally unenforceable — check the date','Clock may restart if HOA files suit or accelerates within the 4-year window','Works alongside §209.0094 (lien filing) and §209.009 (foreclosure restrictions)','Defense in HOA foreclosure litigation: raise limitations as an affirmative defense']},
+  cprc65:{layer:'TX Civil Practice & Remedies Code',title:'CPRC Ch. 65 — Injunctions (TRO & Temporary Injunction)',body:'Chapter 65 provides the procedural framework for obtaining a Temporary Restraining Order (TRO) or Temporary Injunction to halt a wrongful HOA foreclosure sale. A TRO can be obtained on an emergency basis (sometimes within hours) without notice to the other party, and can preserve the status quo for up to 14 days while a full hearing is scheduled. This is a homeowner\'s fastest and most powerful emergency legal tool when facing imminent HOA foreclosure.',rels:['TRO can stop a HOA foreclosure sale within hours — file in the district court','TRO preserves status quo for up to 14 days pending TI hearing','Temporary Injunction (TI) can extend the stay until a full trial on the merits','Must show: probable right to recover + probable injury if not stopped','Far more effective than a wrongful foreclosure suit after the fact — act before the sale']},
+  cprc154:{layer:'TX Civil Practice & Remedies Code',title:'CPRC Ch. 154 — Alternative Dispute Resolution (ADR)',body:'Chapter 154 establishes the framework for alternative dispute resolution in Texas, including mediation, arbitration, and other ADR methods. Section §209.007 of Ch. 209 expressly requires or encourages ADR for HOA disputes before escalating to litigation. Under this chapter, courts may refer HOA disputes to ADR, and parties can voluntarily submit to mediation. A successful mediation can resolve disputes faster and at far lower cost than a lawsuit.',rels:['§209.007 expressly references ADR — this chapter sets the rules and procedures','Courts may compel HOA disputes to mediation under §154.021','Mediator is neutral — not a judge but can facilitate binding agreement','Mediation is confidential — statements made cannot be used in later litigation','Arbitration clause in CC&Rs may require binding arbitration instead of court']},
+  cprcatty:{layer:'TX Civil Practice & Remedies Code',title:'CPRC Ch. 38 — Recovery of Attorney\'s Fees',body:'Chapter 38 provides a statutory basis for recovering attorney\'s fees in contract and property disputes in Texas. It works alongside §209.008 of Ch. 209 which specifically authorizes attorney\'s fee recovery for HOA enforcement actions. Together, these provisions mean that a homeowner who prevails against an HOA\'s improper enforcement action — or an HOA that prevails against a delinquent owner — may be entitled to recover their legal fees from the other side.',rels:['Works alongside §209.008 (both sides can recover fees in HOA disputes)','Winning homeowner in §209.006 notice violation case may recover attorney\'s fees','HOA collecting successful judgment may recover fees under both §209.008 and Ch. 38','Fee recovery requires prevailing party status — partial wins may limit recovery','Fee awards act as a deterrent against both frivolous HOA enforcement and meritless defenses']},
+  lgc:{layer:'Texas Local Government Code',title:'Local Gov. Code §§192.001 & 193.001 — County Clerk Recording Requirements',body:'These sections require the county clerk to accept and properly index all documents submitted for recording in the county\'s real property records. HOA liens (§209.0094), management certificates (§209.004), and all dedicatory instruments (§202.006) must be properly filed with the county clerk to be legally effective. The county clerk assigns an instrument number and records the filing date — the date of recording is legally significant for lien priority.',rels:['HOA lien under §209.0094 must be filed with county clerk to be effective against third parties','Management certificate under §209.004 must be filed and kept current','All dedicatory instruments under §202.006 must be county-recorded to be enforceable','Recording date determines lien priority — earlier recording = higher priority','County deed records are public — any owner can search and obtain copies']},
+  pc41:{layer:'TX Prop. Code Title 5',title:'TX Property Code Ch. 41 — Homestead Exemptions',body:'Chapter 41 is the statutory implementation of the Texas Constitution Art. XVI §50 homestead protection. It defines what qualifies as a homestead (urban homestead: up to 10 acres within a city; rural homestead: up to 200 acres for a family). It also lists the specific types of liens that CAN be enforced against a homestead — HOA assessment liens are included in this narrow list. Understanding Ch. 41 is essential for determining whether §209.0092 (judicial foreclosure) applies to a specific property.',rels:['Implements TX Const. Art. XVI §50 in statute — defines "homestead" precisely','Urban homestead: up to 10 acres of contiguous land within a city','HOA assessment liens are one of the few liens that CAN be enforced against a homestead','§209.0092 judicial foreclosure requirement applies to properties qualifying under Ch. 41','Loss of homestead designation (e.g., converting to rental) changes foreclosure analysis']},
+  pc51:{layer:'TX Prop. Code Title 5',title:'TX Property Code Ch. 51 — Lien Foreclosure Procedures',body:'Chapter 51 provides the actual mechanics of non-judicial (trustee\'s sale) foreclosure in Texas. After an HOA obtains a court order under §209.0092 authorizing a non-judicial sale, the HOA follows Ch. 51 to conduct the foreclosure: posting notice at the courthouse, filing notice with the county clerk at least 21 days before the sale, and holding the auction between 10 a.m. and 4 p.m. on the first Tuesday of a month. §51.002 sets minimum notice requirements. §51.003 governs deficiency judgments.',rels:['Used by HOAs after §209.0092 court order authorizes the sale','§51.002: 21-day posted and filed notice required before foreclosure sale','Sale must occur at the courthouse between 10am–4pm on the first Tuesday of a month','§51.003: if sale price is less than debt, HOA may seek deficiency judgment in district court','Strict compliance required — failure to follow Ch. 51 procedures can void the sale']},
+  ch201:{layer:'TX Property Code Title 11',title:'Ch. 201 — General Definitions',body:'The shared dictionary for all of Title 11. Defines foundational terms like "restrictions" and "subdivision" that are expressly cross-referenced by Chapters 202, 207, and 209. Chapter 207 borrows "restrictions" directly from §201.003. Without understanding the vocabulary in Ch. 201, you cannot fully parse any of the other Title 11 chapters.',rels:['"Restrictions" definition (§201.003) expressly borrowed by Ch. 207','"Subdivision" definition used throughout Title 11','Foundation vocabulary for all Title 11 chapters','Must be read alongside §202.001 and §209.002 for complete definitions picture']},
+  ch202:{layer:'TX Property Code Title 11',title:'★ Ch. 202 — Construction & Enforcement of Restrictive Covenants',body:'The broadest chapter in Title 11 — applies to ALL Texas residential subdivisions with recorded deed restrictions, not just mandatory HOAs. Defines "dedicatory instrument" (§202.001(1)) and "property owners\' association," requires recordation of all governing documents (§202.006), and prohibits certain types of restrictive covenants including bans on: composting, rain barrels, efficient irrigation, solar panels, certain roofing materials, flag displays, religious items, security cameras, standby generators, political signs (with §202.009), and more.',rels:['§202.001 definitions cross-referenced by Ch. 207 and Ch. 209','§202.006 recordation required for all Ch. 209 dedicatory instruments','§202.003 "liberal construction" applies to all CC&R enforcement','§202.007–.024 list specific things HOAs CANNOT ban or restrict','Applies even to subdivisions not governed by Ch. 209 (e.g., voluntary POAs)']},
+  ch203:{layer:'TX Property Code Title 11',title:'Ch. 203 — Land Use Restriction Enforcement in Certain Counties',body:'Chapter 203 specifically addresses the enforcement of land use restrictions in certain Texas counties — primarily applying to unincorporated areas that do not have traditional zoning. It gives property owners and associations additional tools to enforce residential-use restrictions in those jurisdictions. It supplements Ch. 202 for those specific geographic areas.',rels:['Supplements Ch. 202 for land use restriction enforcement in specific counties','Primarily relevant to unincorporated areas without traditional zoning authority','Does NOT replace Ch. 209 for mandatory HOAs — both may apply','Local county judge or attorney general may have enforcement authority under this chapter']},
+  ch204:{layer:'TX Property Code Title 11',title:'Ch. 204 — Assessment Powers of Property Owners\' Associations',body:'Provides the statutory authority for property owners\' associations to levy assessments in subdivisions that predate or fall outside the full scope of Ch. 209. Defines "regular assessment" and "special assessment" — terms that Chapter 207 expressly borrows from §204.001. For most modern mandatory HOAs, Ch. 209 is the primary authority, but Ch. 204 fills gaps for older or less formal associations.',rels:['"Regular assessment" and "special assessment" definitions borrowed by §207.001','Assessment authority for associations partially outside Ch. 209 scope','Assessment authority must be authorized in the CC&Rs to be valid','Feeds into §209.0062 payment plan calculations (what counts as an "assessment")']},
+  ch205:{layer:'TX Property Code Title 11',title:'Ch. 205 — Restrictive Covenants in Revised Subdivisions',body:'Addresses restrictive covenants applicable to revised or replatted subdivisions in certain counties. When a subdivision is replatted — meaning lots are reconfigured — questions arise about whether the original restrictions survive the replat. Chapter 205 provides a framework for resolving those questions in specific jurisdictions, preventing the loss of deed restrictions through the replatting process.',rels:['Applicable only in specific counties — verify local applicability','Prevents accidental extinguishment of deed restrictions through replat process','Works alongside Ch. 202 for general restrictive covenant enforcement','Relevant when an HOA subdivision is being partially replatted or expanded']},
+  ch206:{layer:'TX Property Code Title 11',title:'Ch. 206 — Extension of Restrictions Imposing Regular Assessments',body:'Provides a mechanism for extending deed restrictions in certain subdivisions that would otherwise expire by their own terms. In older Texas subdivisions, the original deed restrictions often had a fixed term (e.g., 25 years) and a provision for automatic renewal or extension. Ch. 206 gives property owners the statutory tools to vote to extend those restrictions — preserving the HOA\'s legal foundation.',rels:['Allows extension of expiring deed restrictions in qualifying subdivisions','Requires petition process — typically a percentage of owners must sign','Critical for HOAs in older subdivisions whose CC&Rs may be approaching their sunset date','Failure to extend restrictions may dissolve the HOA\'s legal authority to collect assessments','Ch. 210 provides a related mechanism for petition-based modification']},
+  ch207:{layer:'TX Property Code Title 11',title:'★ Ch. 207 — Disclosure of Information / Resale Certificates',body:'Triggered every time a home in a mandatory HOA subdivision is sold. The HOA must deliver — within 10 business days of a written request — the CC&Rs, bylaws, rules, and a resale certificate disclosing all amounts owed, pending violations, special assessments, and litigation. If the HOA fails to disclose a debt, it loses its lien on that debt against the new buyer. Ch. 207 expressly borrows definitions from §§201.003, 202.001, 204.001, and 209.002, making it the most cross-referenced chapter in Title 11.',rels:['Borrows definitions from §§201.003, 202.001, 204.001, and 209.002','Undisclosed debts lose lien priority against new buyer (§207.005)','TREC caps fees at $375 cert / $75 update — excess fees must be refunded','HOAs with 60+ lots must publish documents on a website (§207.006)','Failure to deliver on time: owner may sue for damages up to $5,000','Condo parallel: §82.157 (TUCA)']},
+  ch208:{layer:'TX Property Code Title 11',title:'Ch. 208 — Amendment & Termination in Historic Neighborhoods',body:'Provides a special process for amending or terminating restrictive covenants in neighborhoods designated as historic. Standard CC&R amendment procedures may conflict with historic preservation goals. Chapter 208 balances these interests by providing a tailored process for historic neighborhoods, typically requiring coordination with local historic preservation authorities.',rels:['Applies only to areas with formal historic designation','Special amendment process — different from standard §209.0041 procedures','Works alongside local historic preservation ordinances','May limit the types of CC&R changes an HOA can make in designated areas','Relevant to HOAs in older urban neighborhoods with historic district status']},
+  ch210:{layer:'TX Property Code Title 11',title:'Ch. 210 — Covenant Extension or Modification by Petition',body:'Allows residential covenant extension or modification through a petition process in certain subdivisions. Where Ch. 206 addresses extension of assessment-based restrictions, Ch. 210 provides a broader framework for modifying or extending covenants generally through a homeowner petition. This gives majority homeowners a statutory path to update outdated restrictions without needing a developer\'s consent.',rels:['Related to Ch. 206 but broader in scope — applies to modification, not just extension','Petition-based: requires a qualifying percentage of owners to sign','Does not require HOA board action — owners can act independently','Alternative to the §209.0041 board-driven amendment process for certain changes','CC&Rs may specify additional requirements beyond Ch. 210 minimum']},
+  ch211:{layer:'TX Property Code Title 11',title:'Ch. 211 — Amendment & Enforcement in Certain Subdivisions',body:'Addresses the amendment and enforcement of restrictions in certain subdivisions that may not fit cleanly within Ch. 209 — for example, larger or mixed-use developments, or subdivisions with unusual governance structures. It supplements the general Ch. 202 and Ch. 209 frameworks for those edge cases and provides specific amendment voting procedures.',rels:['Supplements Ch. 202 and Ch. 209 for certain atypical subdivisions','Specific voting and amendment procedures for qualifying developments','Relevant for large master-planned communities with mixed residential/commercial elements','HOA counsel should confirm whether Ch. 211 applies alongside or instead of §209.0041']},
+  ch209gov:{layer:'Chapter 209 — Governance',title:'§§209.002–.0051 — Governance: Definitions, Management Certificate, Records & Open Meetings',body:'§209.002 provides the chapter\'s definitions (assessment, board, declaration, dedicatory instrument, management company). §209.003 limits the chapter to mandatory residential POAs. §209.004 requires the HOA to file a management certificate with the county AND the state database. §209.005 gives homeowners the right to inspect all books and records within 10 business days. §209.0051 requires most board meetings to be open to all owners.',rels:['§209.002 definitions expressly borrowed by Ch. 207','§209.004 management cert must also comply with §202.006 county recordation','§209.005 records access: respond in 10 days, produce in 15 business days','§209.0051 open meetings: board cannot go into closed session except for litigation/personnel/contracts','BOC Ch. 22 corporate formalities run alongside these requirements']},
+  ch209enforce:{layer:'Chapter 209 — Enforcement',title:'§§209.006–.008 — Notice, Hearing & Attorney\'s Fees',body:'Before any enforcement action — fine, lawsuit, lien, common area suspension, or credit report — the HOA must send certified mail notice giving the owner at least 30 days to cure a curable violation. The owner may request a hearing before the board within 30 days. No fine can be imposed for a curable violation until the cure period has passed. Attorney\'s fees can be recovered by either party.',rels:['§209.006 notice must precede ANY enforcement action — violation voids the action','Failure to send proper notice may void any subsequent fine, lien, or lawsuit','§209.007 hearing right flows from TX Const. Art. I §19 due process','§209.008 attorney\'s fees apply to both sides — two-way protection and deterrent','§209.006 notice also required before credit reporting under §209.0065']},
+  ch209collect:{layer:'Chapter 209 — Collection',title:'§§209.0061–.0065 — Fines, Payment Plans, Lien Priority & Credit Reporting',body:'§209.0061 requires a written fine schedule. §209.0062 requires the HOA to offer a payment plan (minimum 3 months, no attorney fees included unless owner defaults) before foreclosure. §209.0063 sets mandatory payment application order: delinquent assessments first, current assessments second, fees and fines last. §209.0064 governs third-party collectors (FDCPA/TDCA also apply). §209.0065 allows credit reporting only after §209.006 notice.',rels:['§209.0062 payment plan MUST be offered before §209.009 foreclosure can proceed','§209.0063 payment order cannot be reversed or waived by CC&Rs','§209.0064 third-party collectors: also bound by FDCPA + TX Finance Code §392 (TDCA)','§209.0065 credit reporting requires §209.006 prior written notice','§209.0062 payment plan: no attorney fees in the plan amount unless owner defaults']},
+  ch209fore:{layer:'Chapter 209 — Foreclosure',title:'§§209.009–.011 — Foreclosure Limits, Judicial Requirement & Redemption',body:'§209.009 prohibits foreclosure for fines alone, and prohibits foreclosure when the total assessments fall below a statutory minimum. §209.0092 requires a court order before a homestead can be foreclosed — after the court order, Ch. 51 governs the sale mechanics. §209.010 requires written notice within 30 days after a sale. §209.011 gives the former owner 180 days to redeem the property.',rels:['§209.0092 judicial foreclosure constitutionally required by Art. XVI §50','After court order, Ch. 51 governs the actual foreclosure sale mechanics (notice, timing, auction)','SCRA provides additional layer of protection for active-duty military members','CPRC §16.035: 4-year limitations applies to HOA lien enforcement','CPRC Ch. 65 TRO/TI: emergency tool to stop imminent wrongful foreclosure sale']},
+  ch209vote:{layer:'Chapter 209 — Voting & Elections',title:'§§209.0055–.00594 — Voting, Elections & Board Governance',body:'§209.0059: HOA cannot strip your right to vote — any such CC&R provision is void. §209.0056: advance notice required before any election. §209.0057: recount rights. §209.0058: ballots must be retained. §209.00591: board member eligibility. §209.00592: quorum rules. §209.00593: election procedures. §209.00594: homeowners can observe ballot tabulation.',rels:['§209.0059 right to vote cannot be waived even if delinquent on dues','§209.00594 ballot transparency supplements BOC Ch. 22 corporate formalities','Board elections must satisfy both Ch. 209 and TX BOC Ch. 22 requirements','Violation of election procedures can invalidate board actions taken thereafter','Election Code §259.002 separately governs political sign rights']},
+  ch209arc:{layer:'Chapter 209 — Architectural Review',title:'§209.00505 — Architectural Review Authority',body:'If your HOA has an ARC, this section requires: the committee must act within the time period in the CC&Rs; any denial must be in writing; the denial must state the reason AND what changes would lead to approval; and the homeowner has the right to appeal to the full board. The ARC cannot simply say "no" without explanation. ARC decisions must also comply with FHA/ADA for disability accommodations regardless of CC&R language.',rels:['ARC denials must be written with stated reasons — no oral denials permitted','Right to appeal to the full board within the time set by governing documents','FHA and ADA override any ARC denial that discriminates or denies accommodation','Unreasonable ARC delays may be treated as approval depending on CC&R language','ARC authority must be explicitly granted in the CC&Rs — it is not implied']},
+  ch209lien:{layer:'Chapter 209 — Lien Filing',title:'§209.0094 — Assessment Lien Filing',body:'Before an HOA can enforce a lien, it must file a formal lien document in the county\'s real property records. The homeowner must receive §209.006 notice before filing. A lien clouds the title — it appears in searches and can block any sale or refinance until resolved. After the debt is paid, the HOA must promptly file a lien release. Note: CPRC §16.035\'s 4-year limitations period applies from the date the lien accrues.',rels:['§209.006 notice required before lien can be filed','Filed with county clerk under Local Gov. Code §§192–193 — date of filing = lien priority date','A lien clouds title — may block any sale or refinance until released','After full payment, HOA must promptly file a lien release in county records','CPRC §16.035: 4-year limitations on lien enforcement — check accrual date']},
+  ch209ops:{layer:'Chapter 209 — Operations',title:'§§209.012–.017 — Easements, Amendments, Forced Elections, Rentals & Justice Court',body:'§209.012: HOA cannot grant itself an easement over your lot without your consent. §209.013: Process for amending CC&Rs. §209.014: Owners can force an annual meeting if the board fails to call one. §209.015: HOA land use restrictions limited to what CC&Rs authorize. §209.016: Limits on rental restrictions. §209.017: Justice courts have jurisdiction over certain HOA disputes — faster and cheaper than district court.',rels:['§209.012 easement restriction supported by TX Const. Art. I §17 (taking of property)','§209.013 CC&R amendments must be recorded under §202.006 to be enforceable','§209.017 justice court reduces legal costs for homeowners — max $200/day civil damages','§209.016 rental restrictions must also comply with Fair Housing Act','§209.014 forced election: prevents boards from avoiding accountability to membership']},
+  ch82:{layer:'TX Property Code Title 11',title:'Ch. 82 — Texas Uniform Condominium Act (TUCA)',body:'The Chapter 209 equivalent for condominiums with declarations recorded on or after January 1, 1994. Governs governance, assessment liens, foreclosure, records access, and resale certificates (§82.157). §82.1141 (added 2021) now mirrors §209.005 for condo records access. TUCA is modeled on the Uniform Condominium Act. Chapter 202 still applies to TUCA condos for restrictive covenant enforcement.',rels:['§82.157 resale certificate is the condo equivalent of Ch. 207','§82.1141 condo records access now mirrors §209.005 (added 2021)','Ch. 202 still applies to TUCA condos for restrictive covenant enforcement','Does NOT apply to condos with pre-1994 declarations (Ch. 81 governs those)','TREC resale cert fee caps apply under §82.157 same as Ch. 207']},
+  ch81:{layer:'TX Property Code Title 11',title:'Ch. 81 — Original Texas Condominium Act',body:'The older condominium statute, applying to condos with declarations recorded before January 1, 1994. Less comprehensive than TUCA. Many older high-rise condominiums in Houston and Dallas are governed by Ch. 81. Chapter 202 still applies for restrictive covenant enforcement. Some Ch. 81 condos have voluntarily amended to adopt TUCA-equivalent standards, and some provisions of TUCA now expressly apply to pre-1994 condos as well.',rels:['Applies only to condominium declarations recorded before Jan 1, 1994','Ch. 202 still applies for restrictive covenant enforcement of Ch. 81 condos','Ch. 209 does NOT apply to condominiums — single-family HOAs only','Some TUCA (Ch. 82) provisions now expressly apply to pre-1994 condos as well','Many Ch. 81 condos have voluntarily "upgraded" their docs to TUCA standards']},
+  ch5ch12:{layer:'TX Property Code Foundation',title:'Ch. 5 (Conveyances) & Ch. 12 (Recording)',body:'Chapter 5 governs property conveyances and deed restrictions — the foundational contract law on which all restrictive covenants are built. Chapter 12 governs how instruments are recorded in county deed records, which is the same recording system that §202.006 and §209.004 use to make HOA documents publicly effective and legally binding on all subsequent owners. An unrecorded dedicatory instrument has no effect against a subsequent purchaser without notice.',rels:['Ch. 5 deed restriction contract law underlies all CC&R enforcement under Ch. 202','Ch. 12 recording system is the mechanism §202.006 and §209.004 use','Unrecorded dedicatory instruments have NO effect under §202.006','Ch. 5 §5.010 allows municipalities to enforce deed restrictions in certain situations','Chain of title searches under Ch. 12 reveal existing HOA liens and governing documents']},
+  plat:{layer:'HOA Governing Documents',title:'Subdivision Plat — The Map of Your Community',body:'The plat is the original recorded survey map that divided raw land into individual lots and designated common areas, easements, streets, and setbacks. Filed in the county deed records before any homes are built, it is the first dedicatory instrument under §202.001. The plat defines the physical boundaries that all other HOA rules operate within. Easements and setbacks shown on the plat bind all future owners regardless of subsequent HOA rule changes.',rels:['Filed in county deed records under §202.006 — it is a dedicatory instrument','Defines lot boundaries referenced in all CC&Rs and the Declaration','Common areas shown on plat are subject to HOA governance under Ch. 209','Easements on plat limit what §209.012 means for HOA easement rights','Plat setbacks and easements run with the land — bind all future owners forever']},
+  ccrs:{layer:'HOA Governing Documents',title:'CC&Rs / Declaration of Covenants, Conditions & Restrictions',body:'The founding contract of the HOA community. Sets the assessment amounts, due dates, land use restrictions, architectural rules, enforcement authority, and interest rate for delinquent accounts. Must be recorded in the county deed records under §202.006 to be enforceable. The CC&Rs cannot authorize anything that violates Ch. 202, Ch. 209, the Texas Constitution, or federal law — but within those limits, they are the supreme law of the community.',rels:['Must be recorded under §202.006 — unrecorded CC&Rs are unenforceable against new buyers','Assessment authority comes from CC&Rs — must comply with Ch. 204 and Ch. 209','Interest rate for §209.0062 payment plan calculations comes from CC&Rs','All bylaws and rules must be subordinate to the CC&Rs and Ch. 209','Amendments: must follow §209.0041 process AND be recorded under §202.006']},
+  bylaws:{layer:'HOA Governing Documents',title:'Association Bylaws',body:'The internal operating manual for the HOA. Sets meeting procedures, board composition, terms of office, quorum requirements, and voting rules. Must conform to Ch. 209\'s voting and meeting requirements and the Business Organizations Code (Ch. 22) if the HOA is incorporated. Bylaws cannot grant the board powers that the CC&Rs or Ch. 209 do not allow.',rels:['Must conform to §209.0051 open meeting requirements','Board elections must comply with §§209.00591–.00594','Incorporated HOA bylaws must also comply with TX BOC Ch. 22','Bylaws cannot override CC&Rs, Ch. 209, or any statute above them','Must be included in Ch. 207 resale certificate package delivered to buyers']},
+  rules:{layer:'HOA Governing Documents',title:'Rules & Regulations',body:'The most frequently amended layer of the HOA rulebook — parking, pool hours, pet policies, architectural standards, trash can placement, holiday decorations. Must be adopted through the proper §209.0041 process (open meeting, advance notice, county recording) to be enforceable. Cannot contradict the CC&Rs, bylaws, or any statute. The written fine schedule required by §209.0061 lives here.',rels:['Must be adopted via §209.0041 — unadopted rules are unenforceable against homeowners','Fine schedule (§209.0061) must be in writing and available to all owners','Cannot contradict CC&Rs, bylaws, Election Code §259.002, or any statutory right','HOAs with 60+ lots must post current rules on their website (§207.006)','Must be included in Ch. 207 resale package delivered to buyers at closing']}
+};
+
+let activeCard = null;
+
+function show(el, key) {
+  const d = DATA[key];
+  if (!d) return;
+  if (activeCard) activeCard.classList.remove('active');
+  el.classList.add('active');
+  activeCard = el;
+  document.getElementById('placeholder').style.display = 'none';
+  document.getElementById('search-results').style.display = 'none';
+  const dc = document.getElementById('detail-content');
+  dc.classList.add('visible');
+  document.getElementById('d-layer').textContent = d.layer;
+  document.getElementById('d-title').textContent = d.title;
+  document.getElementById('d-body').textContent = d.body;
+  document.getElementById('d-rels').innerHTML = d.rels.map(r => `<div class="rel-item">${r}</div>`).join('');
+  document.querySelector('.detail-col').scrollTop = 0;
+}
+
+function doSearch(q) {
+  const sr = document.getElementById('search-results');
+  if (!q || q.length < 2) { sr.style.display = 'none'; return; }
+  q = q.toLowerCase();
+  const matches = Object.entries(DATA).filter(([k, d]) =>
+    d.title.toLowerCase().includes(q) ||
+    d.body.toLowerCase().includes(q) ||
+    d.layer.toLowerCase().includes(q) ||
+    d.rels.some(r => r.toLowerCase().includes(q))
+  );
+  if (!matches.length) { sr.style.display = 'none'; return; }
+  sr.style.display = 'flex';
+  sr.innerHTML = matches.slice(0, 8).map(([k, d]) =>
+    `<div class="search-result" onclick="showByKey('${k}')"><strong>${d.title}</strong><br>${d.layer}</div>`
+  ).join('');
+}
+
+function showByKey(key) {
+  document.getElementById('search').value = '';
+  document.getElementById('search-results').style.display = 'none';
+  // find the card and simulate click
+  const cards = document.querySelectorAll('.card');
+  for (const card of cards) {
+    const attr = card.getAttribute('onclick') || '';
+    if (attr.includes(`'${key}'`)) {
+      show(card, key);
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+  }
+  // If card not found (shouldn't happen), just show detail
+  const d = DATA[key];
+  if (!d) return;
+  document.getElementById('placeholder').style.display = 'none';
+  const dc = document.getElementById('detail-content');
+  dc.classList.add('visible');
+  document.getElementById('d-layer').textContent = d.layer;
+  document.getElementById('d-title').textContent = d.title;
+  document.getElementById('d-body').textContent = d.body;
+  document.getElementById('d-rels').innerHTML = d.rels.map(r => `<div class="rel-item">${r}</div>`).join('');
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6/dist/amazon-cognito-identity.min.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/guard.js"></script>
+<script>
+// Set back button destination based on user's portal
+HoaGuard.protect(['board', 'homeowners']);
+const _navCheck = setInterval(function () {
+  const _u = HoaGuard.getUser();
+  if (!_u) return;
+  clearInterval(_navCheck);
+  const _c = typeof HOA_CONFIG !== 'undefined' ? HOA_CONFIG : {};
+  const _isBoard = _u.groups.includes(_c.boardGroup || 'board');
+  document.getElementById('back-link').href = _isBoard ? '/board/index.html' : '/homeowners/index.html';
+}, 50);
+</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Texas HOA Law Structure — Complete Interactive Reference</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue-50:#E6F1FB;--blue-100:#B5D4F4;--blue-200:#85B7EB;--blue-600:#185FA5;--blue-800:#0C447C;
+  --green-50:#EAF3DE;--green-100:#C0DD97;--green-600:#3B6D11;--green-800:#27500A;
+  --gray-50:#F1EFE8;--gray-100:#D3D1C7;--gray-400:#888780;--gray-600:#5F5E5A;
+  --purple-50:#EEEDFE;--purple-100:#CECBF6;--purple-200:#AFA9EC;--purple-600:#534AB7;--purple-800:#3C3489;
+  --amber-50:#FAEEDA;--amber-100:#FAC775;--amber-400:#BA7517;--amber-600:#854F0B;
+  --coral-50:#FAECE7;--coral-100:#F5C4B3;--coral-600:#993C1D;
+  --teal-50:#E1F5EE;--teal-100:#9FE1CB;--teal-600:#0F6E56;
+  --pink-50:#FBEAF0;--pink-100:#F4C0D1;--pink-600:#993556;
+  --red-50:#FCEBEB;--red-100:#F7C1C1;--red-600:#A32D2D;
+  --text-primary:#1a1a1a;--text-secondary:#555;--text-muted:#888;
+  --border:#d0cfc8;--border-light:#e8e7e0;
+  --bg:#f9f8f5;--surface:#ffffff;--surface-alt:#f3f2ed;
+  --radius-sm:6px;--radius-md:8px;--radius-lg:12px
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --text-primary:#e8e6df;--text-secondary:#aaa;--text-muted:#666;
+    --border:#3a3936;--border-light:#2e2d2a;
+    --bg:#1a1918;--surface:#232220;--surface-alt:#2a2927;
+    --blue-50:#0c2035;--blue-100:#1a3a5c;
+    --green-50:#0d2010;--green-100:#1a3c1e;
+    --gray-50:#1e1d1a;--gray-100:#2e2d2a;
+    --purple-50:#1a1830;--purple-100:#2d2a52;--purple-200:#3d3870;
+    --amber-50:#2a2010;--amber-100:#3d2f10;
+    --coral-50:#2a1810;--coral-100:#3d2210;
+    --teal-50:#0a1f18;--teal-100:#143328;
+    --pink-50:#250d18;--pink-100:#3d1628;
+    --red-50:#1f0d0d;--red-100:#3a1818
+  }
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text-primary);line-height:1.5;font-size:14px}
+
+/* HEADER */
+.page-header{background:var(--purple-800);color:#fff;padding:20px 28px 18px;border-bottom:3px solid var(--purple-600)}
+.page-header h1{font-size:20px;font-weight:600;letter-spacing:-.3px}
+.page-header p{font-size:12px;opacity:.7;margin-top:5px}
+.page-header .sub{font-size:11px;opacity:.5;margin-top:3px}
+.version-badge{display:inline-block;background:rgba(255,255,255,.15);border-radius:20px;padding:2px 10px;font-size:10px;margin-left:10px;vertical-align:middle}
+
+/* LAYOUT */
+.main{display:flex;height:calc(100vh - 100px)}
+.diagram-col{flex:1 1 0;overflow-y:auto;padding:16px 14px 40px;border-right:1px solid var(--border)}
+.detail-col{width:350px;flex-shrink:0;overflow-y:auto;background:var(--surface);padding:18px 16px}
+
+/* LAYERS */
+.layer-wrap{margin-bottom:5px}
+.layer-label{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;padding-left:2px;display:flex;align-items:center;gap:6px}
+.layer-label .count{background:var(--surface-alt);border-radius:20px;padding:1px 6px;font-size:9px;color:var(--text-muted)}
+.layer{border-radius:var(--radius-lg);border:1px solid var(--border);padding:8px}
+.layer.federal{background:var(--blue-50);border-color:var(--blue-100)}
+.layer.constitution{background:var(--green-50);border-color:var(--green-100)}
+.layer.codes{background:var(--gray-50);border-color:var(--gray-100)}
+.layer.title11{background:var(--purple-50);border-color:var(--purple-100)}
+.layer.title5{background:var(--teal-50);border-color:var(--teal-100)}
+.layer.other-tx{background:var(--pink-50);border-color:var(--pink-100)}
+.layer.hoadocs{background:var(--amber-50);border-color:var(--amber-100)}
+
+/* GRIDS */
+.grid{display:grid;gap:5px}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:1fr 1fr 1fr}
+.g4{grid-template-columns:1fr 1fr 1fr 1fr}
+.g5{grid-template-columns:1fr 1fr 1fr 1fr 1fr}
+.mt4{margin-top:5px}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border-light);border-radius:var(--radius-md);padding:7px 9px;cursor:pointer;transition:border-color .15s,box-shadow .15s;user-select:none}
+.card:hover{border-color:var(--purple-600);box-shadow:0 1px 5px rgba(83,74,183,.1)}
+.card.active{border-color:var(--purple-600);border-width:2px;background:var(--purple-50)}
+.card .cn{font-size:11px;font-weight:600;color:var(--text-primary)}
+.card .cs{font-size:10.5px;color:var(--text-secondary);margin-top:2px;line-height:1.4}
+.badge{display:inline-block;font-size:9.5px;padding:1px 7px;border-radius:20px;margin-top:4px;font-weight:500}
+.b-fed{background:var(--blue-50);color:var(--blue-600);border:1px solid var(--blue-100)}
+.b-const{background:var(--green-50);color:var(--green-600);border:1px solid var(--green-100)}
+.b-all{background:var(--teal-50);color:var(--teal-600);border:1px solid var(--teal-100)}
+.b-condo{background:var(--coral-50);color:var(--coral-600);border:1px solid var(--coral-100)}
+.b-disc{background:var(--amber-50);color:var(--amber-600);border:1px solid var(--amber-100)}
+.b-core{background:var(--purple-50);color:var(--purple-800);border:1px solid var(--purple-100)}
+.b-lien{background:var(--teal-50);color:var(--teal-600);border:1px solid var(--teal-100)}
+.b-limit{background:var(--red-50);color:var(--red-600);border:1px solid var(--red-100)}
+.b-county{background:var(--gray-50);color:var(--gray-600);border:1px solid var(--gray-100)}
+
+/* CH209 INNER BOX */
+.ch209-box{border:2px solid var(--purple-600);border-radius:var(--radius-md);padding:7px 9px;margin:5px 0;background:var(--surface)}
+.ch209-title{font-size:10px;font-weight:600;color:var(--purple-800);margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.ch209-title::before{content:'★';font-size:11px}
+.ch209-inner .card{border-color:var(--purple-200)}
+.ch209-inner .card:hover{border-color:var(--purple-600)}
+.ch209-inner .card.active{border-color:var(--purple-600);background:var(--purple-50)}
+
+/* ARROWS */
+.arrow-row{display:flex;align-items:center;justify-content:center;gap:7px;padding:2px 0;color:var(--text-muted);font-size:10px;font-style:italic}
+.arrow-row svg{flex-shrink:0}
+
+/* DETAIL PANEL */
+.detail-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:calc(100% - 40px);color:var(--text-muted);text-align:center;padding:20px;gap:10px}
+.detail-placeholder p{font-size:12px;line-height:1.6}
+.detail-content{display:none}
+.detail-content.visible{display:block}
+.detail-layer-tag{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--purple-600);margin-bottom:8px;display:block}
+.detail-content h2{font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:8px;line-height:1.4}
+.detail-content p{font-size:12px;color:var(--text-secondary);line-height:1.7;margin-bottom:10px}
+.detail-content h3{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px}
+.rels{display:flex;flex-direction:column;gap:4px}
+.rel-item{font-size:11.5px;color:var(--text-secondary);background:var(--surface-alt);border-radius:var(--radius-sm);padding:5px 9px;border-left:3px solid var(--purple-200);line-height:1.4}
+
+/* SEARCH */
+.search-wrap{margin-bottom:14px}
+#search{width:100%;padding:7px 10px;font-size:12px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--surface);color:var(--text-primary)}
+#search:focus{outline:none;border-color:var(--purple-600)}
+.search-results{margin-top:8px;display:none;flex-direction:column;gap:3px}
+.search-result{padding:6px 10px;border-radius:var(--radius-sm);background:var(--surface-alt);cursor:pointer;font-size:12px;color:var(--text-secondary)}
+.search-result:hover{background:var(--purple-50);color:var(--purple-800)}
+.search-result strong{color:var(--text-primary)}
+
+/* LEGEND */
+.legend{display:flex;flex-wrap:wrap;gap:8px;padding:9px 14px;border-top:1px solid var(--border);background:var(--surface);font-size:10.5px;color:var(--text-muted)}
+.leg{display:flex;align-items:center;gap:4px}
+.leg-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.leg-note{margin-left:auto;font-style:italic;color:var(--text-muted);font-size:10px}
+
+/* SECTION DIVIDER */
+.sec-div{font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--purple-600);padding:3px 4px 2px;margin-top:4px;margin-bottom:2px;border-bottom:1px solid var(--purple-100)}
+
+@media(max-width:900px){
+  .main{flex-direction:column;height:auto}
+  .detail-col{width:100%;border-top:1px solid var(--border)}
+  .g4,.g5{grid-template-columns:1fr 1fr}
+  .diagram-col{border-right:none}
+}
+@media(max-width:580px){
+  .g3,.g4,.g5{grid-template-columns:1fr 1fr}
+  .g2{grid-template-columns:1fr}
+}
+@media print{
+  .main{height:auto;flex-direction:column}
+  .detail-col{display:none}
+  .diagram-col{overflow:visible;border:none;padding:8px}
+  .card.active{border-color:var(--border-light)!important;background:var(--surface)!important}
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Texas HOA Law — Complete Legal Structure &amp; Relationships <span class="version-badge">v2.0</span></h1>
+  <p>An interactive reference map for homeowners, board members, and property managers</p>
+  <p class="sub">Click any box to learn more &nbsp;·&nbsp; Use the search box in the right panel &nbsp;·&nbsp; For informational purposes only — not legal advice. Verify with a licensed Texas attorney.</p>
+</div>
+
+<div class="main">
+<!-- ═══ LEFT DIAGRAM ════════════════════════════════════════ -->
+<div class="diagram-col">
+
+  <!-- FEDERAL -->
+  <div class="layer-wrap">
+    <div class="layer-label">Federal law — overrides all state and local rules <span class="count">6 provisions</span></div>
+    <div class="layer federal">
+      <div class="grid g3">
+        <div class="card" onclick="show(this,'fha')"><div class="cn">Fair Housing Act (FHA)</div><div class="cs">Anti-discrimination in housing &amp; HOA rule enforcement. Cannot be waived by any CC&R.</div><span class="badge b-fed">Federal</span></div>
+        <div class="card" onclick="show(this,'fdcpa')"><div class="cn">FDCPA (15 U.S.C. §1692)</div><div class="cs">Limits third-party collectors hired by HOA. Debt validation, no harassment, no false statements.</div><span class="badge b-fed">Federal</span></div>
+        <div class="card" onclick="show(this,'ada')"><div class="cn">ADA / FHA Amendments Act</div><div class="cs">Reasonable accommodation for disability — overrides CC&R provisions that deny access.</div><span class="badge b-fed">Federal</span></div>
+        <div class="card" onclick="show(this,'bkcy')"><div class="cn">Bankruptcy Code (11 U.S.C.)</div><div class="cs">Automatic stay immediately halts all HOA collection, lien enforcement &amp; foreclosure.</div><span class="badge b-fed">Federal</span></div>
+        <div class="card" onclick="show(this,'scra')"><div class="cn">Servicemembers Civil Relief Act (SCRA)</div><div class="cs">Active-duty military receive foreclosure &amp; collection protections. HOA must halt proceedings.</div><span class="badge b-fed">Federal</span></div>
+        <div class="card" onclick="show(this,'scm')"><div class="cn">Secretary of State / IRS</div><div class="cs">HOA non-profit incorporation with TX Secretary of State; IRS 501(c)(4) tax-exempt status.</div><span class="badge b-fed">Federal/State</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow-row"><svg width="12" height="18" viewBox="0 0 12 18"><path d="M6 0L6 11M2 8L6 16L10 8" stroke="#aaa" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>sets a floor — Texas law cannot go below this</div>
+
+  <!-- TEXAS CONSTITUTION -->
+  <div class="layer-wrap">
+    <div class="layer-label">Texas Constitution — foundational state protections <span class="count">3 provisions</span></div>
+    <div class="layer constitution">
+      <div class="grid g3">
+        <div class="card" onclick="show(this,'homestead')"><div class="cn">Art. XVI §50 — Homestead Protection</div><div class="cs">HOA must get a court order to foreclose on a homestead. Direct source of §209.0092.</div><span class="badge b-const">TX Constitution</span></div>
+        <div class="card" onclick="show(this,'dueprocess')"><div class="cn">Art. I §19 — Due Course of Law</div><div class="cs">No property deprivation without due process. Constitutional basis for all §209.006 notice requirements.</div><span class="badge b-const">TX Constitution</span></div>
+        <div class="card" onclick="show(this,'txart1s17')"><div class="cn">Art. I §17 — Taking of Property</div><div class="cs">Private property shall not be taken for public use without just compensation. Limits HOA easement authority.</div><span class="badge b-const">TX Constitution</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow-row"><svg width="12" height="18" viewBox="0 0 12 18"><path d="M6 0L6 11M2 8L6 16L10 8" stroke="#aaa" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>state statutes must conform to the constitution</div>
+
+  <!-- OTHER TX STATUTES — BOC, FINANCE, ELECTIONS, GOV CODE -->
+  <div class="layer-wrap">
+    <div class="layer-label">Other Texas statutes — cross-cutting rules that also apply to HOAs <span class="count">8 provisions</span></div>
+    <div class="layer codes">
+      <div class="sec-div">Corporate, Tax &amp; Debt Collection</div>
+      <div class="grid g4">
+        <div class="card" onclick="show(this,'boc22')"><div class="cn">Bus. Org. Code Ch. 22</div><div class="cs">Non-profit corp law. Board fiduciary duties, liability protection, corporate formalities.</div><span class="badge b-all">All HOAs</span></div>
+        <div class="card" onclick="show(this,'boc251')"><div class="cn">Bus. Org. Code Ch. 251</div><div class="cs">Texas Cooperative Association Act. Governs co-ops that function like HOAs but are structured as cooperatives.</div><span class="badge b-all">Co-ops</span></div>
+        <div class="card" onclick="show(this,'tdca')"><div class="cn">Finance Code Ch. 392 (TDCA)</div><div class="cs">Texas Debt Collection Act. Applies alongside FDCPA to HOA management companies and in-house collection.</div><span class="badge b-all">All HOAs</span></div>
+        <div class="card" onclick="show(this,'taxcode')"><div class="cn">Tax Code §11.13 / §11.28</div><div class="cs">Homestead tax exemption reduces taxable value — relevant to HOA foreclosure analysis. HOA non-profit tax exemption.</div><span class="badge b-all">All Owners</span></div>
+      </div>
+      <div class="sec-div mt4">Government Transparency &amp; Political Rights</div>
+      <div class="grid g4">
+        <div class="card" onclick="show(this,'govopen')"><div class="cn">Gov. Code Ch. 551 — Open Meetings</div><div class="cs">Open Meetings Act. §209.0051 carves out large HOAs governed by §552.0036. Rarely applies but important when it does.</div><span class="badge b-limit">Large HOAs only</span></div>
+        <div class="card" onclick="show(this,'govpub')"><div class="cn">Gov. Code Ch. 552 — Public Info Act</div><div class="cs">§209.005 carves out HOAs subject to §552.0036. HOAs meeting that threshold become quasi-public bodies.</div><span class="badge b-limit">Large HOAs only</span></div>
+        <div class="card" onclick="show(this,'elec259')"><div class="cn">Election Code §259.002</div><div class="cs">HOA cannot prohibit political signs from 90 days before to 10 days after an election. Works with §202.009.</div><span class="badge b-all">All HOAs</span></div>
+        <div class="card" onclick="show(this,'trec')"><div class="cn">Occ. Code / TREC Rules</div><div class="cs">TREC caps resale cert fees ($375 cert / $75 update) and publishes official forms for Ch. 207 compliance.</div><span class="badge b-disc">Disclosure</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow-row"><svg width="12" height="18" viewBox="0 0 12 18"><path d="M6 0L6 11M2 8L6 16L10 8" stroke="#aaa" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>litigation, limitations &amp; remedies available alongside Property Code rights</div>
+
+  <!-- CIVIL PRACTICE & REMEDIES + LOCAL GOV -->
+  <div class="layer-wrap">
+    <div class="layer-label">Texas Civil Practice &amp; Remedies Code + Local Gov. Code — enforcement &amp; procedure <span class="count">5 provisions</span></div>
+    <div class="layer other-tx">
+      <div class="grid g5">
+        <div class="card" onclick="show(this,'cprc16')"><div class="cn">CPRC §16.035</div><div class="cs">4-year statute of limitations on real property liens — HOA has 4 years to foreclose before the lien expires.</div><span class="badge b-limit">Limitations</span></div>
+        <div class="card" onclick="show(this,'cprc65')"><div class="cn">CPRC Ch. 65 — Injunctions</div><div class="cs">TRO / Temporary Injunction to stop a wrongful foreclosure sale. Homeowner's fastest emergency legal tool.</div><span class="badge b-limit">Remedies</span></div>
+        <div class="card" onclick="show(this,'cprc154')"><div class="cn">CPRC Ch. 154 — ADR</div><div class="cs">Alternative Dispute Resolution framework. §209.007 references ADR — this chapter sets the rules and procedures.</div><span class="badge b-all">All Disputes</span></div>
+        <div class="card" onclick="show(this,'cprcatty')"><div class="cn">CPRC Ch. 38 — Attorney's Fees</div><div class="cs">Statutory basis for recovering attorney's fees in contract &amp; property disputes. Supplements §209.008.</div><span class="badge b-all">Litigation</span></div>
+        <div class="card" onclick="show(this,'lgc')"><div class="cn">Local Gov. Code §§192–193</div><div class="cs">County clerk recording requirements. Liens and dedicatory instruments must be properly recorded here to be legally effective.</div><span class="badge b-county">County Clerks</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow-row"><svg width="12" height="18" viewBox="0 0 12 18"><path d="M6 0L6 11M2 8L6 16L10 8" stroke="#aaa" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>all layers above set the outer limits for Texas Property Code</div>
+
+  <!-- TITLE 5 — LIENS & HOMESTEAD -->
+  <div class="layer-wrap">
+    <div class="layer-label">Texas Property Code — Title 5 (Exempt Property &amp; Liens) — lien mechanics <span class="count">2 chapters</span></div>
+    <div class="layer title5">
+      <div class="grid g2">
+        <div class="card" onclick="show(this,'pc41')"><div class="cn">Ch. 41 — Homestead Exemptions</div><div class="cs">Property Code definition of "homestead." Implements Art. XVI §50 in statute form. Defines what qualifies for homestead foreclosure protection under §209.0092.</div><span class="badge b-lien">Homestead</span></div>
+        <div class="card" onclick="show(this,'pc51')"><div class="cn">Ch. 51 — Lien Foreclosure Procedures</div><div class="cs">The actual mechanics of non-judicial foreclosure: courthouse-steps sale, posting &amp; filing of notice, trustee sale rules. Used by HOAs after a §209.0092 court order authorizes the sale.</div><span class="badge b-lien">Foreclosure Mechanics</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow-row"><svg width="12" height="18" viewBox="0 0 12 18"><path d="M6 0L6 11M2 8L6 16L10 8" stroke="#aaa" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>Title 11 builds on the lien and homestead framework established in Title 5</div>
+
+  <!-- TITLE 11 -->
+  <div class="layer-wrap">
+    <div class="layer-label">Texas Property Code — Title 11 (Restrictive Covenants) — the HOA-specific statutes <span class="count">15+ chapters</span></div>
+    <div class="layer title11">
+
+      <div class="sec-div">Foundational chapters — apply broadly across subdivisions</div>
+      <div class="grid g5">
+        <div class="card" onclick="show(this,'ch201')"><div class="cn">Ch. 201 — Definitions</div><div class="cs">Dictionary for all of Title 11. Defines "restrictions" and "subdivision."</div><span class="badge b-core">Foundation</span></div>
+        <div class="card" onclick="show(this,'ch202')"><div class="cn">★ Ch. 202 — Restrictive Covenants</div><div class="cs">Applies to ALL Texas subdivisions. Defines dedicatory instrument. Requires county recordation. Prohibits many restrictive covenant types.</div><span class="badge b-all">Applies to all</span></div>
+        <div class="card" onclick="show(this,'ch203')"><div class="cn">Ch. 203 — Certain Counties</div><div class="cs">Land use restriction enforcement in specific Texas counties. Supplements Ch. 202 in those jurisdictions.</div><span class="badge b-county">Select Counties</span></div>
+        <div class="card" onclick="show(this,'ch204')"><div class="cn">Ch. 204 — Assessment Powers</div><div class="cs">Assessment authority for subdivisions outside Ch. 209. Defines "regular" and "special" assessment used by Ch. 207.</div><span class="badge b-core">Assessments</span></div>
+        <div class="card" onclick="show(this,'ch205')"><div class="cn">Ch. 205 — Revised Subdivisions</div><div class="cs">Restrictive covenants applicable to revised or replatted subdivisions in certain counties.</div><span class="badge b-county">Select Counties</span></div>
+      </div>
+      <div class="grid g5 mt4">
+        <div class="card" onclick="show(this,'ch206')"><div class="cn">Ch. 206 — Extension of Restrictions</div><div class="cs">Extends restrictions imposing regular assessments in certain subdivisions. Prevents restriction expiration.</div><span class="badge b-core">Extensions</span></div>
+        <div class="card" onclick="show(this,'ch207')"><div class="cn">★ Ch. 207 — Disclosure / Resale</div><div class="cs">Required on every home sale. HOA must deliver CC&Rs, bylaws, rules &amp; resale certificate within 10 business days.</div><span class="badge b-disc">Disclosure</span></div>
+        <div class="card" onclick="show(this,'ch208')"><div class="cn">Ch. 208 — Historic Neighborhoods</div><div class="cs">Amendment and termination of restrictive covenants in designated historic neighborhoods. Special procedures apply.</div><span class="badge b-county">Historic Areas</span></div>
+        <div class="card" onclick="show(this,'ch210')"><div class="cn">Ch. 210 — Covenant Extension by Petition</div><div class="cs">Allows residential covenant extension or modification through petition process in certain subdivisions.</div><span class="badge b-core">Extensions</span></div>
+        <div class="card" onclick="show(this,'ch211')"><div class="cn">Ch. 211 — Certain Subdivision Restrictions</div><div class="cs">Amendment and enforcement of restrictions in certain subdivisions. Supplement to Ch. 209 in those cases.</div><span class="badge b-core">Amendments</span></div>
+      </div>
+
+      <!-- CH. 209 INNER BOX -->
+      <div class="ch209-box">
+        <div class="ch209-title">Chapter 209 — Texas Residential Property Owners Protection Act (single-family HOAs only)</div>
+        <div class="grid g4 ch209-inner">
+          <div class="card" onclick="show(this,'ch209gov')"><div class="cn">§§209.002–.0051</div><div class="cs">Governance: Definitions, Applicability, Management Cert., Records Access, Open Meetings</div></div>
+          <div class="card" onclick="show(this,'ch209enforce')"><div class="cn">§§209.006–.008</div><div class="cs">Enforcement: Pre-Action Notice, Hearing Rights, Fine Policy, Attorney's Fees</div></div>
+          <div class="card" onclick="show(this,'ch209collect')"><div class="cn">§§209.0061–.0065</div><div class="cs">Collection: Fine Schedules, Payment Plans (min. 3 months), Lien Priority, Credit Reporting</div></div>
+          <div class="card" onclick="show(this,'ch209fore')"><div class="cn">§§209.009–.011</div><div class="cs">Foreclosure: Restrictions, Judicial Requirement (homestead), 180-day Redemption Right</div></div>
+          <div class="card" onclick="show(this,'ch209vote')"><div class="cn">§§209.0055–.00594</div><div class="cs">Voting &amp; Elections: Ballots, Board Membership, Quorum, Recount Rights, Vote Transparency</div></div>
+          <div class="card" onclick="show(this,'ch209arc')"><div class="cn">§209.00505</div><div class="cs">Architectural Review: Written denials required; reasons must be stated; right to appeal to board</div></div>
+          <div class="card" onclick="show(this,'ch209lien')"><div class="cn">§209.0094</div><div class="cs">Assessment Lien Filing: How and when a lien can be filed; notice required; prompt release on payment</div></div>
+          <div class="card" onclick="show(this,'ch209ops')"><div class="cn">§§209.012–.017</div><div class="cs">Operations: Easements, Amendments, Forced Elections, Rental Limits, Land Use, Justice Court Jurisdiction</div></div>
+        </div>
+      </div>
+
+      <div class="sec-div mt4">Condominium chapters — parallel to Ch. 209 but for condos</div>
+      <div class="grid g3">
+        <div class="card" onclick="show(this,'ch82')"><div class="cn">Ch. 82 — TUCA (condos post-Jan 1, 1994)</div><div class="cs">Texas Uniform Condominium Act. Ch. 209 equivalent for condos. §82.157 = condo resale certificate. §82.1141 = condo records access.</div><span class="badge b-condo">Condos post-1994</span></div>
+        <div class="card" onclick="show(this,'ch81')"><div class="cn">Ch. 81 — Original Condo Act (pre-1994)</div><div class="cs">Older law for condos with pre-1994 declarations. Less comprehensive than TUCA. Ch. 202 still applies.</div><span class="badge b-condo">Condos pre-1994</span></div>
+        <div class="card" onclick="show(this,'ch5ch12')"><div class="cn">Ch. 5 (Conveyances) &amp; Ch. 12 (Recording)</div><div class="cs">Foundational property law. Deed restriction contract law (Ch. 5) and county deed records recording rules (Ch. 12) that make HOA documents legally effective.</div><span class="badge b-core">Foundation</span></div>
+      </div>
+
+    </div><!-- /title11 -->
+  </div>
+
+  <div class="arrow-row"><svg width="12" height="18" viewBox="0 0 12 18"><path d="M6 0L6 11M2 8L6 16L10 8" stroke="#aaa" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>all statutes above set limits for these HOA-specific governing documents</div>
+
+  <!-- HOA DOCS -->
+  <div class="layer-wrap">
+    <div class="layer-label">HOA governing documents — your community's own rulebook (most specific layer) <span class="count">4 documents</span></div>
+    <div class="layer hoadocs">
+      <div class="grid g4">
+        <div class="card" onclick="show(this,'plat')"><div class="cn">Subdivision Plat</div><div class="cs">Recorded survey map. Defines lots, common areas, easements, setbacks. The first dedicatory instrument.</div></div>
+        <div class="card" onclick="show(this,'ccrs')"><div class="cn">CC&Rs / Declaration</div><div class="cs">Founding community contract. Sets assessments, restrictions, interest rates. Must be filed under §202.006.</div></div>
+        <div class="card" onclick="show(this,'bylaws')"><div class="cn">Bylaws</div><div class="cs">Internal operating manual: meetings, elections, board powers. Must conform to Ch. 209 &amp; BOC Ch. 22.</div></div>
+        <div class="card" onclick="show(this,'rules')"><div class="cn">Rules &amp; Regulations</div><div class="cs">Day-to-day rules. Must be adopted via §209.0041 process. Fine schedule required by §209.0061 lives here.</div></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /diagram-col -->
+
+<!-- ═══ RIGHT DETAIL PANEL ══════════════════════════════ -->
+<div class="detail-col">
+
+  <div class="search-wrap">
+    <input type="text" id="search" placeholder="Search laws, sections, topics..." oninput="doSearch(this.value)">
+    <div class="search-results" id="search-results"></div>
+  </div>
+
+  <div class="detail-placeholder" id="placeholder">
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="16" stroke="#ccc" stroke-width="1.5"/><path d="M18 10v10M18 24v1" stroke="#ccc" stroke-width="2" stroke-linecap="round"/></svg>
+    <p>Click any box in the diagram to see a plain-language explanation and its connections to other laws.<br><br>Or use the search box above to find a specific law or topic.</p>
+  </div>
+
+  <div class="detail-content" id="detail-content">
+    <span class="detail-layer-tag" id="d-layer"></span>
+    <h2 id="d-title"></h2>
+    <p id="d-body"></p>
+    <h3>Cross-references &amp; connections</h3>
+    <div class="rels" id="d-rels"></div>
+  </div>
+
+</div>
+</div><!-- /main -->
+
+<div class="legend">
+  <div class="leg"><div class="leg-dot" style="background:#B5D4F4"></div>Federal law</div>
+  <div class="leg"><div class="leg-dot" style="background:#C0DD97"></div>TX Constitution</div>
+  <div class="leg"><div class="leg-dot" style="background:#D3D1C7"></div>Other TX statutes</div>
+  <div class="leg"><div class="leg-dot" style="background:#F4C0D1"></div>CPRC + Local Gov. Code</div>
+  <div class="leg"><div class="leg-dot" style="background:#9FE1CB"></div>TX Prop. Code Title 5 (Liens)</div>
+  <div class="leg"><div class="leg-dot" style="background:#CECBF6"></div>TX Prop. Code Title 11</div>
+  <div class="leg"><div class="leg-dot" style="background:#AFA9EC;border:1.5px solid #534AB7"></div>Chapter 209 sub-sections</div>
+  <div class="leg"><div class="leg-dot" style="background:#FAC775"></div>HOA governing documents</div>
+  <div class="leg-note">v2.0 — Updated with Ch. 41, Ch. 51, CPRC, Election Code §259, SCRA, Gov. Code Ch. 551/552 &amp; full Title 11 inventory</div>
+</div>
+
+<script>
+const DATA = {
+  fha:{layer:'Federal Law',title:'Fair Housing Act (42 U.S.C. §3604)',body:'Prohibits HOAs from enforcing rules that discriminate based on race, color, religion, sex, national origin, disability, or familial status. A rule that seems neutral but produces a discriminatory effect ("disparate impact") can still violate the FHA. HOAs must make reasonable accommodations for residents with disabilities — for example, allowing a wheelchair ramp, service animal, or reserved parking space even if the CC&Rs do not expressly permit it.',rels:['Overrides conflicting CC&R provisions — no HOA opt-out','Applies to enforcement of §209.006 fines and §209.00505 ARC decisions','Reasonable accommodation must be granted even without a CC&R provision allowing it','Violations: HUD complaint, private lawsuit, actual + punitive damages','Disparate impact claims do not require proof of discriminatory intent']},
+  fdcpa:{layer:'Federal Law',title:'FDCPA — Fair Debt Collection Practices Act (15 U.S.C. §1692)',body:'When an HOA hires a third-party collection firm or attorney to collect unpaid assessments, that party is a "debt collector" under the FDCPA. They cannot harass, make false statements, or use unfair practices. The law requires a written debt validation notice within 5 days of first contact and prohibits contact at inconvenient times. Works alongside Texas Finance Code §392 (TDCA). The FDCPA applies to third-party collectors; the TDCA may apply to the HOA itself.',rels:['Applies to third-party collectors hired under §209.0064','Works alongside TX Finance Code Ch. 392 (TDCA)','Requires debt validation notice within 5 days of first contact','Violations: actual damages + up to $1,000 statutory damages + attorney\'s fees','Does NOT apply to the HOA itself collecting its own debt (that\'s TDCA)']},
+  ada:{layer:'Federal Law',title:'ADA / Fair Housing Amendments Act',body:'The Fair Housing Amendments Act of 1988 extended civil rights protections to housing. HOAs must provide reasonable accommodations (policy changes) and allow reasonable modifications (physical changes) for residents with disabilities. An HOA cannot refuse to allow a wheelchair ramp, grab bar, or emotional support animal based solely on CC&R provisions that prohibit alterations or pets. Cost of modifications is generally borne by the resident requesting them.',rels:['Overrides CC&R provisions that deny disability accommodations','Affects every §209.00505 architectural review decision involving disability','Cannot be waived by any HOA document at any level','FHA "reasonable accommodation" is a request for rule change; "modification" is a physical change','Distinct from ADA Title III (public accommodation) — FHA Amendments govern HOAs']},
+  bkcy:{layer:'Federal Law',title:'U.S. Bankruptcy Code (11 U.S.C.)',body:'When a homeowner files for bankruptcy, an automatic stay (§362) immediately halts all HOA collection — liens, foreclosures, lawsuits, phone calls. The HOA must file a proof of claim for pre-petition debt. Post-petition assessments (dues accruing after filing) may be treated as administrative expenses and have different priority. Chapter 13 allows homeowners to cure HOA arrearage over a 3-5 year plan, which can halt a pending foreclosure.',rels:['Automatically stays any §209.009 foreclosure proceeding — no exceptions','Automatically stays §209.0094 lien enforcement and all collection calls','HOA must file proof of claim for all pre-petition assessments','Chapter 13 allows cure of HOA arrearage — can permanently stop foreclosure','Post-petition dues may be recoverable as administrative expenses in Ch. 7']},
+  scra:{layer:'Federal Law',title:'Servicemembers Civil Relief Act (50 U.S.C. §3901 et seq.)',body:'Provides important protections for active-duty military members. An HOA generally cannot foreclose on the property of an active-duty servicemember without a court order, regardless of whether the property would otherwise qualify for non-judicial foreclosure. Interest rates on pre-service debt may be capped at 6%. HOA boards and collection attorneys must check SCRA status before initiating any foreclosure, as violations carry significant penalties.',rels:['Requires court order for foreclosure regardless of homestead status','Pre-service HOA assessment debt — interest may be capped at 6%','Violation of SCRA carries civil and criminal penalties','Works alongside §209.0092 judicial foreclosure requirement','Service must be verified through Department of Defense SCRA database']},
+  scm:{layer:'Federal / Texas',title:'Secretary of State Incorporation & IRS Tax Status',body:'Most Texas HOAs must incorporate as non-profit corporations by filing Articles of Incorporation with the Texas Secretary of State under BOC Ch. 22. Once incorporated, the HOA may apply for federal tax-exempt status (typically IRS 501(c)(4) as a social welfare organization). The Comptroller\'s website allows anyone to look up an HOA\'s corporate status, registered agent, and current board officers.',rels:['Incorporation required before most Ch. 209 protections apply to the board','IRS 501(c)(4) status allows HOA to avoid federal income tax on assessments','Texas Comptroller database: verify HOA corporate status and registered agent','Revoked corporate status may expose board members to personal liability','BOC Ch. 22 fiduciary duties attach upon incorporation']},
+  homestead:{layer:'Texas Constitution',title:'Art. XVI §50 — Homestead Protection',body:'One of the strongest homeowner protections in the country. A Texas homestead cannot be forced-sold to pay most debts. HOA assessments are one narrow exception — but even then, the constitution requires a court order before a homestead can be foreclosed. This is the direct constitutional source of §209.0092 (Judicial Foreclosure Required). "Homestead" is further defined in Property Code Ch. 41.',rels:['Direct constitutional source of §209.0092 (judicial foreclosure required)','Implemented in statute by TX Property Code Ch. 41','Cannot be waived by CC&Rs or any HOA document','Limits §209.009 and §209.0094 HOA lien authority on homestead property','SCRA adds additional layer of protection for active-duty military homesteads']},
+  dueprocess:{layer:'Texas Constitution',title:'Art. I §19 — Due Course of Law',body:'No citizen shall be deprived of life, liberty, or property except by due course of law. This is the constitutional foundation for all of Chapter 209\'s notice requirements — the 30-day cure notices, the pre-enforcement hearing rights, and the foreclosure procedures. An HOA that bypasses required notices may face not just a statutory challenge under §209.006 but a constitutional due process challenge.',rels:['Constitutional basis for §209.006 pre-enforcement notice requirements','Underpins the §209.007 hearing right before fines','Supports the §209.011 redemption right after foreclosure','Provides grounds to challenge HOA action taken without proper notice','CPRC Ch. 65 injunctions are the procedural tool to enforce this right']},
+  txart1s17:{layer:'Texas Constitution',title:'Art. I §17 — Taking of Property',body:'Private property shall not be taken or damaged for or applied to public use without adequate compensation and the consent of the owner. While this provision primarily governs government takings, it is relevant to HOA easement authority: an HOA amendment that purports to grant the association an easement over private lots without owner consent implicates this provision, which is reinforced by §209.012.',rels:['Reinforces §209.012 (HOA cannot grant itself easements over lots without consent)','Limits what the HOA can do to your property through CC&R amendments','More typically invoked when a municipality or public utility seeks access through an HOA subdivision','Works alongside TX Prop. Code Ch. 5 deed restriction and easement law']},
+  boc22:{layer:'Business Organizations Code',title:'TX Business Organizations Code Ch. 22 — Non-Profit Corporations',body:'Most Texas HOAs are incorporated as Texas non-profit corporations. This means board members owe fiduciary duties (duty of care, loyalty, obedience) to the membership. BOC Ch. 22 provides limited liability protection to volunteer board members acting in good faith within their authority. The corporate formalities required here — annual meetings, recorded minutes, proper elections — overlap with and supplement Chapter 209\'s open meeting and voting requirements.',rels:['Board fiduciary duties operate alongside §209.0051 open meetings','Provides liability shield for board members acting in good faith','Corporate records supplement §209.005 records access rights','Board elections must satisfy both BOC Ch. 22 and §§209.00591–.00594','Revocation of non-profit status exposes board to personal liability']},
+  boc251:{layer:'Business Organizations Code',title:'TX Business Organizations Code Ch. 251 — Texas Cooperative Association Act',body:'Recognizes and provides a legal framework for cooperative associations in Texas, including those organized for the purpose of purchasing and maintaining real estate. While most Texas communities are organized as non-profit corporations under Ch. 22, some older or unique developments — particularly in large cities — are organized as cooperatives. The governance structure differs significantly from a standard HOA: members own shares in the co-op rather than individual lots.',rels:['Governs co-ops organized for real estate maintenance — distinct from HOA structure','Members own shares, not individual lots — different from Ch. 209 structure','Ch. 209 does not apply to cooperatives — different statutory framework','FHA and FDCPA protections still apply to co-op residents','Relevant to some older Texas urban developments in Houston and Dallas']},
+  tdca:{layer:'Texas Finance Code',title:'TX Finance Code Ch. 392 — Texas Debt Collection Act (TDCA)',body:'The state-level companion to the FDCPA. Unlike the FDCPA, the TDCA applies to first-party collectors (the HOA collecting its own debt directly), not just third-party collectors. It prohibits oppressive tactics, false representations, and unfair means. This means the HOA management company and the board itself — not just hired collection attorneys — must comply with TDCA when pursuing delinquent accounts.',rels:['Applies to HOA itself (first-party) AND third-party collectors — broader than FDCPA','Works alongside FDCPA when third-party collectors are involved','Penalties: actual damages + injunctive relief + attorney\'s fees','Applies to all collection letters, calls, and notices sent by or on behalf of the HOA','§209.0064 (Third Party Collections) cross-references TDCA compliance']},
+  taxcode:{layer:'Texas Tax Code',title:'TX Tax Code §11.13 (Homestead Exemption) & §11.28 (Non-Profit Exemption)',body:'§11.13 provides the residential homestead exemption that reduces a homeowner\'s taxable value — relevant to the HOA foreclosure analysis because a property with a homestead exemption has homestead status, triggering §209.0092. §11.28 provides property tax exemption for qualifying non-profit HOA property (common areas, amenity centers). The HOA\'s own common area land may be exempt from ad valorem taxes if the HOA qualifies.',rels:['§11.13 homestead exemption confirms homestead status → triggers §209.0092 judicial foreclosure req.','§11.28 common area tax exemption for qualifying non-profit HOAs','Tax exemption for HOA non-profit status parallels IRS 501(c)(4) analysis','Property tax records at the county appraisal district identify homestead status','County CAD records are often used to verify homestead status in foreclosure proceedings']},
+  govopen:{layer:'Texas Government Code',title:'Government Code Ch. 551 — Texas Open Meetings Act',body:'The Open Meetings Act requires governmental bodies to hold open public meetings. Section §209.0051 of Ch. 209 expressly states it does NOT apply to an HOA that is already subject to Ch. 551 — because Ch. 551 would impose even stricter requirements. HOAs subject to Ch. 551 (via §552.0036) are typically very large associations with quasi-governmental characteristics. For most private HOAs, §209.0051 is the governing open meeting rule.',rels:['§209.0051 expressly carves out HOAs already subject to Ch. 551','An HOA subject to Ch. 551 has stricter open meeting requirements than §209.0051','Most private HOAs are NOT subject to Ch. 551 — §209.0051 governs instead','Large master-planned or tax-district-adjacent HOAs should verify their status','If Ch. 551 applies, the AG\'s Open Meetings hotline has jurisdiction']},
+  govpub:{layer:'Texas Government Code',title:'Government Code Ch. 552 — Texas Public Information Act',body:'The Public Information Act requires governmental bodies to make records publicly available. §209.005 expressly states it does NOT apply to an HOA that is subject to Ch. 552 via §552.0036 — because Ch. 552 imposes even more comprehensive disclosure requirements. An HOA subject to Ch. 552 would need to respond to public information requests from anyone, not just its own members. This typically applies to associations that have taken on quasi-governmental functions (e.g., providing municipal-like services in large unincorporated areas).',rels:['§209.005 records access explicitly carves out HOAs already subject to Ch. 552','Ch. 552 HOAs must respond to PIA requests from the general public, not just members','Majority of Texas HOAs are private and NOT subject to Ch. 552','Violation of Ch. 552 can be referred to the Texas Attorney General','Large special district-adjacent HOAs in Harris County: verify your status']},
+  elec259:{layer:'Texas Election Code',title:'Election Code §259.002 — Regulation of Political Signs by HOA',body:'Expressly limits how long an HOA can prohibit political signs on private property. The HOA cannot forbid political signs during the period beginning 90 days before an election through 10 days after the election. Outside that window, the HOA may regulate signs, but cannot impose restrictions that go beyond reasonable regulations on size, number, and placement. This section works alongside §202.009 of the Property Code, which contains a parallel provision.',rels:['HOA cannot prohibit political signs from 90 days before to 10 days after election','Works alongside and supplements TX Prop. Code §202.009','HOA may still regulate: size, number (max 1 per candidate), and ground mounting','Sign prohibition outside election window may still be valid if in CC&Rs','Violation: homeowner may display sign despite HOA rule — rule is void during protected window']},
+  trec:{layer:'Texas Occupations Code / TREC',title:'Texas Real Estate Commission — Rules & Fee Caps',body:'TREC does not regulate HOAs directly but regulates the resale certificate process under Chapter 207. TREC caps the fee at $375 for a resale certificate and $75 for an updated certificate. TREC also publishes the official resale certificate form (Form 37-5). Sellers\' agents and title companies rely on TREC timelines and forms. An HOA that charges above the cap or fails to deliver on time may face penalties or be required to refund the excess fee.',rels:['Sets fee caps for §207.003 resale certificates ($375 cert / $75 update)','Publishes official resale certificate form (TREC Form 37-5)','HOA overcharging: excess fees must be refunded; failure to produce: owner may sue for up to $5,000','Regulates real estate agents who order and deliver Ch. 207 disclosures','Title companies rely on TREC-compliant resale certs for clear-title closings']},
+  cprc16:{layer:'TX Civil Practice & Remedies Code',title:'CPRC §16.035 — 4-Year Statute of Limitations on Real Property Liens',body:'A party must bring suit to enforce a real property lien — including an HOA assessment lien — no later than 4 years after the cause of action accrues. If an HOA files a lien and then does nothing for more than 4 years, the lien may become time-barred and unenforceable. This is a critical protection for homeowners who are disputing old or stale lien claims. The clock may be reset by the HOA taking action (filing suit, sending a new notice of acceleration) before limitations runs.',rels:['HOA assessment lien must be enforced within 4 years of accrual','Stale liens filed years ago may be legally unenforceable — check the date','Clock may restart if HOA files suit or accelerates within the 4-year window','Works alongside §209.0094 (lien filing) and §209.009 (foreclosure restrictions)','Defense in HOA foreclosure litigation: raise limitations as an affirmative defense']},
+  cprc65:{layer:'TX Civil Practice & Remedies Code',title:'CPRC Ch. 65 — Injunctions (TRO & Temporary Injunction)',body:'Chapter 65 provides the procedural framework for obtaining a Temporary Restraining Order (TRO) or Temporary Injunction to halt a wrongful HOA foreclosure sale. A TRO can be obtained on an emergency basis (sometimes within hours) without notice to the other party, and can preserve the status quo for up to 14 days while a full hearing is scheduled. This is a homeowner\'s fastest and most powerful emergency legal tool when facing imminent HOA foreclosure.',rels:['TRO can stop a HOA foreclosure sale within hours — file in the district court','TRO preserves status quo for up to 14 days pending TI hearing','Temporary Injunction (TI) can extend the stay until a full trial on the merits','Must show: probable right to recover + probable injury if not stopped','Far more effective than a wrongful foreclosure suit after the fact — act before the sale']},
+  cprc154:{layer:'TX Civil Practice & Remedies Code',title:'CPRC Ch. 154 — Alternative Dispute Resolution (ADR)',body:'Chapter 154 establishes the framework for alternative dispute resolution in Texas, including mediation, arbitration, and other ADR methods. Section §209.007 of Ch. 209 expressly requires or encourages ADR for HOA disputes before escalating to litigation. Under this chapter, courts may refer HOA disputes to ADR, and parties can voluntarily submit to mediation. A successful mediation can resolve disputes faster and at far lower cost than a lawsuit.',rels:['§209.007 expressly references ADR — this chapter sets the rules and procedures','Courts may compel HOA disputes to mediation under §154.021','Mediator is neutral — not a judge but can facilitate binding agreement','Mediation is confidential — statements made cannot be used in later litigation','Arbitration clause in CC&Rs may require binding arbitration instead of court']},
+  cprcatty:{layer:'TX Civil Practice & Remedies Code',title:'CPRC Ch. 38 — Recovery of Attorney\'s Fees',body:'Chapter 38 provides a statutory basis for recovering attorney\'s fees in contract and property disputes in Texas. It works alongside §209.008 of Ch. 209 which specifically authorizes attorney\'s fee recovery for HOA enforcement actions. Together, these provisions mean that a homeowner who prevails against an HOA\'s improper enforcement action — or an HOA that prevails against a delinquent owner — may be entitled to recover their legal fees from the other side.',rels:['Works alongside §209.008 (both sides can recover fees in HOA disputes)','Winning homeowner in §209.006 notice violation case may recover attorney\'s fees','HOA collecting successful judgment may recover fees under both §209.008 and Ch. 38','Fee recovery requires prevailing party status — partial wins may limit recovery','Fee awards act as a deterrent against both frivolous HOA enforcement and meritless defenses']},
+  lgc:{layer:'Texas Local Government Code',title:'Local Gov. Code §§192.001 & 193.001 — County Clerk Recording Requirements',body:'These sections require the county clerk to accept and properly index all documents submitted for recording in the county\'s real property records. HOA liens (§209.0094), management certificates (§209.004), and all dedicatory instruments (§202.006) must be properly filed with the county clerk to be legally effective. The county clerk assigns an instrument number and records the filing date — the date of recording is legally significant for lien priority.',rels:['HOA lien under §209.0094 must be filed with county clerk to be effective against third parties','Management certificate under §209.004 must be filed and kept current','All dedicatory instruments under §202.006 must be county-recorded to be enforceable','Recording date determines lien priority — earlier recording = higher priority','County deed records are public — any owner can search and obtain copies']},
+  pc41:{layer:'TX Prop. Code Title 5',title:'TX Property Code Ch. 41 — Homestead Exemptions',body:'Chapter 41 is the statutory implementation of the Texas Constitution Art. XVI §50 homestead protection. It defines what qualifies as a homestead (urban homestead: up to 10 acres within a city; rural homestead: up to 200 acres for a family). It also lists the specific types of liens that CAN be enforced against a homestead — HOA assessment liens are included in this narrow list. Understanding Ch. 41 is essential for determining whether §209.0092 (judicial foreclosure) applies to a specific property.',rels:['Implements TX Const. Art. XVI §50 in statute — defines "homestead" precisely','Urban homestead: up to 10 acres of contiguous land within a city','HOA assessment liens are one of the few liens that CAN be enforced against a homestead','§209.0092 judicial foreclosure requirement applies to properties qualifying under Ch. 41','Loss of homestead designation (e.g., converting to rental) changes foreclosure analysis']},
+  pc51:{layer:'TX Prop. Code Title 5',title:'TX Property Code Ch. 51 — Lien Foreclosure Procedures',body:'Chapter 51 provides the actual mechanics of non-judicial (trustee\'s sale) foreclosure in Texas. After an HOA obtains a court order under §209.0092 authorizing a non-judicial sale, the HOA follows Ch. 51 to conduct the foreclosure: posting notice at the courthouse, filing notice with the county clerk at least 21 days before the sale, and holding the auction between 10 a.m. and 4 p.m. on the first Tuesday of a month. §51.002 sets minimum notice requirements. §51.003 governs deficiency judgments.',rels:['Used by HOAs after §209.0092 court order authorizes the sale','§51.002: 21-day posted and filed notice required before foreclosure sale','Sale must occur at the courthouse between 10am–4pm on the first Tuesday of a month','§51.003: if sale price is less than debt, HOA may seek deficiency judgment in district court','Strict compliance required — failure to follow Ch. 51 procedures can void the sale']},
+  ch201:{layer:'TX Property Code Title 11',title:'Ch. 201 — General Definitions',body:'The shared dictionary for all of Title 11. Defines foundational terms like "restrictions" and "subdivision" that are expressly cross-referenced by Chapters 202, 207, and 209. Chapter 207 borrows "restrictions" directly from §201.003. Without understanding the vocabulary in Ch. 201, you cannot fully parse any of the other Title 11 chapters.',rels:['"Restrictions" definition (§201.003) expressly borrowed by Ch. 207','"Subdivision" definition used throughout Title 11','Foundation vocabulary for all Title 11 chapters','Must be read alongside §202.001 and §209.002 for complete definitions picture']},
+  ch202:{layer:'TX Property Code Title 11',title:'★ Ch. 202 — Construction & Enforcement of Restrictive Covenants',body:'The broadest chapter in Title 11 — applies to ALL Texas residential subdivisions with recorded deed restrictions, not just mandatory HOAs. Defines "dedicatory instrument" (§202.001(1)) and "property owners\' association," requires recordation of all governing documents (§202.006), and prohibits certain types of restrictive covenants including bans on: composting, rain barrels, efficient irrigation, solar panels, certain roofing materials, flag displays, religious items, security cameras, standby generators, political signs (with §202.009), and more.',rels:['§202.001 definitions cross-referenced by Ch. 207 and Ch. 209','§202.006 recordation required for all Ch. 209 dedicatory instruments','§202.003 "liberal construction" applies to all CC&R enforcement','§202.007–.024 list specific things HOAs CANNOT ban or restrict','Applies even to subdivisions not governed by Ch. 209 (e.g., voluntary POAs)']},
+  ch203:{layer:'TX Property Code Title 11',title:'Ch. 203 — Land Use Restriction Enforcement in Certain Counties',body:'Chapter 203 specifically addresses the enforcement of land use restrictions in certain Texas counties — primarily applying to unincorporated areas that do not have traditional zoning. It gives property owners and associations additional tools to enforce residential-use restrictions in those jurisdictions. It supplements Ch. 202 for those specific geographic areas.',rels:['Supplements Ch. 202 for land use restriction enforcement in specific counties','Primarily relevant to unincorporated areas without traditional zoning authority','Does NOT replace Ch. 209 for mandatory HOAs — both may apply','Local county judge or attorney general may have enforcement authority under this chapter']},
+  ch204:{layer:'TX Property Code Title 11',title:'Ch. 204 — Assessment Powers of Property Owners\' Associations',body:'Provides the statutory authority for property owners\' associations to levy assessments in subdivisions that predate or fall outside the full scope of Ch. 209. Defines "regular assessment" and "special assessment" — terms that Chapter 207 expressly borrows from §204.001. For most modern mandatory HOAs, Ch. 209 is the primary authority, but Ch. 204 fills gaps for older or less formal associations.',rels:['"Regular assessment" and "special assessment" definitions borrowed by §207.001','Assessment authority for associations partially outside Ch. 209 scope','Assessment authority must be authorized in the CC&Rs to be valid','Feeds into §209.0062 payment plan calculations (what counts as an "assessment")']},
+  ch205:{layer:'TX Property Code Title 11',title:'Ch. 205 — Restrictive Covenants in Revised Subdivisions',body:'Addresses restrictive covenants applicable to revised or replatted subdivisions in certain counties. When a subdivision is replatted — meaning lots are reconfigured — questions arise about whether the original restrictions survive the replat. Chapter 205 provides a framework for resolving those questions in specific jurisdictions, preventing the loss of deed restrictions through the replatting process.',rels:['Applicable only in specific counties — verify local applicability','Prevents accidental extinguishment of deed restrictions through replat process','Works alongside Ch. 202 for general restrictive covenant enforcement','Relevant when an HOA subdivision is being partially replatted or expanded']},
+  ch206:{layer:'TX Property Code Title 11',title:'Ch. 206 — Extension of Restrictions Imposing Regular Assessments',body:'Provides a mechanism for extending deed restrictions in certain subdivisions that would otherwise expire by their own terms. In older Texas subdivisions, the original deed restrictions often had a fixed term (e.g., 25 years) and a provision for automatic renewal or extension. Ch. 206 gives property owners the statutory tools to vote to extend those restrictions — preserving the HOA\'s legal foundation.',rels:['Allows extension of expiring deed restrictions in qualifying subdivisions','Requires petition process — typically a percentage of owners must sign','Critical for HOAs in older subdivisions whose CC&Rs may be approaching their sunset date','Failure to extend restrictions may dissolve the HOA\'s legal authority to collect assessments','Ch. 210 provides a related mechanism for petition-based modification']},
+  ch207:{layer:'TX Property Code Title 11',title:'★ Ch. 207 — Disclosure of Information / Resale Certificates',body:'Triggered every time a home in a mandatory HOA subdivision is sold. The HOA must deliver — within 10 business days of a written request — the CC&Rs, bylaws, rules, and a resale certificate disclosing all amounts owed, pending violations, special assessments, and litigation. If the HOA fails to disclose a debt, it loses its lien on that debt against the new buyer. Ch. 207 expressly borrows definitions from §§201.003, 202.001, 204.001, and 209.002, making it the most cross-referenced chapter in Title 11.',rels:['Borrows definitions from §§201.003, 202.001, 204.001, and 209.002','Undisclosed debts lose lien priority against new buyer (§207.005)','TREC caps fees at $375 cert / $75 update — excess fees must be refunded','HOAs with 60+ lots must publish documents on a website (§207.006)','Failure to deliver on time: owner may sue for damages up to $5,000','Condo parallel: §82.157 (TUCA)']},
+  ch208:{layer:'TX Property Code Title 11',title:'Ch. 208 — Amendment & Termination in Historic Neighborhoods',body:'Provides a special process for amending or terminating restrictive covenants in neighborhoods designated as historic. Standard CC&R amendment procedures may conflict with historic preservation goals. Chapter 208 balances these interests by providing a tailored process for historic neighborhoods, typically requiring coordination with local historic preservation authorities.',rels:['Applies only to areas with formal historic designation','Special amendment process — different from standard §209.0041 procedures','Works alongside local historic preservation ordinances','May limit the types of CC&R changes an HOA can make in designated areas','Relevant to HOAs in older urban neighborhoods with historic district status']},
+  ch210:{layer:'TX Property Code Title 11',title:'Ch. 210 — Covenant Extension or Modification by Petition',body:'Allows residential covenant extension or modification through a petition process in certain subdivisions. Where Ch. 206 addresses extension of assessment-based restrictions, Ch. 210 provides a broader framework for modifying or extending covenants generally through a homeowner petition. This gives majority homeowners a statutory path to update outdated restrictions without needing a developer\'s consent.',rels:['Related to Ch. 206 but broader in scope — applies to modification, not just extension','Petition-based: requires a qualifying percentage of owners to sign','Does not require HOA board action — owners can act independently','Alternative to the §209.0041 board-driven amendment process for certain changes','CC&Rs may specify additional requirements beyond Ch. 210 minimum']},
+  ch211:{layer:'TX Property Code Title 11',title:'Ch. 211 — Amendment & Enforcement in Certain Subdivisions',body:'Addresses the amendment and enforcement of restrictions in certain subdivisions that may not fit cleanly within Ch. 209 — for example, larger or mixed-use developments, or subdivisions with unusual governance structures. It supplements the general Ch. 202 and Ch. 209 frameworks for those edge cases and provides specific amendment voting procedures.',rels:['Supplements Ch. 202 and Ch. 209 for certain atypical subdivisions','Specific voting and amendment procedures for qualifying developments','Relevant for large master-planned communities with mixed residential/commercial elements','HOA counsel should confirm whether Ch. 211 applies alongside or instead of §209.0041']},
+  ch209gov:{layer:'Chapter 209 — Governance',title:'§§209.002–.0051 — Governance: Definitions, Management Certificate, Records & Open Meetings',body:'§209.002 provides the chapter\'s definitions (assessment, board, declaration, dedicatory instrument, management company). §209.003 limits the chapter to mandatory residential POAs. §209.004 requires the HOA to file a management certificate with the county AND the state database. §209.005 gives homeowners the right to inspect all books and records within 10 business days. §209.0051 requires most board meetings to be open to all owners.',rels:['§209.002 definitions expressly borrowed by Ch. 207','§209.004 management cert must also comply with §202.006 county recordation','§209.005 records access: respond in 10 days, produce in 15 business days','§209.0051 open meetings: board cannot go into closed session except for litigation/personnel/contracts','BOC Ch. 22 corporate formalities run alongside these requirements']},
+  ch209enforce:{layer:'Chapter 209 — Enforcement',title:'§§209.006–.008 — Notice, Hearing & Attorney\'s Fees',body:'Before any enforcement action — fine, lawsuit, lien, common area suspension, or credit report — the HOA must send certified mail notice giving the owner at least 30 days to cure a curable violation. The owner may request a hearing before the board within 30 days. No fine can be imposed for a curable violation until the cure period has passed. Attorney\'s fees can be recovered by either party.',rels:['§209.006 notice must precede ANY enforcement action — violation voids the action','Failure to send proper notice may void any subsequent fine, lien, or lawsuit','§209.007 hearing right flows from TX Const. Art. I §19 due process','§209.008 attorney\'s fees apply to both sides — two-way protection and deterrent','§209.006 notice also required before credit reporting under §209.0065']},
+  ch209collect:{layer:'Chapter 209 — Collection',title:'§§209.0061–.0065 — Fines, Payment Plans, Lien Priority & Credit Reporting',body:'§209.0061 requires a written fine schedule. §209.0062 requires the HOA to offer a payment plan (minimum 3 months, no attorney fees included unless owner defaults) before foreclosure. §209.0063 sets mandatory payment application order: delinquent assessments first, current assessments second, fees and fines last. §209.0064 governs third-party collectors (FDCPA/TDCA also apply). §209.0065 allows credit reporting only after §209.006 notice.',rels:['§209.0062 payment plan MUST be offered before §209.009 foreclosure can proceed','§209.0063 payment order cannot be reversed or waived by CC&Rs','§209.0064 third-party collectors: also bound by FDCPA + TX Finance Code §392 (TDCA)','§209.0065 credit reporting requires §209.006 prior written notice','§209.0062 payment plan: no attorney fees in the plan amount unless owner defaults']},
+  ch209fore:{layer:'Chapter 209 — Foreclosure',title:'§§209.009–.011 — Foreclosure Limits, Judicial Requirement & Redemption',body:'§209.009 prohibits foreclosure for fines alone, and prohibits foreclosure when the total assessments fall below a statutory minimum. §209.0092 requires a court order before a homestead can be foreclosed — after the court order, Ch. 51 governs the sale mechanics. §209.010 requires written notice within 30 days after a sale. §209.011 gives the former owner 180 days to redeem the property.',rels:['§209.0092 judicial foreclosure constitutionally required by Art. XVI §50','After court order, Ch. 51 governs the actual foreclosure sale mechanics (notice, timing, auction)','SCRA provides additional layer of protection for active-duty military members','CPRC §16.035: 4-year limitations applies to HOA lien enforcement','CPRC Ch. 65 TRO/TI: emergency tool to stop imminent wrongful foreclosure sale']},
+  ch209vote:{layer:'Chapter 209 — Voting & Elections',title:'§§209.0055–.00594 — Voting, Elections & Board Governance',body:'§209.0059: HOA cannot strip your right to vote — any such CC&R provision is void. §209.0056: advance notice required before any election. §209.0057: recount rights. §209.0058: ballots must be retained. §209.00591: board member eligibility. §209.00592: quorum rules. §209.00593: election procedures. §209.00594: homeowners can observe ballot tabulation.',rels:['§209.0059 right to vote cannot be waived even if delinquent on dues','§209.00594 ballot transparency supplements BOC Ch. 22 corporate formalities','Board elections must satisfy both Ch. 209 and TX BOC Ch. 22 requirements','Violation of election procedures can invalidate board actions taken thereafter','Election Code §259.002 separately governs political sign rights']},
+  ch209arc:{layer:'Chapter 209 — Architectural Review',title:'§209.00505 — Architectural Review Authority',body:'If your HOA has an ARC, this section requires: the committee must act within the time period in the CC&Rs; any denial must be in writing; the denial must state the reason AND what changes would lead to approval; and the homeowner has the right to appeal to the full board. The ARC cannot simply say "no" without explanation. ARC decisions must also comply with FHA/ADA for disability accommodations regardless of CC&R language.',rels:['ARC denials must be written with stated reasons — no oral denials permitted','Right to appeal to the full board within the time set by governing documents','FHA and ADA override any ARC denial that discriminates or denies accommodation','Unreasonable ARC delays may be treated as approval depending on CC&R language','ARC authority must be explicitly granted in the CC&Rs — it is not implied']},
+  ch209lien:{layer:'Chapter 209 — Lien Filing',title:'§209.0094 — Assessment Lien Filing',body:'Before an HOA can enforce a lien, it must file a formal lien document in the county\'s real property records. The homeowner must receive §209.006 notice before filing. A lien clouds the title — it appears in searches and can block any sale or refinance until resolved. After the debt is paid, the HOA must promptly file a lien release. Note: CPRC §16.035\'s 4-year limitations period applies from the date the lien accrues.',rels:['§209.006 notice required before lien can be filed','Filed with county clerk under Local Gov. Code §§192–193 — date of filing = lien priority date','A lien clouds title — may block any sale or refinance until released','After full payment, HOA must promptly file a lien release in county records','CPRC §16.035: 4-year limitations on lien enforcement — check accrual date']},
+  ch209ops:{layer:'Chapter 209 — Operations',title:'§§209.012–.017 — Easements, Amendments, Forced Elections, Rentals & Justice Court',body:'§209.012: HOA cannot grant itself an easement over your lot without your consent. §209.013: Process for amending CC&Rs. §209.014: Owners can force an annual meeting if the board fails to call one. §209.015: HOA land use restrictions limited to what CC&Rs authorize. §209.016: Limits on rental restrictions. §209.017: Justice courts have jurisdiction over certain HOA disputes — faster and cheaper than district court.',rels:['§209.012 easement restriction supported by TX Const. Art. I §17 (taking of property)','§209.013 CC&R amendments must be recorded under §202.006 to be enforceable','§209.017 justice court reduces legal costs for homeowners — max $200/day civil damages','§209.016 rental restrictions must also comply with Fair Housing Act','§209.014 forced election: prevents boards from avoiding accountability to membership']},
+  ch82:{layer:'TX Property Code Title 11',title:'Ch. 82 — Texas Uniform Condominium Act (TUCA)',body:'The Chapter 209 equivalent for condominiums with declarations recorded on or after January 1, 1994. Governs governance, assessment liens, foreclosure, records access, and resale certificates (§82.157). §82.1141 (added 2021) now mirrors §209.005 for condo records access. TUCA is modeled on the Uniform Condominium Act. Chapter 202 still applies to TUCA condos for restrictive covenant enforcement.',rels:['§82.157 resale certificate is the condo equivalent of Ch. 207','§82.1141 condo records access now mirrors §209.005 (added 2021)','Ch. 202 still applies to TUCA condos for restrictive covenant enforcement','Does NOT apply to condos with pre-1994 declarations (Ch. 81 governs those)','TREC resale cert fee caps apply under §82.157 same as Ch. 207']},
+  ch81:{layer:'TX Property Code Title 11',title:'Ch. 81 — Original Texas Condominium Act',body:'The older condominium statute, applying to condos with declarations recorded before January 1, 1994. Less comprehensive than TUCA. Many older high-rise condominiums in Houston and Dallas are governed by Ch. 81. Chapter 202 still applies for restrictive covenant enforcement. Some Ch. 81 condos have voluntarily amended to adopt TUCA-equivalent standards, and some provisions of TUCA now expressly apply to pre-1994 condos as well.',rels:['Applies only to condominium declarations recorded before Jan 1, 1994','Ch. 202 still applies for restrictive covenant enforcement of Ch. 81 condos','Ch. 209 does NOT apply to condominiums — single-family HOAs only','Some TUCA (Ch. 82) provisions now expressly apply to pre-1994 condos as well','Many Ch. 81 condos have voluntarily "upgraded" their docs to TUCA standards']},
+  ch5ch12:{layer:'TX Property Code Foundation',title:'Ch. 5 (Conveyances) & Ch. 12 (Recording)',body:'Chapter 5 governs property conveyances and deed restrictions — the foundational contract law on which all restrictive covenants are built. Chapter 12 governs how instruments are recorded in county deed records, which is the same recording system that §202.006 and §209.004 use to make HOA documents publicly effective and legally binding on all subsequent owners. An unrecorded dedicatory instrument has no effect against a subsequent purchaser without notice.',rels:['Ch. 5 deed restriction contract law underlies all CC&R enforcement under Ch. 202','Ch. 12 recording system is the mechanism §202.006 and §209.004 use','Unrecorded dedicatory instruments have NO effect under §202.006','Ch. 5 §5.010 allows municipalities to enforce deed restrictions in certain situations','Chain of title searches under Ch. 12 reveal existing HOA liens and governing documents']},
+  plat:{layer:'HOA Governing Documents',title:'Subdivision Plat — The Map of Your Community',body:'The plat is the original recorded survey map that divided raw land into individual lots and designated common areas, easements, streets, and setbacks. Filed in the county deed records before any homes are built, it is the first dedicatory instrument under §202.001. The plat defines the physical boundaries that all other HOA rules operate within. Easements and setbacks shown on the plat bind all future owners regardless of subsequent HOA rule changes.',rels:['Filed in county deed records under §202.006 — it is a dedicatory instrument','Defines lot boundaries referenced in all CC&Rs and the Declaration','Common areas shown on plat are subject to HOA governance under Ch. 209','Easements on plat limit what §209.012 means for HOA easement rights','Plat setbacks and easements run with the land — bind all future owners forever']},
+  ccrs:{layer:'HOA Governing Documents',title:'CC&Rs / Declaration of Covenants, Conditions & Restrictions',body:'The founding contract of the HOA community. Sets the assessment amounts, due dates, land use restrictions, architectural rules, enforcement authority, and interest rate for delinquent accounts. Must be recorded in the county deed records under §202.006 to be enforceable. The CC&Rs cannot authorize anything that violates Ch. 202, Ch. 209, the Texas Constitution, or federal law — but within those limits, they are the supreme law of the community.',rels:['Must be recorded under §202.006 — unrecorded CC&Rs are unenforceable against new buyers','Assessment authority comes from CC&Rs — must comply with Ch. 204 and Ch. 209','Interest rate for §209.0062 payment plan calculations comes from CC&Rs','All bylaws and rules must be subordinate to the CC&Rs and Ch. 209','Amendments: must follow §209.0041 process AND be recorded under §202.006']},
+  bylaws:{layer:'HOA Governing Documents',title:'Association Bylaws',body:'The internal operating manual for the HOA. Sets meeting procedures, board composition, terms of office, quorum requirements, and voting rules. Must conform to Ch. 209\'s voting and meeting requirements and the Business Organizations Code (Ch. 22) if the HOA is incorporated. Bylaws cannot grant the board powers that the CC&Rs or Ch. 209 do not allow.',rels:['Must conform to §209.0051 open meeting requirements','Board elections must comply with §§209.00591–.00594','Incorporated HOA bylaws must also comply with TX BOC Ch. 22','Bylaws cannot override CC&Rs, Ch. 209, or any statute above them','Must be included in Ch. 207 resale certificate package delivered to buyers']},
+  rules:{layer:'HOA Governing Documents',title:'Rules & Regulations',body:'The most frequently amended layer of the HOA rulebook — parking, pool hours, pet policies, architectural standards, trash can placement, holiday decorations. Must be adopted through the proper §209.0041 process (open meeting, advance notice, county recording) to be enforceable. Cannot contradict the CC&Rs, bylaws, or any statute. The written fine schedule required by §209.0061 lives here.',rels:['Must be adopted via §209.0041 — unadopted rules are unenforceable against homeowners','Fine schedule (§209.0061) must be in writing and available to all owners','Cannot contradict CC&Rs, bylaws, Election Code §259.002, or any statutory right','HOAs with 60+ lots must post current rules on their website (§207.006)','Must be included in Ch. 207 resale package delivered to buyers at closing']}
+};
+
+let activeCard = null;
+
+function show(el, key) {
+  const d = DATA[key];
+  if (!d) return;
+  if (activeCard) activeCard.classList.remove('active');
+  el.classList.add('active');
+  activeCard = el;
+  document.getElementById('placeholder').style.display = 'none';
+  document.getElementById('search-results').style.display = 'none';
+  const dc = document.getElementById('detail-content');
+  dc.classList.add('visible');
+  document.getElementById('d-layer').textContent = d.layer;
+  document.getElementById('d-title').textContent = d.title;
+  document.getElementById('d-body').textContent = d.body;
+  document.getElementById('d-rels').innerHTML = d.rels.map(r => `<div class="rel-item">${r}</div>`).join('');
+  document.querySelector('.detail-col').scrollTop = 0;
+}
+
+function doSearch(q) {
+  const sr = document.getElementById('search-results');
+  if (!q || q.length < 2) { sr.style.display = 'none'; return; }
+  q = q.toLowerCase();
+  const matches = Object.entries(DATA).filter(([k, d]) =>
+    d.title.toLowerCase().includes(q) ||
+    d.body.toLowerCase().includes(q) ||
+    d.layer.toLowerCase().includes(q) ||
+    d.rels.some(r => r.toLowerCase().includes(q))
+  );
+  if (!matches.length) { sr.style.display = 'none'; return; }
+  sr.style.display = 'flex';
+  sr.innerHTML = matches.slice(0, 8).map(([k, d]) =>
+    `<div class="search-result" onclick="showByKey('${k}')"><strong>${d.title}</strong><br>${d.layer}</div>`
+  ).join('');
+}
+
+function showByKey(key) {
+  document.getElementById('search').value = '';
+  document.getElementById('search-results').style.display = 'none';
+  // find the card and simulate click
+  const cards = document.querySelectorAll('.card');
+  for (const card of cards) {
+    const attr = card.getAttribute('onclick') || '';
+    if (attr.includes(`'${key}'`)) {
+      show(card, key);
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+  }
+  // If card not found (shouldn't happen), just show detail
+  const d = DATA[key];
+  if (!d) return;
+  document.getElementById('placeholder').style.display = 'none';
+  const dc = document.getElementById('detail-content');
+  dc.classList.add('visible');
+  document.getElementById('d-layer').textContent = d.layer;
+  document.getElementById('d-title').textContent = d.title;
+  document.getElementById('d-body').textContent = d.body;
+  document.getElementById('d-rels').innerHTML = d.rels.map(r => `<div class="rel-item">${r}</div>`).join('');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In — MMPOAII HOA</title>
+<link rel="stylesheet" href="/css/site.css">
+<style>
+body { display: flex; flex-direction: column; min-height: 100vh; background: var(--gray-50); }
+.login-wrap {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  padding: 32px 16px;
+}
+.login-card {
+  background: var(--surf);
+  border: 1px solid var(--border);
+  border-radius: var(--r3);
+  padding: 36px 40px;
+  width: 100%; max-width: 420px;
+  box-shadow: 0 4px 32px rgba(0,0,0,.07);
+}
+.login-header { text-align: center; margin-bottom: 28px; }
+.login-logo {
+  width: 52px; height: 52px; background: var(--purple-800);
+  border-radius: var(--r2); margin: 0 auto 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+}
+.login-header h1 { font-family: var(--serif); font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.login-header p  { font-size: 13px; color: var(--text3); }
+.login-header .area-badge {
+  display: inline-block; margin-top: 8px;
+  font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px;
+}
+.area-badge.board { background: var(--purple-50); color: var(--purple-800); }
+.area-badge.homeowners { background: var(--teal-50); color: var(--teal-600); }
+
+.divider-line {
+  border: none; border-top: 1px solid var(--border);
+  margin: 20px 0;
+}
+
+/* Password show/hide */
+.pw-wrap { position: relative; }
+.pw-wrap input { padding-right: 44px; }
+.pw-toggle {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer; font-size: 16px; color: var(--text3);
+  padding: 0; line-height: 1;
+}
+.pw-toggle:hover { color: var(--text); }
+
+/* Submit button loading state */
+.login-btn {
+  width: 100%; padding: 12px;
+  background: var(--purple-600); color: #fff;
+  border: none; border-radius: var(--r);
+  font-family: var(--sans); font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: background .13s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.login-btn:hover:not(:disabled) { background: var(--purple-800); }
+.login-btn:disabled { opacity: .65; cursor: not-allowed; }
+.login-btn .spinner {
+  display: none; width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,.4);
+  border-top-color: #fff; border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+.login-btn.loading .spinner { display: block; }
+.login-btn.loading .btn-text { display: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.forgot-link { text-align: right; margin-top: 6px; }
+.forgot-link a { font-size: 12.5px; color: var(--purple-600); text-decoration: none; }
+.forgot-link a:hover { text-decoration: underline; }
+
+.back-link { text-align: center; margin-top: 18px; }
+.back-link a { font-size: 13px; color: var(--text3); text-decoration: none; }
+.back-link a:hover { color: var(--purple-600); }
+
+/* Views */
+.view { display: none; }
+.view.active { display: block; }
+
+/* New password checklist */
+.pw-rules { margin-top: 8px; }
+.pw-rules li {
+  font-size: 12px; color: var(--text3); list-style: none;
+  margin-bottom: 2px; display: flex; align-items: center; gap: 5px;
+}
+.pw-rules li.met { color: var(--green-600); }
+.pw-rules li::before { content: '○'; font-size: 10px; }
+.pw-rules li.met::before { content: '✓'; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="inner">
+    <a href="/" class="site-logo">
+      <div class="logo-mark">🏡</div>
+      <div class="logo-text">
+        <div class="logo-name" id="hdr-name">MMPOAII HOA</div>
+        <div class="logo-sub">Community Portal</div>
+      </div>
+    </a>
+    <nav class="site-nav">
+      <a href="/">← Back to Home</a>
+    </nav>
+  </div>
+</header>
+
+<div class="login-wrap">
+  <div class="login-card">
+
+    <!-- ── VIEW 1: SIGN IN ── -->
+    <div class="view active" id="view-signin">
+      <div class="login-header">
+        <div class="login-logo">🔐</div>
+        <h1 id="card-title">Community Portal</h1>
+        <p id="card-sub">Sign in to access your portal</p>
+        <div id="area-badge" class="area-badge" style="display:none"></div>
+      </div>
+
+      <div class="error-msg" id="signin-error"></div>
+      <div class="success-msg" id="signin-success"></div>
+
+      <div class="form-group">
+        <label for="username">Username or Email</label>
+        <input type="text" id="username" autocomplete="username"
+               placeholder="Enter your username" oninput="clearErrors()">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="password" autocomplete="current-password"
+                 placeholder="Enter your password" oninput="clearErrors()"
+                 onkeydown="if(event.key==='Enter') doSignIn()">
+          <button class="pw-toggle" type="button" onclick="togglePw('password', this)"
+                  title="Show/hide password">👁</button>
+        </div>
+        <div class="forgot-link"><a href="#" onclick="showView('view-forgot');return false">Forgot password?</a></div>
+      </div>
+
+      <button class="login-btn" id="signin-btn" onclick="doSignIn()">
+        <span class="btn-text">Sign In</span>
+        <div class="spinner"></div>
+      </button>
+
+      <div class="back-link">
+        <a href="/">← Return to home page</a>
+      </div>
+    </div>
+
+    <!-- ── VIEW 2: NEW PASSWORD REQUIRED (first-time login) ── -->
+    <div class="view" id="view-newpw">
+      <div class="login-header">
+        <div class="login-logo">🔑</div>
+        <h1>Set Your Password</h1>
+        <p>This is your first login. Please create a new password.</p>
+      </div>
+      <div class="error-msg" id="newpw-error"></div>
+
+      <div class="form-group">
+        <label for="newpw1">New Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="newpw1" placeholder="Choose a password"
+                 oninput="checkPwRules()" autocomplete="new-password">
+          <button class="pw-toggle" type="button" onclick="togglePw('newpw1', this)">👁</button>
+        </div>
+        <ul class="pw-rules" id="pw-rules">
+          <li id="rule-len">At least 8 characters</li>
+          <li id="rule-upper">One uppercase letter (A–Z)</li>
+          <li id="rule-lower">One lowercase letter (a–z)</li>
+          <li id="rule-num">One number (0–9)</li>
+          <li id="rule-special">One special character (!@#$%^&*()-+)</li>
+        </ul>
+      </div>
+
+      <div class="form-group">
+        <label for="newpw2">Confirm New Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="newpw2" placeholder="Repeat password"
+                 autocomplete="new-password"
+                 onkeydown="if(event.key==='Enter') doSetNewPassword()">
+          <button class="pw-toggle" type="button" onclick="togglePw('newpw2', this)">👁</button>
+        </div>
+      </div>
+
+      <button class="login-btn" id="newpw-btn" onclick="doSetNewPassword()">
+        <span class="btn-text">Set Password & Continue</span>
+        <div class="spinner"></div>
+      </button>
+    </div>
+
+    <!-- ── VIEW 3: FORGOT PASSWORD ── -->
+    <div class="view" id="view-forgot">
+      <div class="login-header">
+        <div class="login-logo">✉️</div>
+        <h1>Forgot Password</h1>
+        <p>Enter your username and we'll email you a reset code.</p>
+      </div>
+      <div class="error-msg"   id="forgot-error"></div>
+      <div class="success-msg" id="forgot-success"></div>
+
+      <div class="form-group">
+        <label for="forgot-user">Username or Email</label>
+        <input type="text" id="forgot-user" placeholder="Your username"
+               onkeydown="if(event.key==='Enter') doForgot()">
+      </div>
+
+      <button class="login-btn" id="forgot-btn" onclick="doForgot()">
+        <span class="btn-text">Send Reset Code</span>
+        <div class="spinner"></div>
+      </button>
+      <div class="back-link">
+        <a href="#" onclick="showView('view-signin');return false">← Back to sign in</a>
+      </div>
+    </div>
+
+    <!-- ── VIEW 4: RESET CODE CONFIRM ── -->
+    <div class="view" id="view-reset">
+      <div class="login-header">
+        <div class="login-logo">🔓</div>
+        <h1>Reset Password</h1>
+        <p>Check your email for a verification code. It expires in 24 hours.</p>
+      </div>
+      <div class="error-msg"   id="reset-error"></div>
+      <div class="success-msg" id="reset-success"></div>
+
+      <div class="form-group">
+        <label for="reset-code">Verification Code</label>
+        <input type="text" id="reset-code" placeholder="6-digit code from email"
+               inputmode="numeric" autocomplete="one-time-code">
+      </div>
+      <div class="form-group">
+        <label for="reset-pw">New Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="reset-pw" placeholder="Choose a new password"
+                 autocomplete="new-password">
+          <button class="pw-toggle" type="button" onclick="togglePw('reset-pw', this)">👁</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="reset-pw2">Confirm New Password</label>
+        <input type="password" id="reset-pw2" placeholder="Repeat new password"
+               autocomplete="new-password"
+               onkeydown="if(event.key==='Enter') doReset()">
+      </div>
+
+      <button class="login-btn" id="reset-btn" onclick="doReset()">
+        <span class="btn-text">Reset Password</span>
+        <div class="spinner"></div>
+      </button>
+      <div class="back-link">
+        <a href="#" onclick="showView('view-signin');return false">← Back to sign in</a>
+      </div>
+    </div>
+
+  </div><!-- /login-card -->
+</div><!-- /login-wrap -->
+
+<footer class="site-footer">
+  <div id="foot-name">MMPOAII Homeowners Association</div>
+  <div class="footer-disclaimer">Having trouble? Contact <a id="foot-email" href="#">board@mmpoaii.com</a></div>
+</footer>
+
+<!-- SCRIPTS -->
+<script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6/dist/amazon-cognito-identity.min.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/auth.js"></script>
+<script>
+// ── Determine destination from URL parameter ──────────────────────────────────
+const urlParams  = new URLSearchParams(window.location.search);
+const targetArea = urlParams.get('area') || '';   // 'board' or 'homeowners'
+let   pendingCognitoUser   = null;
+let   pendingUserAttributes = {};
+let   forgotUsername        = '';
+
+// ── Populate page from config ──────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function () {
+  const c = typeof HOA_CONFIG !== 'undefined' ? HOA_CONFIG : {};
+  document.getElementById('hdr-name').textContent = c.hoaName || 'MMPOAII HOA';
+  document.getElementById('foot-name').textContent = c.hoaName || 'MMPOAII HOA';
+  const emailEl = document.getElementById('foot-email');
+  emailEl.textContent = c.hoaEmail || 'board@mmpoaii.com';
+  emailEl.href = 'mailto:' + (c.hoaEmail || 'board@mmpoaii.com');
+
+  const badge = document.getElementById('area-badge');
+  if (targetArea === 'board') {
+    badge.textContent = 'Board Member Access'; badge.className = 'area-badge board'; badge.style.display = 'inline-block';
+  } else if (targetArea === 'homeowners') {
+    badge.textContent = 'Homeowner Access'; badge.className = 'area-badge homeowners'; badge.style.display = 'inline-block';
+  }
+
+  document.title = 'Sign In — ' + (c.hoaName || 'MMPOAII HOA');
+
+  // Show any message passed from guard.js
+  const msg = sessionStorage.getItem('hoa_login_msg');
+  if (msg) {
+    showError('signin-error', msg);
+    sessionStorage.removeItem('hoa_login_msg');
+  }
+});
+
+// ── View switching ─────────────────────────────────────────────────────────────
+function showView(id) {
+  document.querySelectorAll('.view').forEach(function (v) { v.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+}
+
+// ── Error/success helpers ──────────────────────────────────────────────────────
+function showError(id, msg)   { const el = document.getElementById(id); el.textContent = msg; el.classList.add('show'); }
+function showSuccess(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.classList.add('show'); }
+function clearErrors() {
+  document.querySelectorAll('.error-msg, .success-msg').forEach(function (el) {
+    el.classList.remove('show'); el.textContent = '';
+  });
+}
+
+// ── Button loading state ───────────────────────────────────────────────────────
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = loading;
+  btn.classList.toggle('loading', loading);
+}
+
+// ── Toggle password visibility ─────────────────────────────────────────────────
+function togglePw(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; }
+  else { input.type = 'password'; btn.textContent = '👁'; }
+}
+
+// ── Password rule checker ──────────────────────────────────────────────────────
+function checkPwRules() {
+  const pw = document.getElementById('newpw1').value;
+  const rules = [
+    ['rule-len',   pw.length >= 8],
+    ['rule-upper', /[A-Z]/.test(pw)],
+    ['rule-lower', /[a-z]/.test(pw)],
+    ['rule-num',   /[0-9]/.test(pw)]
+  ];
+  rules.forEach(function (r) {
+    document.getElementById(r[0]).classList.toggle('met', r[1]);
+  });
+}
+
+// ── SIGN IN ───────────────────────────────────────────────────────────────────
+function doSignIn() {
+  clearErrors();
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  if (!username || !password) { showError('signin-error', 'Please enter your username and password.'); return; }
+
+  setLoading('signin-btn', true);
+
+  HoaAuth.signIn(username, password, {
+    onSuccess: function (result) {
+      const groups = result.groups;
+      const c = typeof HOA_CONFIG !== 'undefined' ? HOA_CONFIG : {};
+      const boardGroup = c.boardGroup || 'board';
+      const homeGroup  = c.homeownersGroup || 'homeowners';
+
+      if (groups.includes(boardGroup)) {
+        window.location.href = '/board/index.html';
+      } else if (groups.includes(homeGroup)) {
+        window.location.href = '/homeowners/index.html';
+      } else {
+        setLoading('signin-btn', false);
+        showError('signin-error', 'Your account has not been assigned to a group. Please contact the board administrator.');
+      }
+    },
+    onFailure: function (msg) {
+      setLoading('signin-btn', false);
+      showError('signin-error', msg);
+    },
+    onNewPasswordRequired: function (cognitoUser, userAttributes) {
+      setLoading('signin-btn', false);
+      pendingCognitoUser   = cognitoUser;
+      pendingUserAttributes = userAttributes || {};
+      showView('view-newpw');
+    }
+  });
+}
+
+// ── SET NEW PASSWORD (first-time login) ──────────────────────────────────────
+function doSetNewPassword() {
+  clearErrors();
+  const pw1 = document.getElementById('newpw1').value;
+  const pw2 = document.getElementById('newpw2').value;
+  if (pw1 !== pw2) { showError('newpw-error', 'Passwords do not match.'); return; }
+  if (pw1.length < 8) { showError('newpw-error', 'Password must be at least 8 characters.'); return; }
+  if (!pendingCognitoUser) { showView('view-signin'); return; }
+
+  setLoading('newpw-btn', true);
+
+  HoaAuth.completeNewPassword(pendingCognitoUser, pw1, pendingUserAttributes, {
+    onSuccess: function (result) {
+      const groups = result.groups;
+      const c = typeof HOA_CONFIG !== 'undefined' ? HOA_CONFIG : {};
+      if (groups.includes(c.boardGroup || 'board')) {
+        window.location.href = '/board/index.html';
+      } else {
+        window.location.href = '/homeowners/index.html';
+      }
+    },
+    onFailure: function (msg) {
+      setLoading('newpw-btn', false);
+      showError('newpw-error', msg);
+    }
+  });
+}
+
+// ── FORGOT PASSWORD ───────────────────────────────────────────────────────────
+function doForgot() {
+  clearErrors();
+  forgotUsername = document.getElementById('forgot-user').value.trim();
+  if (!forgotUsername) { showError('forgot-error', 'Please enter your username.'); return; }
+
+  setLoading('forgot-btn', true);
+
+  HoaAuth.forgotPassword(forgotUsername, {
+    onCodeSent: function () {
+      setLoading('forgot-btn', false);
+      showView('view-reset');
+    },
+    onSuccess: function () {
+      setLoading('forgot-btn', false);
+      showView('view-reset');
+    },
+    onFailure: function (msg) {
+      setLoading('forgot-btn', false);
+      showError('forgot-error', msg);
+    }
+  });
+}
+
+// ── CONFIRM RESET ─────────────────────────────────────────────────────────────
+function doReset() {
+  clearErrors();
+  const code = document.getElementById('reset-code').value.trim();
+  const pw   = document.getElementById('reset-pw').value;
+  const pw2  = document.getElementById('reset-pw2').value;
+  if (!code || !pw) { showError('reset-error', 'Please fill in all fields.'); return; }
+  if (pw !== pw2)   { showError('reset-error', 'Passwords do not match.'); return; }
+  if (pw.length < 8){ showError('reset-error', 'Password must be at least 8 characters.'); return; }
+
+  setLoading('reset-btn', true);
+
+  HoaAuth.confirmForgotPassword(forgotUsername, code, pw, {
+    onSuccess: function () {
+      setLoading('reset-btn', false);
+      showSuccess('reset-success', 'Password reset successfully! Redirecting to sign in…');
+      setTimeout(function () { showView('view-signin'); }, 2000);
+    },
+    onFailure: function (msg) {
+      setLoading('reset-btn', false);
+      showError('reset-error', msg);
+    }
+  });
+}
+</script>
+</body>
+</html>

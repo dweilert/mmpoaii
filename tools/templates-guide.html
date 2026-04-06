@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Board Communication Templates — Operational Guide</title>
+<link rel="stylesheet" href="/css/site.css">
+<style>
+:root{
+  --teal-50:#E1F5EE;--teal-100:#9FE1CB;--teal-600:#0F6E56;
+  --pink-50:#FBEAF0;--pink-100:#F4C0D1;--pink-600:#993556;
+  --red-50:#FCEBEB;--red-100:#F7C1C1;--red-600:#A32D2D;
+}
+
+.doc-teal-100 { padding:5px; margin: 5px;width: 50%;background: var(--teal-100) !important; }
+.doc-pink-100  { padding:5px; margin: 5px;width: 50%;background: var(--pink-100) !important; }
+.doc-teal-50 { padding:5px; margin: 5px;width: 50%;background: var(--teal-50) !important; }
+.doc-pink-50  { padding:5px; margin: 5px;width: 50%;background: var(--pink-50) !important; }
+
+/* Page-specific styles */
+.templates-header {
+  background: linear-gradient(135deg, var(--purple-800), var(--purple-600));
+  color: #fff;
+  padding: 32px 28px;
+  margin-bottom: 28px;
+  border-radius: var(--r-xl);
+}
+
+.templates-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.templates-header .th-subtitle {
+  font-size: 14px;
+  opacity: 0.85;
+  max-width: 700px;
+  line-height: 1.6;
+}
+
+/* Two-column layout for main + sticky nav */
+.templates-layout {
+  display: grid;
+  grid-template-columns: 1fr 240px;
+  gap: 28px;
+  align-items: start;
+}
+
+.templates-main {
+  flex: 1;
+}
+
+/* Sticky section nav */
+.section-nav {
+  position: sticky;
+  top: 90px;
+  background: var(--surf);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 16px 0;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  font-size: 13px;
+}
+
+.section-nav-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text3);
+  padding: 8px 14px;
+  margin-bottom: 4px;
+}
+
+.section-nav a {
+  display: block;
+  padding: 6px 14px;
+  color: var(--text2);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all 0.15s;
+}
+
+.section-nav a:hover {
+  background: var(--purple-50);
+  border-left-color: var(--purple-400);
+  color: var(--purple-800);
+}
+
+.section-nav a.active {
+  background: var(--purple-50);
+  border-left-color: var(--purple-600);
+  color: var(--purple-800);
+  font-weight: 600;
+}
+
+/* Section styling */
+.guide-section {
+  scroll-margin-top: 100px;
+  margin-bottom: 48px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--border2);
+}
+
+.guide-section:last-child {
+  border-bottom: none;
+}
+
+.gs-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.gs-title::before {
+  content: '';
+  width: 4px;
+  height: 24px;
+  background: var(--purple-600);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.gs-subtitle {
+  font-size: 13px;
+  color: var(--text3);
+  margin-bottom: 16px;
+}
+
+/* Sequence tables */
+.seq-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 16px 0;
+}
+
+.seq-table th {
+  background: var(--purple-800);
+  color: #fff;
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.seq-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border2);
+  color: var(--text2);
+  vertical-align: top;
+}
+
+.seq-table tr:nth-child(even) td {
+  background: var(--surf2);
+}
+
+.seq-table .step-num {
+  font-weight: 700;
+  color: var(--purple-600);
+  width: 40px;
+}
+
+.seq-table .template-ref {
+  background: var(--purple-50);
+  color: var(--purple-800);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-family: monospace;
+  font-size: 11.5px;
+}
+
+.seq-table .critical {
+  background: var(--red-50);
+  color: var(--red-600);
+  font-weight: 600;
+}
+
+/* Callouts */
+.callout {
+  border-radius: var(--r-lg);
+  padding: 14px 16px;
+  margin: 16px 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.callout-law {
+  background: var(--purple-50);
+  border-left: 4px solid var(--purple-600);
+  color: var(--text2);
+}
+
+.callout-warn {
+  background: var(--amber-50);
+  border-left: 4px solid var(--amber-600);
+  color: var(--text2);
+}
+
+.callout-danger {
+  background: var(--red-50);
+  border-left: 4px solid var(--red-600);
+  color: var(--text2);
+}
+
+.callout-good {
+  background: var(--green-50);
+  border-left: 4px solid var(--green-600);
+  color: var(--text2);
+}
+
+.cl-title {
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 5px;
+}
+
+.callout-law .cl-title {
+  color: var(--purple-800);
+}
+
+.callout-warn .cl-title {
+  color: var(--amber-600);
+}
+
+.callout-danger .cl-title {
+  color: var(--red-600);
+}
+
+.callout-good .cl-title {
+  color: var(--green-600);
+}
+
+/* Timing rules list */
+.timing-list {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+}
+
+.timing-list li {
+  padding: 6px 0;
+  font-size: 13.5px;
+  color: var(--text2);
+  display: flex;
+  gap: 10px;
+}
+
+.timing-list li::before {
+  content: '▪';
+  color: var(--purple-600);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* Download buttons */
+.dl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--purple-50);
+  color: var(--purple-600);
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.15s;
+  border: 1px solid var(--purple-200);
+}
+
+.dl-btn:hover {
+  background: var(--purple-100);
+  border-color: var(--purple-400);
+  color: var(--purple-800);
+}
+
+.dl-btn::before {
+  content: '⬇';
+  font-size: 10px;
+}
+
+/* Mistake cards */
+.mistake-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.mistake-card {
+  background: var(--surf);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 16px;
+  border-left: 4px solid var(--red-600);
+}
+
+.mistake-card .mc-problem {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--red-600);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.mistake-card .mc-problem::before {
+  content: '❌';
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.mistake-card .mc-fix {
+  font-size: 12.5px;
+  color: var(--green-600);
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.mistake-card .mc-fix::before {
+  content: '✓';
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* Content sections */
+.section-content {
+  margin-bottom: 20px;
+}
+
+.section-content p {
+  font-size: 13.5px;
+  color: var(--text2);
+  margin-bottom: 12px;
+  line-height: 1.7;
+}
+
+.section-content h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 18px 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-content h3::before {
+  content: '';
+  width: 3px;
+  height: 14px;
+  background: var(--purple-600);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.section-content ul,
+.section-content ol {
+  padding-left: 20px;
+  margin-bottom: 12px;
+}
+
+.section-content li {
+  font-size: 13.5px;
+  color: var(--text2);
+  margin-bottom: 6px;
+  line-height: 1.6;
+}
+
+/* Footer */
+.page-footer {
+  background: var(--purple-900);
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  padding: 24px;
+  margin-top: 48px;
+  border-radius: var(--r-lg);
+  font-size: 12px;
+}
+
+.page-footer a {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+}
+
+.page-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Back link */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--purple-600);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  transition: color 0.15s;
+}
+
+.back-link:hover {
+  color: var(--purple-800);
+}
+
+.back-link::before {
+  content: '←';
+  font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .templates-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .section-nav {
+    position: static;
+    max-height: none;
+  }
+
+  .mistake-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .templates-header {
+    padding: 20px 16px;
+  }
+
+  .templates-header h1 {
+    font-size: 22px;
+  }
+
+  .gs-title {
+    font-size: 16px;
+  }
+
+  .seq-table {
+    font-size: 12px;
+  }
+
+  .seq-table th,
+  .seq-table td {
+    padding: 8px 10px;
+  }
+}
+
+/* Situation cards for Quick Reference */
+.situation-card {
+  background: var(--surf); border: 1px solid var(--border);
+  border-radius: 12px; margin-bottom: 12px;
+  overflow: hidden;
+}
+.sit-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 18px; cursor: pointer;
+  transition: background .15s;
+}
+.sit-header:hover { background: var(--gray-50); }
+.sit-num {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--purple-50); color: var(--purple-600);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; flex-shrink: 0;
+}
+.sit-title { font-size: 14px; font-weight: 700; }
+.sit-body { padding: 0 18px 16px 60px; }
+.sit-note {
+  font-size: 12.5px; color: var(--text2); line-height: 1.55;
+  margin-bottom: 8px; font-style: italic;
+}
+.sit-flow {
+  font-size: 12px; color: var(--purple-600); font-weight: 600;
+  margin-bottom: 10px; letter-spacing: .3px;
+}
+.sit-links { display: flex; flex-wrap: wrap; gap: 8px; }
+.sit-links a {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--purple-50); color: var(--purple-600);
+  padding: 5px 12px; border-radius: 6px;
+  font-size: 12px; font-weight: 600;
+  text-decoration: none;
+  transition: background .15s, color .15s;
+}
+.sit-links a:hover { background: var(--purple-600); color: #fff; }
+.sit-links a::before { content: '\2B07'; font-size: 10px; }
+
+/* Print styles */
+@media print {
+  .section-nav,
+  .back-link,
+  .site-header,
+  .site-footer {
+    display: none;
+  }
+
+  .templates-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .guide-section {
+    break-inside: avoid;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="inner">
+    <a href="/" class="site-logo">
+      <div class="logo-mark">🏡</div>
+      <div class="logo-text">
+        <div class="logo-name" data-hoa-name>MMPOAII HOA</div>
+        <div class="logo-sub">Board Portal</div>
+      </div>
+    </a>
+    <nav class="site-nav">
+      <a href="/homeowners/index.html" style="opacity:.7">Homeowner View</a>
+      <div class="nav-user">
+        <div class="avatar" id="nav-avatar">B</div>
+        <div>
+          <div class="uname" data-user-name>Loading…</div>
+          <div class="urole" data-user-role>Board Member</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="HoaGuard.logout()">Sign Out</button>
+    </nav>
+  </div>
+</header>
+
+<div id="page-content">
+<div class="page-wrap">
+
+  <!-- Back link -->
+  <a href="/board/index.html" class="back-link">Board Portal</a>
+
+  <!-- Hero section -->
+  <div class="templates-header">
+    <h1>Communication Templates Guide</h1>
+    <p class="th-subtitle">Board Member Operational Reference — Complete enforcement sequences, assessment collection procedures, ARC timelines, delivery methods, record retention requirements, and compliance checklists.</p>
+  </div>
+
+
+
+
+  <!-- Main layout with sidebar -->
+  <div class="templates-layout">
+
+    <!-- MAIN CONTENT -->
+    <div class="templates-main">
+
+      <!-- SECTION 0: TYPES OF TEMPLATES -->
+      <div class="guide-section" id="sec-types">
+        <div class="gs-title">Two Types of Templates</div>
+        <table>
+        <tbody>
+        <tr>
+        <td class="doc-pink-100"><strong>MANDATORY Templates (16)</strong></td>
+        <td class="doc-teal-100"><strong>DISCRETIONARY Templates (11)</strong></td>
+        </tr>
+        <tr>
+        <td class="doc-pink-50 sit-note">These templates are required by Texas law or the CC&amp;Rs before the Association may take a specific action. Skipping them, sending by the wrong delivery method, or omitting required content can void the action entirely — meaning a lien is unenforceable, a fine is void, or an ARC decision is invalid.</td>
+        <td class="doc-teal-50 sit-note">These templates reflect best practice and community governance standards. They are not required by statute but are expected by Members and protect the Board from claims of unfair or inconsistent administration. Skipping them will not void an action but may damage community trust and expose the Board to criticism.</td>
+        </tr>
+        <tr>
+        <td class="doc-pink-100"><strong>Templates 3, 5, 7, 8, 9, 10, 11, 12, 13, 15, 21, 24, 26, 27 + Resale Cert (23) + Pre-Lien (5)</strong></td>
+        <td class="doc-teal-100"><strong>Templates 1, 2, 4, 6, 14, 16, 17, 18, 19, 20, 22, 25</strong></td>
+        </tr>
+        </tbody>
+        </table>
+      </div>
+      
+      <!-- SECTION 1: SITUATION CARDS -->
+      <div class="guide-section" id="sec-situations">
+        <div class="gs-title">Find Your Situation</div>
+        <p class="gs-subtitle">Find the situation you're facing, then download the template(s) you need. All templates require attorney review before first use.</p>
+
+        <div class="section-content">
+
+          <div class="situation-card">
+            <div class="sit-header">
+              <span class="sit-num">1</span>
+              <div class="sit-title">An owner has not paid their assessment</div>
+            </div>
+            <div class="sit-body">
+              <div class="sit-note">You MUST offer T3 before you send T5. You MUST send T5 by certified mail before filing any lien.</div>
+              <div class="sit-flow">T3 → T5 → file lien → T6</div>
+              <div class="sit-links">
+                <a href="/documents/board-templates/T3_Payment_Plan_Offer.docx" download>T3 — Payment Plan Offer</a>
+                <a href="/documents/board-templates/T5_Pre_Lien_Notice.docx" download>T5 — Pre-Lien Notice</a>
+                <a href="/documents/board-templates/T6_Lien_Release_Confirmation.docx" download>T6 — Lien Release Confirmation</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="situation-card">
+            <div class="sit-header">
+              <span class="sit-num">2</span>
+              <div class="sit-title">You have observed a rule or CC&Rs violation</div>
+            </div>
+            <div class="sit-body">
+              <div class="sit-note">T8 is the first mandatory step. Send by certified mail. No fine may be levied until after the T9 hearing opportunity.</div>
+              <div class="sit-flow">Optional: T7 → T8 → T9 (if requested) → T10 → T11 (if uncured)</div>
+              <div class="sit-links">
+                <a href="/documents/board-templates/T7_Courtesy_Notice.docx" download>T7 — Courtesy Notice</a>
+                <a href="/documents/board-templates/T8_Notice_of_Violation.docx" download>T8 — Notice of Violation</a>
+                <a href="/documents/board-templates/T9_Hearing_Notice.docx" download>T9 — Hearing Notice</a>
+                <a href="/documents/board-templates/T10_Hearing_Decision.docx" download>T10 — Hearing Decision</a>
+                <a href="/documents/board-templates/T11_Remedy_Notice.docx" download>T11 — Remedy Notice</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="situation-card">
+            <div class="sit-header">
+              <span class="sit-num">3</span>
+              <div class="sit-title">You need to hold a Board meeting</div>
+            </div>
+            <div class="sit-body">
+              <div class="sit-note">Every Board meeting requires T12, no exceptions. Post on website and email to all members at least 72 hours in advance.</div>
+              <div class="sit-links">
+                <a href="/documents/board-templates/T12_Board_Meeting_Notice.docx" download>T12 — Board Meeting Notice (72-Hour)</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="situation-card">
+            <div class="sit-header">
+              <span class="sit-num">4</span>
+              <div class="sit-title">You need to hold the Annual Membership Meeting</div>
+            </div>
+            <div class="sit-body">
+              <div class="sit-note">Send T13 at least 10 days in advance (60-day maximum). Include T24 and T1 if budget adoption is concurrent.</div>
+              <div class="sit-flow">T13 + T24 + T1</div>
+              <div class="sit-links">
+                <a href="/documents/board-templates/T13_Annual_Meeting_Notice.docx" download>T13 — Annual Meeting Notice</a>
+                <a href="/documents/board-templates/T24_Annual_Budget_Summary.docx" download>T24 — Budget Summary</a>
+                <a href="/documents/board-templates/T1_Annual_Assessment_Notice.docx" download>T1 — Assessment Notice</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="situation-card">
+            <div class="sit-header">
+              <span class="sit-num">5</span>
+              <div class="sit-title">You need to call a Special Membership Meeting</div>
+            </div>
+            <div class="sit-body">
+              <div class="sit-note">Only the specific purpose stated in T14 may be addressed at the meeting.</div>
+              <div class="sit-links">
+                <a href="/documents/board-templates/T14_Special_Meeting_Notice.docx" download>T14 — Special Meeting Notice</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="situation-card">
+            <div class="sit-header">
+              <span class="sit-num">6</span>
+              <div class="sit-title">You are proposing to amend the Declaration</div>
+            </div>
+            <div class="sit-body">
+              <div class="sit-note">Full text of the proposed amendment must be sent with the notice, at least 14 days before the vote.</div>
+              <div class="sit-flow">T15 → hold vote → if approved, record in Travis County</div>
+              <div class="sit-links">
+                <a href="/documents/board-templates/T15_Declaration_Amendment_Notice.docx" download>T15 — Declaration Amendment Notice</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="situation-card">
+            <div class="sit-header">
+              <span class="sit-num">7</span>
+              <div class="sit-title">An owner wants to sell their home</div>
+            </div>
+            <div class="sit-body">
+              <div class="sit-note">Must be issued within 10 business days of written request. Missing this deadline exposes the Association to legal liability.</div>
+              <div class="sit-links">
+                <a href="/documents/board-templates/T23_Resale_Certificate.docx" download>T23 — Resale Certificate</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="situation-card">
+            <div class="sit-header">
+              <span class="sit-num">8</span>
+              <div class="sit-title">An owner wants to lease their home</div>
+            </div>
+            <div class="sit-body">
+              <div class="sit-note">The Association may NOT require approval of tenants. Registration is for emergency contact and enforcement purposes only.</div>
+              <div class="sit-links">
+                <a href="/documents/board-templates/T22_Tenant_Registration_Confirmation.docx" download>T22 — Tenant Registration Confirmation</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="situation-card">
+            <div class="sit-header">
+              <span class="sit-num">9</span>
+              <div class="sit-title">An owner submits an ARC application</div>
+            </div>
+            <div class="sit-body">
+              <div class="sit-note">The 45-day clock runs from acknowledged receipt of a COMPLETE submission. If the 45-day deadline is missed, the application may be deemed approved.</div>
+              <div class="sit-flow">T17 → if incomplete T18 → if complete T19 / T20 / T21</div>
+              <div class="sit-links">
+                <a href="/documents/board-templates/T17_ARC_Acknowledgment.docx" download>T17 — ARC Acknowledgment</a>
+                <a href="/documents/board-templates/T18_ARC_Incompleteness.docx" download>T18 — ARC Incompleteness Notice</a>
+                <a href="/documents/board-templates/T19_ARC_Approval.docx" download>T19 — ARC Approval</a>
+                <a href="/documents/board-templates/T20_ARC_Conditional_Approval.docx" download>T20 — ARC Conditional Approval</a>
+                <a href="/documents/board-templates/T21_ARC_Denial.docx" download>T21 — ARC Denial</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="situation-card">
+            <div class="sit-header">
+              <span class="sit-num">10</span>
+              <div class="sit-title">You are adopting or changing the Fine Schedule</div>
+            </div>
+            <div class="sit-body">
+              <div class="sit-note">Fines for violations not listed in the published Fine Schedule are void under &sect; 202.004(b). Must be distributed 30 days before new amounts take effect.</div>
+              <div class="sit-links">
+                <a href="/documents/board-templates/T27_Fine_Schedule_Notice.docx" download>T27 — Fine Schedule Notice</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="situation-card">
+            <div class="sit-header">
+              <span class="sit-num">11</span>
+              <div class="sit-title">You are adopting the annual budget</div>
+            </div>
+            <div class="sit-body">
+              <div class="sit-note">&sect; 209.0052 requires the budget summary within 30 days. Combine T24 and T1 into one mailing.</div>
+              <div class="sit-flow">T24 + T1</div>
+              <div class="sit-links">
+                <a href="/documents/board-templates/T24_Annual_Budget_Summary.docx" download>T24 — Budget Summary</a>
+                <a href="/documents/board-templates/T1_Annual_Assessment_Notice.docx" download>T1 — Annual Assessment Notice</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="situation-card">
+            <div class="sit-header">
+              <span class="sit-num">12</span>
+              <div class="sit-title">You need to transfer money from the Reserve Fund</div>
+            </div>
+            <div class="sit-body">
+              <div class="sit-note">Reserve Fund transfers require a 2/3 Board vote. Send T25 within 30 days of the vote.</div>
+              <div class="sit-links">
+                <a href="/documents/board-templates/T25_Reserve_Fund_Transfer.docx" download>T25 — Reserve Fund Transfer Notice</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="situation-card">
+            <div class="sit-header">
+              <span class="sit-num">13</span>
+              <div class="sit-title">You are beginning collection enforcement before you have a Collection Policy</div>
+            </div>
+            <div class="sit-body">
+              <div class="sit-note">You cannot take any collection action until T26 has been adopted and distributed. This is a prerequisite, not a concurrent step.</div>
+              <div class="sit-links">
+                <a href="/documents/board-templates/T26_Collection_Policy.docx" download>T26 — Assessment Collection Policy</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="situation-card">
+            <div class="sit-header">
+              <span class="sit-num">14</span>
+              <div class="sit-title">A Special Assessment is needed</div>
+            </div>
+            <div class="sit-body">
+              <div class="sit-note">If over $500 per lot, a member vote (67% approval at a meeting with quorum) must occur before T2 is sent.</div>
+              <div class="sit-flow">If &gt; $500/lot: T13 or T14 (member vote) → T2</div>
+              <div class="sit-links">
+                <a href="/documents/board-templates/T2_Special_Assessment_Notice.docx" download>T2 — Special Assessment Notice</a>
+                <a href="/documents/board-templates/T13_Annual_Meeting_Notice.docx" download>T13 — Annual Meeting Notice</a>
+                <a href="/documents/board-templates/T14_Special_Meeting_Notice.docx" download>T14 — Special Meeting Notice</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="situation-card">
+            <div class="sit-header">
+              <span class="sit-num">15</span>
+              <div class="sit-title">Homeowner has requested a deviation</div>
+            </div>
+            <div class="sit-body">
+              <div class="sit-note">A homeowner has requested a deviation from the published CC&Rs and a notice to all other homeowners need to be notified.</div>
+              <div class="sit-flow">If &gt; $500/lot: T13 or T14 (member vote) → T2</div>
+              <div class="sit-links">
+                <a href="/documents/board-templates/T16_Deviation_Request_Notice.docx" download>T16 — Deviation Request Notice</a>
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+
+      <!-- SECTION 2: ENFORCEMENT SEQUENCE -->
+      <div class="guide-section" id="sec-enforcement">
+        <div class="gs-title">The Enforcement Sequence</div>
+        <p class="gs-subtitle">8-Step Process from Notice to Self-Help or Legal Action</p>
+
+        <div class="section-content">
+          <p>This is the mandatory sequence for enforcing deed restrictions against a violating property. Every step must be followed in order. Skipping steps or using the wrong template can render the enforcement void.</p>
+
+          <table class="seq-table">
+            <thead>
+              <tr>
+                <th style="width: 50px">Step</th>
+                <th>Template</th>
+                <th>Action Required</th>
+                <th>If Skipped</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="step-num">1</td>
+                <td><span class="template-ref">T7</span></td>
+                <td>Courtesy Notice (optional informal notice). Send written notice, give owner chance to self-correct.</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td class="step-num">2</td>
+                <td><span class="template-ref">T8</span></td>
+                <td>Notice of Violation. Send by <strong>CERTIFIED MAIL</strong> with 5 required elements: (a) violation description, (b) cure period, (c) 30-day hearing right, (d) attorney fee warning, (e) SCRA notice.</td>
+                <td><span class="critical">Fine void; enforcement invalid</span></td>
+              </tr>
+              <tr>
+                <td class="step-num">3</td>
+                <td>—</td>
+                <td>Wait for cure period. Allow time stated in T8 for owner to remedy. If owner requests hearing within 30 days, go to Step 4.</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td class="step-num">4</td>
+                <td><span class="template-ref">T9</span></td>
+                <td>Hearing Notice. If owner requests hearing, send T9 with 10+ days advance notice, names of 3-member panel, right to counsel.</td>
+                <td><span class="critical">Hearing void</span></td>
+              </tr>
+              <tr>
+                <td class="step-num">5</td>
+                <td>—</td>
+                <td>Conduct Hearing. Panel of 3+ Board members. Allow owner to present evidence. Keep minutes.</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td class="step-num">6</td>
+                <td><span class="template-ref">T10</span></td>
+                <td>Hearing Decision. Issue written decision within 14 days. State finding, fine if any, remedy deadline.</td>
+                <td><span class="critical">No enforceable fine</span></td>
+              </tr>
+              <tr>
+                <td class="step-num">7</td>
+                <td><span class="template-ref">T11</span></td>
+                <td>Remedy Notice. If uncured after decision, send T11 with 30-day final remedy deadline and self-help warning.</td>
+                <td><span class="critical">Self-help entry = trespass</span></td>
+              </tr>
+              <tr>
+                <td class="step-num">8</td>
+                <td>—</td>
+                <td>Self-help or legal action. If still uncured after T11, Board may enter property or pursue legal remedies (collection agency, attorney).</td>
+                <td>—</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="callout callout-law">
+            <div class="cl-title">Key Timing Rules</div>
+            <ul class="timing-list">
+              <li><strong>Cure period minimum:</strong> 10 days for most violations (check CC&Rs)</li>
+              <li><strong>Hearing request window:</strong> 30 days from T8 Notice of Violation</li>
+              <li><strong>Hearing notice lead time:</strong> 10 days advance notice minimum</li>
+              <li><strong>Hearing decision deadline:</strong> 14 days after hearing concludes</li>
+              <li><strong>Remedy notice cure:</strong> 30 days from T11 to cure</li>
+              <li><strong>Fine cap:</strong> $200/day continuing; $5,000 total per violation</li>
+            </ul>
+          </div>
+
+          <h3>Download Templates</h3>
+          <p>All templates are available as Word documents ready to fill in. Required fields are marked in red [BRACKETS]. Do not alter black text without attorney approval.</p>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+            <a href="/documents/board-templates/T7_Courtesy_Notice.docx" class="dl-btn">T7 Courtesy Notice</a>
+            <a href="/documents/board-templates/T8_Notice_of_Violation.docx" class="dl-btn">T8 Notice of Violation</a>
+            <a href="/documents/board-templates/T9_Hearing_Notice.docx" class="dl-btn">T9 Hearing Notice</a>
+            <a href="/documents/board-templates/T10_Hearing_Decision.docx" class="dl-btn">T10 Decision</a>
+            <a href="/documents/board-templates/T11_Remedy_Notice.docx" class="dl-btn">T11 Remedy Notice</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 3: ASSESSMENT COLLECTION SEQUENCE -->
+      <div class="guide-section" id="sec-assessment">
+        <div class="gs-title">The Assessment Collection Sequence</div>
+        <p class="gs-subtitle">8-Step Process from Delinquency to Lien Filing</p>
+
+        <div class="section-content">
+          <p>This sequence must be followed exactly to create an enforceable assessment lien. The most common mistake is filing a lien without sending the Pre-Lien Notice (T5) by certified mail.</p>
+
+          <table class="seq-table">
+            <thead>
+              <tr>
+                <th style="width: 50px">Step</th>
+                <th>Template</th>
+                <th>Action Required</th>
+                <th>If Skipped</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="step-num">1</td>
+                <td><span class="template-ref">T26</span></td>
+                <td>Adopt Collection Policy. Before any collection action, adopt and distribute written policy to all members (required by § 209.0093).</td>
+                <td><span class="critical">Collection invalid</span></td>
+              </tr>
+              <tr>
+                <td class="step-num">2</td>
+                <td>—</td>
+                <td>Assessment becomes delinquent. Interest at 10% per annum from due date. Document in records.</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td class="step-num">3</td>
+                <td>—</td>
+                <td>Optional reminder. Send informal payment reminder (not required, does not satisfy any statute).</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td class="step-num">4</td>
+                <td><span class="template-ref">T3</span></td>
+                <td>Payment Plan Offer. Send by certified mail offering minimum 3-month plan BEFORE filing any lien (§ 209.0093).</td>
+                <td><span class="critical">Lien challengeable</span></td>
+              </tr>
+              <tr>
+                <td class="step-num">5</td>
+                <td><span class="template-ref">T4</span></td>
+                <td>If accepted: Payment Plan Agreement. Execute signed agreement. Defer lien filing while payments current.</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td class="step-num">6</td>
+                <td><span class="template-ref">T5</span></td>
+                <td>Pre-Lien Notice. Send by <strong>CERTIFIED MAIL</strong> with 6 required elements: total amount, itemized breakdown, payment address, deadline, right to cure, right to payment plan.</td>
+                <td><span class="critical">Lien is VOID</span></td>
+              </tr>
+              <tr>
+                <td class="step-num">7</td>
+                <td>—</td>
+                <td>File assessment lien. Record in Travis County (property records) if not cured within T5 deadline (typically 30 days).</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td class="step-num">8</td>
+                <td><span class="template-ref">T6</span></td>
+                <td>Lien Release. Within 30 days of full payment, record release in Travis County and send T6 confirmation to owner.</td>
+                <td><span class="critical">Potential legal action</span></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="callout callout-danger">
+            <div class="cl-title">Homestead Foreclosure Rules</div>
+            A homestead cannot be foreclosed to satisfy HOA assessment liens UNLESS: (a) delinquent amount exceeds $2,500 (excluding interest/fees), AND (b) foreclosure is judicial (not non-judicial/power of sale). Most HOA liens are non-judicial and cannot foreclose homesteads regardless of amount.
+          </div>
+
+          <h3>Download Templates</h3>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+            <a href="/documents/board-templates/T26_Collection_Policy.docx" class="dl-btn">T26 Collection Policy</a>
+            <a href="/documents/board-templates/T3_Payment_Plan_Offer.docx" class="dl-btn">T3 Payment Plan</a>
+            <a href="/documents/board-templates/T4_Payment_Plan_Agreement.docx" class="dl-btn">T4 Agreement</a>
+            <a href="/documents/board-templates/T5_Pre_Lien_Notice.docx" class="dl-btn">T5 Pre-Lien Notice</a>
+            <a href="/documents/board-templates/T6_Lien_Release_Confirmation.docx" class="dl-btn">T6 Lien Release</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 4: ARC TIMELINE -->
+      <div class="guide-section" id="sec-arc">
+        <div class="gs-title">The ARC Application Timeline</div>
+        <p class="gs-subtitle">4-Step Process for Architectural Review Approvals</p>
+
+        <div class="section-content">
+          <p>The ARC (Architectural Review Committee) must follow these strict timelines. Missing any deadline can result in deemed approval or void denials.</p>
+
+          <table class="seq-table">
+            <thead>
+              <tr>
+                <th style="width: 50px">Step</th>
+                <th>Template</th>
+                <th>Action Required</th>
+                <th>Risk If Late</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="step-num">1</td>
+                <td><span class="template-ref">T17</span></td>
+                <td>Acknowledgment of Receipt. Within 5 business days of receiving complete application, send T17 starting the 45-day clock.</td>
+                <td><span class="critical">45-day clock unclear</span></td>
+              </tr>
+              <tr>
+                <td class="step-num">2</td>
+                <td><span class="template-ref">T18</span></td>
+                <td>Notice of Incompleteness (if needed). Within 10 business days if submission incomplete. List every deficiency with specific details.</td>
+                <td>Clock may continue running</td>
+              </tr>
+              <tr>
+                <td class="step-num">3</td>
+                <td>—</td>
+                <td>ARC Review. 45-day review period from acknowledged complete receipt. Request additional info, conduct site visit, evaluate compliance.</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td class="step-num">4</td>
+                <td><span class="template-ref">T19/T20/T21</span></td>
+                <td>Decision Notice. Issue Approval (T19), Conditional Approval (T20), or Denial (T21) within 45 days. Denial requires specific written reasons with alternative options.</td>
+                <td><span class="critical">Denial may be void; deemed approval possible</span></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="callout callout-danger">
+            <div class="cl-title">ARC Denial Requirements</div>
+            Under § 209.00505, a vague ARC denial without specific features identified as violations and suggested modifications will be voided by a court. Every denied application must include: (1) exact description of what violates CC&Rs, (2) specific alternative designs that would be acceptable, and (3) explanation of why each alternative complies.
+          </div>
+
+          <h3>Download Templates</h3>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+            <a href="/documents/board-templates/T17_ARC_Acknowledgment.docx" class="dl-btn">T17 Acknowledgment</a>
+            <a href="/documents/board-templates/T18_ARC_Incompleteness.docx" class="dl-btn">T18 Incomplete</a>
+            <a href="/documents/board-templates/T19_ARC_Approval.docx" class="dl-btn">T19 Approval</a>
+            <a href="/documents/board-templates/T20_ARC_Conditional_Approval.docx" class="dl-btn">T20 Conditional</a>
+            <a href="/documents/board-templates/T21_ARC_Denial.docx" class="dl-btn">T21 Denial</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 5: DELIVERY METHODS -->
+      <div class="guide-section" id="sec-delivery">
+        <div class="gs-title">Delivery Methods & Certified Mail</div>
+        <p class="gs-subtitle">Which Method to Use for Each Template</p>
+
+        <div class="section-content">
+          <p>Different templates have different legal delivery requirements. Using the wrong method can invalidate the notice.</p>
+
+          <table class="seq-table">
+            <thead>
+              <tr>
+                <th style="width: 150px">Method</th>
+                <th>When Required / Recommended</th>
+                <th>What to Keep</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>CERTIFIED MAIL<br/>Return Receipt</strong></td>
+                <td><strong>MANDATORY:</strong> T3 (Payment Plan Offer), T5 (Pre-Lien Notice), T8 (Notice of Violation)<br/><strong>Strongly recommended:</strong> T9 (Hearing Notice), T11 (Remedy Notice), T15 (Notice of Meeting)</td>
+                <td>✓ USPS tracking number<br/>✓ Green receipt card (signed)<br/>✓ Mailing date & time<br/>✓ Recipient signature</td>
+              </tr>
+              <tr>
+                <td><strong>First-Class Mail</strong></td>
+                <td><strong>Acceptable for:</strong> T1, T2, T6, T7, T13, T14, T22, T24, T25</td>
+                <td>✓ Copy of letter<br/>✓ Mailing date<br/>✓ Postmark (if available)</td>
+              </tr>
+              <tr>
+                <td><strong>Email</strong></td>
+                <td><strong>Acceptable for:</strong> T9–T12, T17–T22, T24, T25 (per § 209.0051 and CC&Rs Art. XIII §4). Owner must consent to electronic delivery.</td>
+                <td>✓ Copy of sent email<br/>✓ Timestamp (from outbox)<br/>✓ Delivery/read receipt (if available)<br/>✓ Email consent form on file</td>
+              </tr>
+              <tr>
+                <td><strong>Website Posting</strong></td>
+                <td><strong>Required for:</strong> T12 (Board Meeting Notice), T26 (Collection Policy), T27 (Fine Schedule)<br/>Also acceptable for: T15 (Annual Meeting), governance items</td>
+                <td>✓ Screenshot with URL<br/>✓ Date/time posted<br/>✓ Confirmation email<br/>✓ Duration posted (typically 72+ hours)</td>
+              </tr>
+              <tr>
+                <td><strong>Signed Written Agreement</strong></td>
+                <td><strong>Required for:</strong> T4 (Payment Plan Agreement), T23 (CC&Rs Modification). Also for any contract >$5,000.</td>
+                <td>✓ Original signed by both parties<br/>✓ Scan of both signatures<br/>✓ Date signed<br/>✓ Initial pages of each party</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="callout callout-warn">
+            <div class="cl-title">Certified Mail Best Practice</div>
+            If certified mail is returned "unclaimed" or "undeliverable," document the attempt, photograph the returned card, and re-send to the property address via first-class mail AND to the owner's last known address on file with the Travis County Appraisal District (TCAD). This creates evidence of reasonable effort.
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 6: RECORD RETENTION -->
+      <div class="guide-section" id="sec-retention">
+        <div class="gs-title">Record Retention & Archival</div>
+        <p class="gs-subtitle">Mandatory Retention Periods by Document Type</p>
+
+        <div class="section-content">
+          <p>Texas law imposes specific retention periods for HOA records. Destroying records before the retention period expires can expose the Board to liability and is grounds for sanctions.</p>
+
+          <table class="seq-table">
+            <thead>
+              <tr>
+                <th>Document Type</th>
+                <th style="width: 80px">Retain For</th>
+                <th>Related Templates</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Enforcement records (NOVs, hearing transcripts, decisions, fines)</td>
+                <td><strong>4 years</strong> from resolution</td>
+                <td>T7–T11</td>
+              </tr>
+              <tr>
+                <td>Assessment and lien records</td>
+                <td><strong>4 years after lien release</strong> (or 4 years if never filed)</td>
+                <td>T3–T6</td>
+              </tr>
+              <tr>
+                <td>ARC applications and decisions</td>
+                <td><strong>4 years</strong> from decision date</td>
+                <td>T17–T21</td>
+              </tr>
+              <tr>
+                <td>Contracts: 1+ year duration</td>
+                <td><strong>4 years from contract end</strong></td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>Contracts: <1 year duration</td>
+                <td><strong>4 years from expiration</strong></td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>Financial statements, budgets, tax returns, audit reports</td>
+                <td><strong>7 years</strong> from date of statement</td>
+                <td>T1, T2, T24</td>
+              </tr>
+              <tr>
+                <td>Insurance policies and certificates</td>
+                <td><strong>4 years</strong> from expiration</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>Board meeting minutes</td>
+                <td><strong>PERMANENT</strong> (never destroy)</td>
+                <td>T9–T14</td>
+              </tr>
+              <tr>
+                <td>Membership/owner meeting minutes</td>
+                <td><strong>PERMANENT</strong> (never destroy)</td>
+                <td>T15, T16</td>
+              </tr>
+              <tr>
+                <td>Governing documents (CC&Rs, Bylaws, Rules)</td>
+                <td><strong>PERMANENT</strong> — post on website, update online annually</td>
+                <td>T15, T26, T27</td>
+              </tr>
+              <tr>
+                <td>Resale certificates & estoppel statements</td>
+                <td><strong>4 years</strong> from issuance</td>
+                <td>T23</td>
+              </tr>
+              <tr>
+                <td>Tenant registration forms</td>
+                <td><strong>Duration of tenancy + 1 year</strong></td>
+                <td>T22</td>
+              </tr>
+              <tr>
+                <td>Delivery records (certified mail cards, email logs, posting screenshots)</td>
+                <td><strong>4 years</strong> from mailing/delivery date</td>
+                <td>T8–T11, T3–T6, T17–T22</td>
+              </tr>
+              <tr>
+                <td>Payment plan agreements</td>
+                <td><strong>4 years after final payment</strong> or plan termination</td>
+                <td>T4</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="callout callout-good">
+            <div class="cl-title">Recommended Practice</div>
+            Create a Records Retention Matrix and distribute it to all officers. Include a shred-date calendar in the office manager's system. Every document should be labeled with its destruction date. Use secure destruction (shredding) for records containing personal financial information.
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 7: TOP 10 MISTAKES -->
+      <div class="guide-section" id="sec-mistakes">
+        <div class="gs-title">Top 10 Board Compliance Mistakes</div>
+        <p class="gs-subtitle">Common errors and how to avoid them</p>
+
+        <div class="section-content">
+          <div class="mistake-grid">
+            <div class="mistake-card">
+              <div class="mc-problem">Sending NOV by regular mail instead of certified mail</div>
+              <div class="mc-fix">Always use certified mail (Return Receipt) for T8 Notice of Violation. Keep green card and tracking number.</div>
+            </div>
+
+            <div class="mistake-card">
+              <div class="mc-problem">Imposing fine before giving 30-day hearing opportunity</div>
+              <div class="mc-fix">Wait minimum 30 days after T8 before levying any fine. Only issue fine after hearing (T10) or if owner waives hearing in writing.</div>
+            </div>
+
+            <div class="mistake-card">
+              <div class="mc-problem">Filing lien without Pre-Lien Notice (T5)</div>
+              <div class="mc-fix">NEVER file lien until T5 is sent by certified mail AND cure period expires. Missing T5 makes lien VOID and unenforceable.</div>
+            </div>
+
+            <div class="mistake-card">
+              <div class="mc-problem">Filing lien without offering payment plan (T3)</div>
+              <div class="mc-fix">Send T3 Payment Plan Offer by certified mail BEFORE sending T5. Build this into collection calendar. § 209.0093 requires it.</div>
+            </div>
+
+            <div class="mistake-card">
+              <div class="mc-problem">Board meetings without 72-hour notice</div>
+              <div class="mc-fix">Post T12 Board Meeting Notice on website + email owners every time, no exceptions. 72 hours minimum (check bylaws for more).</div>
+            </div>
+
+            <div class="mistake-card">
+              <div class="mc-problem">Fines before Fine Schedule published</div>
+              <div class="mc-fix">Adopt T27 Fine Schedule at a Board meeting and post on website BEFORE levying any fine. Fines without published schedule are unenforceable.</div>
+            </div>
+
+            <div class="mistake-card">
+              <div class="mc-problem">ARC denial without written specific reasons</div>
+              <div class="mc-fix">Always use T21 Denial with EVERY field completed. Include specific features violated, alternative designs, and compliance explanation. Vague denials are void.</div>
+            </div>
+
+            <div class="mistake-card">
+              <div class="mc-problem">Not distributing Collection Policy (T26) first</div>
+              <div class="mc-fix">Adopt T26 at a Board meeting and distribute to all members BEFORE first collection action. Missing T26 invalidates entire collection sequence.</div>
+            </div>
+
+            <div class="mistake-card">
+              <div class="mc-problem">Altering required statutory language in templates</div>
+              <div class="mc-fix">Only fill in red [BRACKETED] fields with specific facts. Never change black text without attorney review and written approval.</div>
+            </div>
+
+            <div class="mistake-card">
+              <div class="mc-problem">Not completing Delivery Record block</div>
+              <div class="mc-fix">Fill in Delivery Record section the day notice is sent. Include method, date, recipient, tracking number. Keep with original letter in file.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+    <!-- STICKY SECTION NAVIGATION -->
+    <div class="section-nav">
+      <div class="section-nav-title">On This Page</div>
+      <a href="#sec-types" class="section-nav-link">Two Types of Templates</a>
+      <a href="#sec-situations" class="section-nav-link">Find Your Situation</a>
+      <a href="#sec-enforcement" class="section-nav-link">Enforcement Sequence</a>
+      <a href="#sec-assessment" class="section-nav-link">Assessment Collection</a>
+      <a href="#sec-arc" class="section-nav-link">ARC Timeline</a>
+      <a href="#sec-delivery" class="section-nav-link">Delivery Methods</a>
+      <a href="#sec-retention" class="section-nav-link">Record Retention</a>
+      <a href="#sec-mistakes" class="section-nav-link">Top 10 Mistakes</a>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="page-footer">
+    <p>This Templates Guide is an operational reference for HOA board members and is not a substitute for legal advice. For questions about proper procedures, consult the HOA's attorney. <a href="/board/index.html">Back to Board Portal</a></p>
+  </div>
+
+</div>
+</div>
+
+<!-- SCRIPTS -->
+<script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6/dist/amazon-cognito-identity.min.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/guard.js"></script>
+
+<script>
+// Section nav highlighting
+document.addEventListener('scroll', function() {
+  const sections = document.querySelectorAll('.guide-section');
+  const navLinks = document.querySelectorAll('.section-nav-link');
+
+  let current = '';
+  sections.forEach(section => {
+    const sectionTop = section.offsetTop;
+    if (pageYOffset >= sectionTop - 150) {
+      current = section.getAttribute('id');
+    }
+  });
+
+  navLinks.forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('href') === '#' + current) {
+      link.classList.add('active');
+    }
+  });
+});
+
+// Initialize guard
+HoaGuard.protect('board');
+</script>
+
+</body>
+</html>

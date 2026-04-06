@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Board Portal — MMPOAII HOA</title>
+<link rel="stylesheet" href="/css/site.css">
+<style>
+.welcome-banner {
+  background: linear-gradient(135deg, var(--purple-800), var(--purple-900));
+  color: #fff; border-radius: var(--r3);
+  padding: 24px 28px; margin-bottom: 28px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  flex-wrap: wrap;
+}
+.wb-left h2 { font-family: var(--serif); font-size: 22px; font-weight: 700; margin-bottom: 3px; }
+.wb-left p  { font-size: 13px; opacity: .75; }
+.wb-right { text-align: right; font-size: 12px; opacity: .7; }
+.wb-right .wr-date { font-size: 14px; font-weight: 600; opacity: .9; }
+
+.section-block { margin-bottom: 32px; }
+
+/* Notice cards */
+.notice-row { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.notice-item {
+  background: var(--surf); border: 1px solid var(--border);
+  border-radius: var(--r2); padding: 12px 16px;
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 13.5px;
+}
+.notice-item.purple { border-left: 4px solid var(--purple-600); }
+.notice-item.teal   { border-left: 4px solid var(--teal-600); }
+.notice-item .ni-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.notice-item .ni-body .ni-title { font-weight: 700; font-size: 13px; margin-bottom: 2px; }
+.notice-item .ni-body .ni-text  { color: var(--text2); font-size: 12.5px; }
+
+/* Tools grid — larger cards */
+.tool-card {
+  background: var(--surf); border: 1px solid var(--border);
+  border-radius: var(--r2); padding: 20px 22px;
+  cursor: pointer; text-decoration: none; color: var(--text);
+  display: flex; align-items: flex-start; gap: 14px;
+  transition: box-shadow .15s, border-color .15s, transform .1s;
+}
+.tool-card:hover {
+  border-color: var(--purple-200);
+  box-shadow: 0 4px 16px rgba(83,74,183,.1);
+  transform: translateY(-1px);
+}
+.tc-icon {
+  width: 44px; height: 44px; border-radius: var(--r2);
+  background: var(--purple-50); display: flex; align-items: center;
+  justify-content: center; font-size: 22px; flex-shrink: 0;
+}
+.tool-card.teal-card .tc-icon { background: var(--teal-50); }
+.tool-card.amber-card .tc-icon { background: var(--amber-50); }
+.tc-body { flex: 1; }
+.tc-title { font-size: 14.5px; font-weight: 700; margin-bottom: 3px; }
+.tc-desc  { font-size: 12.5px; color: var(--text3); line-height: 1.5; }
+.tc-meta  { font-size: 11px; color: var(--purple-600); margin-top: 7px; font-weight: 600; }
+.tool-card.teal-card .tc-meta  { color: var(--teal-600); }
+.tool-card.amber-card .tc-meta { color: var(--amber-600); }
+.tc-arrow { font-size: 18px; color: var(--text3); flex-shrink: 0; align-self: center; }
+
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="inner">
+    <a href="/" class="site-logo">
+      <div class="logo-mark">🏡</div>
+      <div class="logo-text">
+        <div class="logo-name" data-hoa-name>MMPOAII HOA</div>
+        <div class="logo-sub">Board Portal</div>
+      </div>
+    </a>
+    <nav class="site-nav">
+      <a href="/homeowners/index.html" style="opacity:.7">Homeowner View</a>
+      <div class="nav-user">
+        <div class="avatar" id="nav-avatar">B</div>
+        <div>
+          <div class="uname" data-user-name>Loading…</div>
+          <div class="urole" data-user-role>Board Member</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="HoaGuard.logout()">Sign Out</button>
+    </nav>
+  </div>
+</header>
+
+<div id="page-content">
+<div class="page-wrap">
+
+  <!-- Welcome banner -->
+  <div class="welcome-banner">
+    <div class="wb-left">
+      <h2>Board Member Portal</h2>
+      <p>Welcome back, <span data-user-name>Board Member</span>. Access training, legal resources, templates, and community records.</p>
+    </div>
+    <div class="wb-right">
+      <div class="wr-date" id="wb-date"></div>
+      <div data-hoa-name>MMPOAII HOA</div>
+    </div>
+  </div>
+
+  <!-- Quick notices -->
+  <div class="notice-row">
+    <div class="notice-item purple">
+      <div class="ni-icon">⚠</div>
+      <div class="ni-body">
+        <div class="ni-title">Attorney Review Reminder</div>
+        <div class="ni-text">All templates and policy documents on this portal are drafts that may need to be reviewed by a licensed Texas HOA attorney before adoption or use.</div>
+      </div>
+    </div>
+    <div class="notice-item teal">
+      <div class="ni-icon">📋</div>
+      <div class="ni-body">
+        <div class="ni-title">Conflict of Interest Disclosure Required</div>
+        <div class="ni-text">All board members must sign the annual Conflict of Interest Disclosure form. Access it from the Board Member Training Program.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section: Training & Education -->
+  <div class="section-block">
+    <div class="section-label">Training & Education</div>
+    <div class="card-grid two-col">
+      <a class="tool-card" href="/tools/training">
+        <div class="tc-icon">🎓</div>
+        <div class="tc-body">
+          <div class="tc-title">Board Member Training Program</div>
+          <div class="tc-desc">12-module interactive training covering fiduciary duties, Chapter 209, meetings, budgets, collections, insurance, and more. Progress saved per device.</div>
+          <div class="tc-meta">12 modules · Quiz-based · localStorage persistence</div>
+        </div>
+        <div class="tc-arrow">→</div>
+      </a>
+      <a class="tool-card teal-card" href="/tools/law-structure">
+        <div class="tc-icon">🗺</div>
+        <div class="tc-body">
+          <div class="tc-title">Texas HOA Law Structure</div>
+          <div class="tc-desc">Interactive visual map of all Texas HOA statutes — Chapters 202, 207, 209, Title 5, CPRC, Election Code, and more. Click any law for plain-language details.</div>
+          <div class="tc-meta">Interactive reference · 30+ clickable law cards</div>
+        </div>
+        <div class="tc-arrow">→</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Section: Operational Guides -->
+  <div class="section-block">
+    <div class="section-label">Operational Guides & Tools</div>
+    <div class="card-grid two-col">
+      <a class="tool-card amber-card" href="/tools/templates-guide.html">
+        <div class="tc-icon">📋</div>
+        <div class="tc-body">
+          <div class="tc-title">Communication Templates Guide</div>
+          <div class="tc-desc">Step-by-step operational reference for all 27 Board communication templates. Includes quick-reference situation cards, enforcement sequences, collection process, ARC timeline, delivery methods, and record retention.</div>
+          <div class="tc-meta">Enforcement · Collections · ARC · Delivery · Retention</div>
+        </div>
+        <div class="tc-arrow">→</div>
+      </a>
+      <a class="tool-card" href="/tools/ch209-guide">
+        <div class="tc-icon">⚖</div>
+        <div class="tc-body">
+          <div class="tc-title">Chapter 209 Plain-Language Guide</div>
+          <div class="tc-desc">Section-by-section plain-language explanation of every major Chapter 209 provision, with homeowner rights summary table and statutory references.</div>
+          <div class="tc-meta">Every §209 section covered · Homeowner rights table</div>
+        </div>
+        <div class="tc-arrow">→</div>
+      </a>
+      <a class="tool-card teal-card" href="/tools/interest-calc">
+        <div class="tc-icon">📊</div>
+        <div class="tc-body">
+          <div class="tc-title">Assessment Interest Calculator</div>
+          <div class="tc-desc">Calculate interest on delinquent accounts using monthly, daily, or running balance methods. Exports CSV payment schedules. Based on Texas Property Code §209.0062.</div>
+          <div class="tc-meta">3 calculation methods · CSV export · localStorage</div>
+        </div>
+        <div class="tc-arrow">→</div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- Section: Community Records (shared) -->
+  <div class="section-block">
+    <div class="section-label">Community Records</div>
+    <div class="card-grid">
+      <a class="tool-card" href="/documents/governing-docs/">
+        <div class="tc-icon">📋</div>
+        <div class="tc-body">
+          <div class="tc-title">Governing Documents</div>
+          <div class="tc-desc">CC&Rs, Bylaws, Rules & Regulations, and all recorded amendments. Available to board members and homeowners.</div>
+          <div class="tc-meta">Shared with homeowners</div>
+        </div>
+        <div class="tc-arrow">→</div>
+      </a>
+      <a class="tool-card" href="/documents/meeting-minutes">
+        <div class="tc-icon">📝</div>
+        <div class="tc-body">
+          <div class="tc-title">Meeting Minutes</div>
+          <div class="tc-desc">Board meeting minutes archive. Most recent meetings appear first. Available to all community members per §209.005.</div>
+          <div class="tc-meta">Shared with homeowners</div>
+        </div>
+        <div class="tc-arrow">→</div>
+      </a>
+      <a class="tool-card" href="/documents/budget">
+        <div class="tc-icon">💰</div>
+        <div class="tc-body">
+          <div class="tc-title">Budget & Financials</div>
+          <div class="tc-desc">Annual operating budget, reserve fund status, and financial summaries. Shared with homeowners; full financial records available to board members.</div>
+          <div class="tc-meta">Shared summary with homeowners</div>
+        </div>
+        <div class="tc-arrow">→</div>
+      </a>
+      <!-- <a class="tool-card" href="/documents/management-cert.html">
+        <div class="tc-icon">🏛</div>
+        <div class="tc-body">
+          <div class="tc-title">Management Certificate</div>
+          <div class="tc-desc">Current §209.004 management certificate filed with the county. Must be updated when board officers change.</div>
+          <div class="tc-meta">Board only</div>
+        </div>
+        <div class="tc-arrow">→</div>
+      </a> -->
+    </div>
+  </div>
+
+</div><!-- /page-wrap -->
+</div><!-- /page-content -->
+
+<footer class="site-footer">
+  <div data-hoa-name>MMPOAII HOA</div>
+  <div>Board Member Portal — Content is for informational purposes only. Not legal advice. Consult a licensed Texas HOA attorney before taking any enforcement action.</div>
+  <div class="footer-disclaimer">Governed by Texas Property Code Chapter 209 · <a href="https://statutes.capitol.texas.gov/Docs/PR/htm/PR.209.htm" target="_blank" rel="noopener">View Statute ↗</a></div>
+</footer>
+
+<!-- SCRIPTS — ORDER MATTERS -->
+<script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6/dist/amazon-cognito-identity.min.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/guard.js"></script>
+<script>
+// ── Protect this page — board members only ────────────────────────────────────
+HoaGuard.protect('board');
+
+// ── Date display ──────────────────────────────────────────────────────────────
+document.getElementById('wb-date').textContent = new Date().toLocaleDateString('en-US', {
+  weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+});
+
+// ── Set avatar initial ────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function () {
+  document.title = 'Board Portal — ' + (HOA_CONFIG.hoaName || 'MMPOAII HOA');
+});
+
+// Watch for guard to populate username, then set avatar initial
+const observer = new MutationObserver(function () {
+  const uname = document.querySelector('[data-user-name]');
+  if (uname && uname.textContent && uname.textContent !== 'Loading…') {
+    document.getElementById('nav-avatar').textContent = uname.textContent.charAt(0).toUpperCase();
+    observer.disconnect();
+  }
+});
+observer.observe(document.body, { subtree: true, characterData: true, childList: true });
+</script>
+</body>
+</html>

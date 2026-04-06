@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Homeowner Portal — MMPOAII HOA</title>
+<link rel="stylesheet" href="/css/site.css">
+<style>
+.welcome-banner {
+  background: linear-gradient(135deg, var(--teal-700), #0a5a45);
+  color: #fff; border-radius: var(--r3);
+  padding: 24px 28px; margin-bottom: 28px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  flex-wrap: wrap;
+}
+.wb-left h2 { font-family: var(--serif); font-size: 22px; font-weight: 700; margin-bottom: 3px; }
+.wb-left p  { font-size: 13px; opacity: .75; }
+.wb-right { text-align: right; font-size: 12px; opacity: .7; }
+.wb-right .wr-date { font-size: 14px; font-weight: 600; opacity: .9; }
+
+.section-block { margin-bottom: 32px; }
+
+.tool-card {
+  background: var(--surf); border: 1px solid var(--border);
+  border-radius: var(--r2); padding: 20px 22px;
+  cursor: pointer; text-decoration: none; color: var(--text);
+  display: flex; align-items: flex-start; gap: 14px;
+  transition: box-shadow .15s, border-color .15s, transform .1s;
+}
+.tool-card:hover {
+  border-color: var(--teal-600);
+  box-shadow: 0 4px 16px rgba(15,110,86,.1);
+  transform: translateY(-1px);
+}
+.tc-icon {
+  width: 44px; height: 44px; border-radius: var(--r2);
+  background: var(--teal-50); display: flex; align-items: center;
+  justify-content: center; font-size: 22px; flex-shrink: 0;
+}
+.tc-body { flex: 1; }
+.tc-title { font-size: 14.5px; font-weight: 700; margin-bottom: 3px; }
+.tc-desc  { font-size: 12.5px; color: var(--text3); line-height: 1.5; }
+.tc-meta  { font-size: 11px; color: var(--teal-600); margin-top: 7px; font-weight: 600; }
+.tc-arrow { font-size: 18px; color: var(--text3); flex-shrink: 0; align-self: center; }
+
+/* Situation cards for Communication Templates */
+.situation-card {
+  background: var(--surf); border: 1px solid var(--border);
+  border-radius: var(--r2); margin-bottom: 12px;
+  overflow: hidden;
+}
+.sit-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 18px; cursor: pointer;
+  transition: background .15s;
+}
+.sit-header:hover { background: var(--gray-50); }
+.sit-num {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--teal-50); color: var(--teal-600);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; flex-shrink: 0;
+}
+.sit-title { font-size: 14px; font-weight: 700; }
+.sit-body {
+  padding: 0 18px 16px 60px;
+}
+.sit-note {
+  font-size: 12.5px; color: var(--text2); line-height: 1.55;
+  margin-bottom: 8px; font-style: italic;
+}
+.sit-deadline {
+  font-size: 12px; color: var(--red-600); font-weight: 600;
+  margin-bottom: 10px;
+}
+.sit-links {
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+.sit-links a {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--teal-50); color: var(--teal-600);
+  padding: 5px 12px; border-radius: 6px;
+  font-size: 12px; font-weight: 600;
+  text-decoration: none;
+  transition: background .15s, color .15s;
+}
+.sit-links a:hover {
+  background: var(--teal-600); color: #fff;
+}
+.sit-links a::before {
+  content: '⬇'; font-size: 10px;
+}
+
+/* Contact board form */
+.contact-card {
+  background: var(--surf); border: 1px solid var(--border);
+  border-radius: var(--r3); padding: 24px 28px;
+}
+.contact-card h3 { font-family: var(--serif); font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+.contact-card p  { font-size: 13.5px; color: var(--text2); margin-bottom: 18px; }
+.contact-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 14px; margin-bottom: 14px;
+}
+.contact-grid .form-group { margin-bottom: 0; }
+.contact-grid.full { grid-template-columns: 1fr; }
+textarea {
+  width: 100%; padding: 10px 13px;
+  border: 1.5px solid var(--border); border-radius: var(--r);
+  font-family: var(--sans); font-size: 14px; color: var(--text);
+  resize: vertical; min-height: 90px; background: var(--surf);
+}
+textarea:focus { outline: none; border-color: var(--teal-600); }
+
+/* Board member list */
+.board-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px; margin-top: 14px;
+}
+.board-item {
+  background: var(--surf); border: 1px solid var(--border);
+  border-radius: var(--r2); padding: 12px 14px;
+}
+.board-item .bi-name  { font-size: 13.5px; font-weight: 700; margin-bottom: 2px; }
+.board-item .bi-title { font-size: 12px; color: var(--text3); }
+.board-item .bi-email { font-size: 11.5px; color: var(--teal-600); margin-top: 5px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="inner">
+    <a href="/" class="site-logo">
+      <div class="logo-mark">🏡</div>
+      <div class="logo-text">
+        <div class="logo-name" data-hoa-name>MMPOAII HOA</div>
+        <div class="logo-sub">Homeowner Portal</div>
+      </div>
+    </a>
+    <nav class="site-nav">
+      <div class="nav-user">
+        <div class="avatar" id="nav-avatar" style="background:rgba(255,255,255,.15)">H</div>
+        <div>
+          <div class="uname" data-user-name>Loading…</div>
+          <div class="urole" data-user-role>Homeowner</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="HoaGuard.logout()">Sign Out</button>
+    </nav>
+  </div>
+</header>
+
+<div id="page-content">
+
+<div class="page-wrap">
+
+  <!-- Welcome banner -->
+  <div class="welcome-banner">
+    <div class="wb-left">
+      <h2>Homeowner Portal</h2>
+      <p>Welcome, <span data-user-name>Homeowner</span>. Access community resources, know your rights, and contact the board.</p>
+    </div>
+    <div class="wb-right">
+      <div class="wr-date" id="wb-date"></div>
+      <div data-hoa-name>MMPOAII HOA</div>
+    </div>
+  </div>
+
+  <!-- Section: Know Your Rights -->
+  <div class="section-block">
+    <div class="section-label">Know Your Rights Under Texas Law</div>
+    <div class="card-grid two-col">
+      <a class="tool-card" href="/tools/ch209-guide.html">
+        <div class="tc-icon">⚖</div>
+        <div class="tc-body">
+          <div class="tc-title">Chapter 209 — Your Rights Guide</div>
+          <div class="tc-desc">A plain-language walkthrough of every major Section 209 provision. Know your rights before any dispute, fine, or collection action. Covers payment plan rights, hearing rights, voting rights, and foreclosure protections.</div>
+          <div class="tc-meta">Texas Residential Property Owners Protection Act</div>
+        </div>
+        <div class="tc-arrow">→</div>
+      </a>
+      <a class="tool-card" href="/tools/homeowner-guide.html">
+        <div class="tc-icon">📋</div>
+        <div class="tc-body">
+          <div class="tc-title">Homeowner Communication Guide</div>
+          <div class="tc-desc">Step-by-step guide for using your communication templates. Covers deadlines, the violation process, ARC applications, disability rights, assessments and liens, selling or renting, and neighbor disputes.</div>
+          <div class="tc-meta">Deadlines · Violations · ARC · Liens · Selling · Renting · Disputes</div>
+        </div>
+        <div class="tc-arrow">→</div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- Section: Community Documents -->
+  <div class="section-block">
+    <div class="section-label">Community Documents</div>
+    <div class="card-grid">
+      <a class="tool-card" href="/documents/governing-docs/">
+        <div class="tc-icon">📋</div>
+        <div class="tc-body">
+          <div class="tc-title">Governing Documents</div>
+          <div class="tc-desc">CC&Rs, Bylaws, and Rules & Regulations. These are the community rules that govern your property. Available to all members per §209.005.</div>
+          <div class="tc-meta">CC&Rs · Bylaws · Rules & Regulations</div>
+        </div>
+        <div class="tc-arrow">→</div>
+      </a>
+      <a class="tool-card" href="/documents/meeting-minutes">
+        <div class="tc-icon">📝</div>
+        <div class="tc-body">
+          <div class="tc-title">Meeting Minutes</div>
+          <div class="tc-desc">Board meeting minutes. You have the right to access these records under §209.005. Most recent meetings listed first.</div>
+          <div class="tc-meta">All board meetings · Most recent first</div>
+        </div>
+        <div class="tc-arrow">→</div>
+      </a>
+      <a class="tool-card" href="/documents/budget">
+        <div class="tc-icon">💰</div>
+        <div class="tc-body">
+          <div class="tc-title">Budget Summary</div>
+          <div class="tc-desc">Annual operating budget and reserve fund summary. The board is required to maintain accurate financial records accessible to all members.</div>
+          <div class="tc-meta">Annual budget · Reserve fund status</div>
+        </div>
+        <div class="tc-arrow">→</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Section: Communication Guide -->
+  <div class="section-block">
+    <div class="section-label">Guides & Tools</div>
+    <div class="card-grid two-col">
+      <a class="tool-card" href="/tools/homeowner-guide.html">
+        <div class="tc-icon">📋</div>
+        <div class="tc-body">
+          <div class="tc-title">Homeowner Guide</div>
+          <div class="tc-desc">Information for homeowners and the neighborhood. Includes information on the fire safety, enterance gate, sewage system, and more.</div>
+          <div class="tc-meta">Deadlines · Violations · ARC · Liens · Selling · Renting · Disputes</div>
+        </div>
+        <div class="tc-arrow">→</div>
+      </a>
+    </div>
+  </div>
+
+
+  <!-- Section: Contact the Board -->
+  <!-- Board members -->
+  <div id="board-members-section" style="margin-top:24px">
+    <div class="section-label">Your Board of Directors</div>
+    <div class="board-list" id="board-list"></div>
+  </div>
+
+</div><!-- /page-wrap -->
+</div><!-- /page-content -->
+
+<footer class="site-footer">
+  <div data-hoa-name>MMPOAII-A HOA</div>
+  <div>Homeowner Portal — All content for informational purposes only. Not legal advice.</div>
+  <div class="footer-disclaimer">Your rights are protected by Texas Property Code Chapter 209 ·
+    <a href="https://guides.sll.texas.gov/property-owners-associations" target="_blank" rel="noopener">Texas State Law Library HOA Guide ↗</a>
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6/dist/amazon-cognito-identity.min.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/guard.js"></script>
+<script>
+HoaGuard.protect('homeowners');
+
+document.getElementById('wb-date').textContent = new Date().toLocaleDateString('en-US', {
+  weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  const c = typeof HOA_CONFIG !== 'undefined' ? HOA_CONFIG : {};
+  document.title = 'Homeowner Portal — ' + (c.hoaName || 'MMPOAII HOA');
+
+  // Board members
+  const members = c.boardMembers || [];
+  const list = document.getElementById('board-list');
+  if (members.length) {
+    list.innerHTML = members.map(function (m) {
+      return '<div class="board-item">' +
+        '<div class="bi-name">' + m.name + '</div>' +
+        '<div class="bi-title">' + m.title + '</div>' +
+        (m.email ? '<div class="bi-email"><a href="mailto:' + m.email + '">' + m.email + '</a></div>' : '') +
+      '</div>';
+    }).join('');
+  } else {
+    document.getElementById('board-members-section').style.display = 'none';
+  }
+
+  // Emergency contacts
+  const emerg = c.emergencyContacts || [{ label: 'Emergency', number: '911' }];
+  const ec = document.getElementById('emergency-cards');
+  ec.innerHTML = emerg.map(function (e) {
+    return '<div class="resource-card" style="cursor:default">' +
+      '<div class="rc-icon">📞</div>' +
+      '<div class="rc-title">' + e.label + '</div>' +
+      '<div class="rc-desc" style="font-size:15px;font-weight:700;color:var(--text)">' + e.number + '</div>' +
+    '</div>';
+  }).join('');
+});
+
+// Contact form — uses mailto: since there's no backend
+function sendContactForm() {
+  const name    = document.getElementById('c-name').value.trim();
+  const addr    = document.getElementById('c-addr').value.trim();
+  const email   = document.getElementById('c-email').value.trim();
+  const subject = document.getElementById('c-subject').value;
+  const msg     = document.getElementById('c-msg').value.trim();
+
+  if (!name || !email || !subject || !msg) {
+    const err = document.getElementById('contact-error');
+    err.textContent = 'Please fill in all required fields.';
+    err.classList.add('show');
+    return;
+  }
+
+  const c   = typeof HOA_CONFIG !== 'undefined' ? HOA_CONFIG : {};
+  const to  = c.hoaEmail || 'board@mmpoaii.com';
+  const sub = encodeURIComponent('[Homeowner Portal] ' + subject + ' — ' + name);
+  const body = encodeURIComponent(
+    'From: ' + name + '\n' +
+    'Property: ' + addr + '\n' +
+    'Reply-to: ' + email + '\n\n' +
+    'Subject: ' + subject + '\n\n' +
+    msg + '\n\n' +
+    '---\nSent via ' + (c.hoaName || 'MMPOAII HOA') + ' Homeowner Portal'
+  );
+
+  window.location.href = 'mailto:' + to + '?subject=' + sub + '&body=' + body;
+
+  document.getElementById('contact-error').classList.remove('show');
+  const suc = document.getElementById('contact-success');
+  suc.textContent = 'Your email client should open with the message pre-filled. If it does not, send directly to ' + to;
+  suc.classList.add('show');
+}
+
+// Nav avatar
+const observer = new MutationObserver(function () {
+  const uname = document.querySelector('[data-user-name]');
+  if (uname && uname.textContent && uname.textContent !== 'Loading…') {
+    document.getElementById('nav-avatar').textContent = uname.textContent.charAt(0).toUpperCase();
+    observer.disconnect();
+  }
+});
+observer.observe(document.body, { subtree: true, characterData: true, childList: true });
+</script>
+</body>
+</html>

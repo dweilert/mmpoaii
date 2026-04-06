@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Governing Documents — MMPOAII HOA</title>
+<link rel="stylesheet" href="/css/site.css">
+<style>
+.doc-hero{background:var(--purple-800);color:#fff;border-radius:var(--r3);padding:22px 26px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.doc-hero h1{font-family:var(--serif);font-size:21px;font-weight:700;margin-bottom:3px}
+.doc-hero p{font-size:13px;opacity:.75}
+.doc-hero .back-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;padding:7px 14px;border-radius:var(--r);font-size:12.5px;text-decoration:none;white-space:nowrap}
+.doc-hero .back-btn:hover{background:rgba(255,255,255,.25)}
+
+.gov-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:8px}
+
+.gov-card{
+  background:var(--surf);border:1px solid var(--border);border-radius:var(--r2);
+  padding:24px 26px;text-decoration:none;color:var(--text);
+  display:flex;align-items:flex-start;gap:16px;
+  transition:box-shadow .15s, border-color .15s, transform .1s;
+  position:relative;overflow:hidden;
+}
+.gov-card::before{
+  content:'';position:absolute;top:0;left:0;width:3px;height:100%;
+  background:var(--gray-200);transition:background .13s;
+}
+.gov-card:hover{
+  border-color:var(--purple-200);
+  box-shadow:0 4px 16px rgba(83,74,183,.1);
+  transform:translateY(-1px);
+}
+.gov-card:hover::before{background:var(--purple-600)}
+
+.gc-icon{
+  width:52px;height:52px;border-radius:var(--r2);
+  background:var(--purple-50);display:flex;align-items:center;
+  justify-content:center;font-size:26px;flex-shrink:0;
+}
+.gc-body{flex:1}
+.gc-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.gc-desc{font-size:12.5px;color:var(--text3);line-height:1.55}
+.gc-meta{font-size:11px;color:var(--purple-600);margin-top:10px;font-weight:600;display:flex;align-items:center;gap:5px}
+.gc-arrow{font-size:18px;color:var(--text3);flex-shrink:0;align-self:center}
+
+.callout-info{background:var(--purple-50);border-left:4px solid var(--purple-600);border-radius:0 var(--r2) var(--r2) 0;padding:12px 16px;font-size:13px;color:var(--text2);margin-bottom:20px}
+.callout-info .cl-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--purple-800);margin-bottom:3px}
+
+@media(max-width:580px){
+  .gov-grid{grid-template-columns:1fr}
+  .doc-hero{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="inner">
+    <a href="/" class="site-logo">
+      <div class="logo-mark">🏡</div>
+      <div class="logo-text">
+        <div class="logo-name" data-hoa-name>MMPOAII HOA</div>
+        <div class="logo-sub">Governing Documents</div>
+      </div>
+    </a>
+    <nav class="site-nav">
+      <div class="nav-user">
+        <div class="avatar" id="nav-avatar">?</div>
+        <div>
+          <div class="uname" data-user-name>Loading…</div>
+          <div class="urole" data-user-role></div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="HoaGuard.logout()">Sign Out</button>
+    </nav>
+  </div>
+</header>
+
+<div id="page-content">
+<div class="page-wrap">
+
+  <div class="doc-hero">
+    <div>
+      <h1>📋 Governing Documents</h1>
+      <p>The community's foundational legal documents — CC&Rs, Bylaws, and Rules of Conduct</p>
+    </div>
+    <a href="#" id="back-link" class="back-btn">← Back to Portal</a>
+  </div>
+
+  <div class="callout-info">
+    <div class="cl-title">Member Access</div>
+    All homeowners are entitled to copies of these governing documents under Texas Property Code §209.005. Documents open as PDF in your browser.
+  </div>
+
+  <div class="gov-grid">
+
+    <a class="gov-card" href="/documents/governing/CCRs.pdf" target="_blank">
+      <div class="gc-icon">📜</div>
+      <div class="gc-body">
+        <div class="gc-title">CC&Rs</div>
+        <div class="gc-desc">Declaration of Covenants, Conditions & Restrictions — the master document recorded against every lot that defines property use, architectural standards, assessments, and enforcement authority.</div>
+        <div class="gc-meta">📄 Opens PDF in browser</div>
+      </div>
+      <div class="gc-arrow">→</div>
+    </a>
+
+    <a class="gov-card" href="/documents/governing/Bylaws.pdf" target="_blank">
+      <div class="gc-icon">⚖️</div>
+      <div class="gc-body">
+        <div class="gc-title">Bylaws</div>
+        <div class="gc-desc">Association Bylaws — the internal operating rules that govern board elections, meeting procedures, officer duties, quorum requirements, and committee structure.</div>
+        <div class="gc-meta">📄 Opens PDF in browser</div>
+      </div>
+      <div class="gc-arrow">→</div>
+    </a>
+
+    <a class="gov-card" href="/documents/governing/Rules-of-Conduct.pdf" target="_blank">
+      <div class="gc-icon">📐</div>
+      <div class="gc-body">
+        <div class="gc-title">Rules of Conduct</div>
+        <div class="gc-desc">Community Rules & Regulations — day-to-day rules adopted by the board covering common areas, noise, parking, landscaping, pets, and other community standards.</div>
+        <div class="gc-meta">📄 Opens PDF in browser</div>
+      </div>
+      <div class="gc-arrow">→</div>
+    </a>
+
+  </div>
+
+</div>
+</div>
+
+<footer class="site-footer">
+  <div data-hoa-name>MMPOAII HOA</div>
+  <div class="footer-disclaimer">Governing documents are available to all members under Texas Property Code §209.005</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6/dist/amazon-cognito-identity.min.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/guard.js"></script>
+<script>
+// Allow board AND homeowners
+HoaGuard.protect(['board', 'homeowners']);
+
+const guardCheck = setInterval(function () {
+  const user = HoaGuard.getUser();
+  if (!user) return;
+  clearInterval(guardCheck);
+
+  const c = typeof HOA_CONFIG !== 'undefined' ? HOA_CONFIG : {};
+  const isBoard = user.groups.includes(c.boardGroup || 'board');
+
+  // Set nav avatar
+  document.getElementById('nav-avatar').textContent = user.username.charAt(0).toUpperCase();
+
+  // Back link goes to correct portal
+  document.getElementById('back-link').href = isBoard ? '/board/index.html' : '/homeowners/index.html';
+
+  document.title = 'Governing Documents — ' + (c.hoaName || 'MMPOAII HOA');
+}, 100);
+</script>
+</body>
+</html>

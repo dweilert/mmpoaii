@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Budget & Financials — MMPOAII HOA</title>
+<link rel="stylesheet" href="/css/site.css">
+<style>
+.doc-hero{background:var(--purple-800);color:#fff;border-radius:var(--r3);padding:22px 26px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.doc-hero h1{font-family:var(--serif);font-size:21px;font-weight:700;margin-bottom:3px}
+.doc-hero p{font-size:13px;opacity:.75}
+.doc-hero .back-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;padding:7px 14px;border-radius:var(--r);font-size:12.5px;text-decoration:none;white-space:nowrap}
+.doc-hero .back-btn:hover{background:rgba(255,255,255,.25)}
+
+/* Upload zone — board only */
+.upload-section{background:var(--surf);border:1px solid var(--border);border-radius:var(--r3);padding:22px;margin-bottom:22px}
+.upload-section h2{font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.upload-section h2::before{content:'';width:3px;height:15px;background:var(--purple-600);border-radius:2px}
+.drop-zone{border:2px dashed var(--gray-200);border-radius:var(--r2);padding:36px 20px;text-align:center;transition:all .15s;cursor:pointer;background:var(--gray-50)}
+.drop-zone:hover,.drop-zone.dragover{border-color:var(--purple-600);background:var(--purple-50)}
+.drop-zone .dz-icon{font-size:36px;margin-bottom:10px}
+.drop-zone .dz-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+.drop-zone .dz-sub{font-size:12.5px;color:var(--text3)}
+.file-input{display:none}
+.browse-btn{display:inline-block;margin-top:12px;padding:8px 18px;background:var(--purple-600);color:#fff;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:var(--sans)}
+.browse-btn:hover{background:var(--purple-800)}
+
+/* Upload queue */
+.upload-queue{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+.uq-item{background:var(--gray-50);border:1px solid var(--border);border-radius:var(--r2);padding:10px 14px}
+.uq-top{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.uq-name{font-size:13px;font-weight:600;flex:1;color:var(--text);word-break:break-all}
+.uq-size{font-size:11.5px;color:var(--text3);white-space:nowrap}
+.uq-status{font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.status-waiting{background:var(--gray-100);color:var(--text3)}
+.status-uploading{background:var(--purple-50);color:var(--purple-800)}
+.status-done{background:var(--green-50);color:var(--green-600)}
+.status-error{background:var(--red-50);color:var(--red-600)}
+.uq-bar-wrap{height:4px;background:var(--gray-200);border-radius:2px;overflow:hidden}
+.uq-bar{height:100%;background:var(--purple-600);border-radius:2px;width:0%;transition:width .3s}
+.uq-bar.done{background:var(--green-600);width:100%}
+.uq-bar.error{background:var(--red-600)}
+.upload-actions{display:flex;gap:8px;margin-top:12px}
+.upload-btn{padding:9px 20px;background:var(--teal-600);color:#fff;border:none;border-radius:var(--r);font-size:13.5px;font-weight:600;cursor:pointer;font-family:var(--sans)}
+.upload-btn:hover{background:var(--teal-700)}
+.upload-btn:disabled{opacity:.45;cursor:not-allowed}
+.clear-btn{padding:9px 16px;background:transparent;border:1px solid var(--border);color:var(--text2);border-radius:var(--r);font-size:13px;cursor:pointer;font-family:var(--sans)}
+.clear-btn:hover{border-color:var(--red-600);color:var(--red-600)}
+
+/* File list */
+.files-section{background:var(--surf);border:1px solid var(--border);border-radius:var(--r3);overflow:hidden}
+.files-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border)}
+.files-head h2{font-size:14px;font-weight:700;display:flex;align-items:center;gap:7px}
+.files-head h2::before{content:'';width:3px;height:15px;background:var(--teal-600);border-radius:2px}
+.file-count{font-size:12px;color:var(--text3)}
+.refresh-btn{background:none;border:1px solid var(--border);color:var(--text3);padding:5px 11px;border-radius:var(--r);font-size:12px;cursor:pointer;font-family:var(--sans)}
+.refresh-btn:hover{border-color:var(--purple-600);color:var(--purple-600)}
+.file-list{padding:0}
+.file-item{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--border2);transition:background .1s}
+.file-item:last-child{border-bottom:none}
+.file-item:hover{background:var(--gray-50)}
+.fi-icon{font-size:22px;flex-shrink:0;width:32px;text-align:center}
+.fi-body{flex:1;min-width:0}
+.fi-name{font-size:13.5px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.fi-meta{font-size:11.5px;color:var(--text3)}
+.fi-actions{display:flex;gap:7px;flex-shrink:0}
+.dl-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;background:var(--teal-600);color:#fff;border-radius:var(--r);font-size:12.5px;font-weight:600;text-decoration:none;transition:background .13s}
+.dl-btn:hover{background:var(--teal-700)}
+.del-btn{padding:6px 10px;background:transparent;border:1px solid var(--border);color:var(--text3);border-radius:var(--r);font-size:12px;cursor:pointer;font-family:var(--sans)}
+.del-btn:hover{border-color:var(--red-600);color:var(--red-600)}
+
+/* Empty / loading states */
+.state-box{padding:48px 20px;text-align:center;color:var(--text3)}
+.state-box .sb-icon{font-size:36px;margin-bottom:10px}
+.state-box p{font-size:13.5px;line-height:1.6}
+.spinner-sm{display:inline-block;width:20px;height:20px;border:2px solid var(--gray-200);border-top-color:var(--purple-600);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:7px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.callout-warn{background:var(--amber-50);border-left:4px solid var(--amber-600);border-radius:0 var(--r2) var(--r2) 0;padding:11px 14px;font-size:13px;color:var(--text2);margin-bottom:16px}
+.callout-warn .cl-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--amber-600);margin-bottom:3px}
+
+@media(max-width:580px){
+  .fi-actions .del-btn{display:none}
+  .doc-hero{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="inner">
+    <a href="/" class="site-logo">
+      <div class="logo-mark">🏡</div>
+      <div class="logo-text">
+        <div class="logo-name" data-hoa-name>MMPOAII HOA</div>
+        <div class="logo-sub">Community Documents</div>
+      </div>
+    </a>
+    <nav class="site-nav">
+      <div class="nav-user">
+        <div class="avatar" id="nav-avatar">?</div>
+        <div>
+          <div class="uname" data-user-name>Loading…</div>
+          <div class="urole" data-user-role></div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="HoaGuard.logout()">Sign Out</button>
+    </nav>
+  </div>
+</header>
+
+<div id="page-content">
+<div class="page-wrap">
+
+  <div class="doc-hero">
+    <div>
+      <h1>📝 Budget & Financials</h1>
+      <p>Board budget documents and financial summaries — available to all community members Board financial records for all community members</p>
+    </div>
+    <a href="#" id="back-link" class="back-btn">← Back to Portal</a>
+  </div>
+
+  <!-- CONFIG WARNING — shown if S3 not configured -->
+  <div class="callout-warn" id="config-warn" style="display:none">
+    <div class="cl-title">Setup Required</div>
+    S3 bucket is not yet configured. Complete the Documents Setup Guide and add your bucket name to config.js, then redeploy.
+  </div>
+
+  <!-- UPLOAD SECTION — board only, hidden until role is confirmed -->
+  <div id="upload-section" style="display:none">
+    <div class="upload-section">
+      <h2>Upload Budget Documents</h2>
+      <div class="drop-zone" id="drop-zone"
+           ondragover="handleDragOver(event)"
+           ondragleave="handleDragLeave(event)"
+           ondrop="handleDrop(event)"
+           onclick="document.getElementById('file-input').click()">
+        <div class="dz-icon">📂</div>
+        <div class="dz-title">Drag files here to upload</div>
+        <div class="dz-sub">PDF, Word, or Excel — any file type accepted</div>
+        <button class="browse-btn" onclick="event.stopPropagation();document.getElementById('file-input').click()">Browse Files</button>
+      </div>
+      <input type="file" id="file-input" class="file-input" multiple
+             onchange="addFiles(this.files)">
+      <div class="upload-queue" id="upload-queue"></div>
+      <div class="upload-actions" id="upload-actions" style="display:none">
+        <button class="upload-btn" id="upload-btn" onclick="uploadAll()">⬆ Upload All</button>
+        <button class="clear-btn" onclick="clearQueue()">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILE LIST -->
+  <div class="files-section">
+    <div class="files-head">
+      <h2>All Budget Documents <span class="file-count" id="file-count"></span></h2>
+      <button class="refresh-btn" onclick="loadFiles()">↺ Refresh</button>
+    </div>
+    <div class="file-list" id="file-list">
+      <div class="state-box">
+        <div class="sb-icon">⏳</div>
+        <p><span class="spinner-sm"></span>Loading files…</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<footer class="site-footer">
+  <div data-hoa-name>MMPOAII HOA</div>
+  <div class="footer-disclaimer">Meeting minutes are available to all members under Texas Property Code §209.005</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6/dist/amazon-cognito-identity.min.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/guard.js"></script>
+<script>
+// ── Constants ──────────────────────────────────────────────────────────────────
+const FOLDER = 'budget';
+let isBoard = false;
+let uploadQueue = [];
+
+// ── Guard — allow board AND homeowners ────────────────────────────────────────
+HoaGuard.protect(['board', 'homeowners']);
+
+// ── Init after guard confirms auth ────────────────────────────────────────────
+const guardCheck = setInterval(function () {
+  const user = HoaGuard.getUser();
+  if (!user) return;
+  clearInterval(guardCheck);
+
+  const c = typeof HOA_CONFIG !== 'undefined' ? HOA_CONFIG : {};
+  isBoard = user.groups.includes(c.boardGroup || 'board');
+
+  // Set nav avatar
+  document.getElementById('nav-avatar').textContent = user.username.charAt(0).toUpperCase();
+
+  // Back link goes to correct portal
+  document.getElementById('back-link').href = isBoard ? '/board/index.html' : '/homeowners/index.html';
+
+  // Show upload section for board members only
+  if (isBoard) document.getElementById('upload-section').style.display = 'block';
+
+  // Check S3 is configured
+  if (!c.s3BucketName || c.s3BucketName.startsWith('REPLACE')) {
+    document.getElementById('config-warn').style.display = 'block';
+  }
+
+  document.title = 'Budget & Financials — ' + (c.hoaName || 'MMPOAII HOA');
+  loadFiles();
+}, 100);
+
+// ── S3 helpers ─────────────────────────────────────────────────────────────────
+function s3BaseUrl() {
+  const c = HOA_CONFIG;
+  return 'https://' + c.s3BucketName + '.s3.' + c.s3Region + '.amazonaws.com';
+}
+
+function fileIcon(name) {
+  const ext = name.split('.').pop().toLowerCase();
+  const icons = { pdf:'📄', doc:'📝', docx:'📝', xls:'📊', xlsx:'📊', ppt:'📋', pptx:'📋', jpg:'🖼', jpeg:'🖼', png:'🖼' };
+  return icons[ext] || '📎';
+}
+
+function fmtSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/1048576).toFixed(1) + ' MB';
+}
+
+function fmtDate(iso) {
+  try { return new Date(iso).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}); }
+  catch(e) { return iso.slice(0,10); }
+}
+
+// ── Load and render file list ──────────────────────────────────────────────────
+async function loadFiles() {
+  const list = document.getElementById('file-list');
+  list.innerHTML = '<div class="state-box"><p><span class="spinner-sm"></span>Loading…</p></div>';
+
+  try {
+    const url = s3BaseUrl() + '/?list-type=2&prefix=' + FOLDER + '/&delimiter=/';
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const text = await res.text();
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(text, 'application/xml');
+    const items = Array.from(xml.querySelectorAll('Contents')).map(function(el) {
+      return {
+        key:      el.querySelector('Key').textContent,
+        size:     parseInt(el.querySelector('Size').textContent),
+        modified: el.querySelector('LastModified').textContent
+      };
+    }).filter(function(f) {
+      // exclude the folder placeholder object itself
+      return f.key !== FOLDER + '/' && f.size > 0;
+    }).sort(function(a,b) {
+      return new Date(b.modified) - new Date(a.modified);
+    });
+
+    document.getElementById('file-count').textContent = '(' + items.length + ' file' + (items.length !== 1 ? 's' : '') + ')';
+
+    if (items.length === 0) {
+      list.innerHTML = '<div class="state-box"><div class="sb-icon">📂</div><p>No budget documents uploaded yet.' + (isBoard ? '<br>Use the upload section above to add files.' : '') + '</p></div>';
+      return;
+    }
+
+    list.innerHTML = items.map(function(f) {
+      const name = f.key.replace(FOLDER + '/', '');
+      const dlUrl = s3BaseUrl() + '/' + f.key;
+      return '<div class="file-item">' +
+        '<div class="fi-icon">' + fileIcon(name) + '</div>' +
+        '<div class="fi-body">' +
+          '<div class="fi-name" title="' + name + '">' + name + '</div>' +
+          '<div class="fi-meta">' + fmtDate(f.modified) + ' &nbsp;·&nbsp; ' + fmtSize(f.size) + '</div>' +
+        '</div>' +
+        '<div class="fi-actions">' +
+          '<a href="' + dlUrl + '" download="' + name + '" class="dl-btn" target="_blank">⬇ Download</a>' +
+          (isBoard ? '<button class="del-btn" onclick="deleteFile(\'' + f.key + '\',this)" title="Delete">🗑</button>' : '') +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+  } catch(err) {
+    list.innerHTML = '<div class="state-box"><div class="sb-icon">⚠</div><p>Could not load files.<br><small style="color:var(--text3)">' + err.message + '</small></p></div>';
+  }
+}
+
+// ── Upload helpers ─────────────────────────────────────────────────────────────
+function handleDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('dragover'); }
+function handleDragLeave(e) { e.currentTarget.classList.remove('dragover'); }
+function handleDrop(e) {
+  e.preventDefault(); e.currentTarget.classList.remove('dragover');
+  addFiles(e.dataTransfer.files);
+}
+
+function addFiles(files) {
+  Array.from(files).forEach(function(f) {
+    uploadQueue.push({ file: f, status: 'waiting', progress: 0 });
+  });
+  renderQueue();
+}
+
+function renderQueue() {
+  const qEl = document.getElementById('upload-queue');
+  const actEl = document.getElementById('upload-actions');
+  if (uploadQueue.length === 0) { qEl.innerHTML = ''; actEl.style.display = 'none'; return; }
+  actEl.style.display = 'flex';
+  qEl.innerHTML = uploadQueue.map(function(item, i) {
+    const barClass = item.status === 'done' ? 'done' : item.status === 'error' ? 'error' : '';
+    const statusClass = { waiting:'status-waiting', uploading:'status-uploading', done:'status-done', error:'status-error' }[item.status];
+    return '<div class="uq-item" id="qi-' + i + '">' +
+      '<div class="uq-top">' +
+        '<span class="uq-name">' + item.file.name + '</span>' +
+        '<span class="uq-size">' + fmtSize(item.file.size) + '</span>' +
+        '<span class="uq-status ' + statusClass + '">' + item.status + '</span>' +
+      '</div>' +
+      '<div class="uq-bar-wrap"><div class="uq-bar ' + barClass + '" id="bar-' + i + '" style="width:' + item.progress + '%"></div></div>' +
+    '</div>';
+  }).join('');
+}
+
+function clearQueue() {
+  uploadQueue = uploadQueue.filter(function(i) { return i.status === 'uploading'; });
+  renderQueue();
+}
+
+async function uploadAll() {
+  const btn = document.getElementById('upload-btn');
+  btn.disabled = true;
+  const c = HOA_CONFIG;
+  const session = (await HoaAuth.getCurrentUser())?.session;
+      const token = 'Bearer ' + (session?.getAccessToken().getJwtToken() || session?.getIdToken().getJwtToken());
+
+  for (let i = 0; i < uploadQueue.length; i++) {
+    const item = uploadQueue[i];
+    if (item.status === 'done') continue;
+    item.status = 'uploading';
+    renderQueue();
+
+    try {
+      // Get pre-signed upload URL from Lambda
+      const res = await fetch(c.uploadApiUrl + '/upload-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': token },
+        body: JSON.stringify({ filename: item.file.name, folder: FOLDER, contentType: item.file.type || 'application/octet-stream' })
+      });
+      if (!res.ok) throw new Error('Could not get upload URL');
+      const { url } = await res.json();
+
+      // Upload directly to S3 using the pre-signed URL
+      await uploadWithProgress(url, item.file, function(pct) {
+        item.progress = pct;
+        const bar = document.getElementById('bar-' + i);
+        if (bar) bar.style.width = pct + '%';
+      });
+
+      item.status = 'done'; item.progress = 100;
+    } catch(err) {
+      item.status = 'error';
+      console.error('Upload failed:', err);
+    }
+    renderQueue();
+  }
+
+  btn.disabled = false;
+  // Refresh file list to show newly uploaded files
+  setTimeout(loadFiles, 500);
+}
+
+function uploadWithProgress(url, file, onProgress) {
+  return new Promise(function(resolve, reject) {
+    const xhr = new XMLHttpRequest();
+    xhr.upload.addEventListener('progress', function(e) {
+      if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100));
+    });
+    xhr.addEventListener('load', function() {
+      if (xhr.status >= 200 && xhr.status < 300) resolve();
+      else reject(new Error('Upload failed: ' + xhr.status));
+    });
+    xhr.addEventListener('error', function() { reject(new Error('Network error')); });
+    xhr.open('PUT', url);
+    xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
+    xhr.send(file);
+  });
+}
+
+// ── Delete file (board only) ──────────────────────────────────────────────────
+async function deleteFile(key, btn) {
+  if (!confirm('Delete "' + key.replace(FOLDER + '/', '') + '"? This cannot be undone.')) return;
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    const c = HOA_CONFIG;
+    const session = (await HoaAuth.getCurrentUser())?.session;
+      const token = 'Bearer ' + (session?.getAccessToken().getJwtToken() || session?.getIdToken().getJwtToken());
+    const res = await fetch(c.uploadApiUrl + '/delete', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', 'Authorization': token },
+      body: JSON.stringify({ key })
+    });
+    if (!res.ok) throw new Error('Delete failed');
+    await loadFiles();
+  } catch(err) {
+    alert('Delete failed: ' + err.message);
+    btn.disabled = false; btn.textContent = '🗑';
+  }
+}
+</script>
+</body>
+</html>
