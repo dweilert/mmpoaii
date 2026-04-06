@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="/css/site.css">
 <style>
 :root{
-  --teal-50:#E1F5EE;--teal-100:#9FE1CB;--teal-600:#0F6E56;
+  --teal-50:#EEEDFE;--teal-100:#CECBF6;--teal-600:#534AB7;
   --pink-50:#FBEAF0;--pink-100:#F4C0D1;--pink-600:#993556;
   --red-50:#FCEBEB;--red-100:#F7C1C1;--red-600:#A32D2D;
 }
@@ -400,27 +400,7 @@
   text-decoration: underline;
 }
 
-/* Back link */
-.back-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--purple-600);
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 600;
-  margin-bottom: 20px;
-  transition: color 0.15s;
-}
-
-.back-link:hover {
-  color: var(--purple-800);
-}
-
-.back-link::before {
-  content: '←';
-  font-size: 14px;
-}
+/* back-btn styles in site.css — local override for positioning inside hero */
 
 /* Responsive */
 @media (max-width: 1024px) {
@@ -504,7 +484,7 @@
 /* Print styles */
 @media print {
   .section-nav,
-  .back-link,
+  .back-btn,
   .site-header,
   .site-footer {
     display: none;
@@ -550,10 +530,9 @@
 <div class="page-wrap">
 
   <!-- Back link -->
-  <a href="/board/index.html" class="back-link">Board Portal</a>
-
-  <!-- Hero section -->
-  <div class="templates-header">
+<!-- Hero section -->
+  <div class="templates-header" style="position:relative">
+    <a href="/board/index.html" class="back-btn" style="position:absolute;top:20px;right:20px">← Back to Portal</a>
     <h1>Communication Templates Guide</h1>
     <p class="th-subtitle">Board Member Operational Reference — Complete enforcement sequences, assessment collection procedures, ARC timelines, delivery methods, record retention requirements, and compliance checklists.</p>
   </div>

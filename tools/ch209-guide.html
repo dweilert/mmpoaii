@@ -8,7 +8,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --purple-900:#26215C;--purple-800:#3C3489;--purple-600:#534AB7;--purple-200:#AFA9EC;--purple-50:#EEEDFE;
-  --teal-600:#0F6E56;--teal-50:#E1F5EE;
+  --teal-600:#534AB7;--teal-50:#EEEDFE;
   --amber-600:#854F0B;--amber-50:#FAEEDA;
   --red-600:#A32D2D;--red-50:#FCEBEB;
   --green-600:#3B6D11;--green-50:#EAF3DE;
@@ -22,7 +22,7 @@
   --text:#e6e4dc;--text2:#aaa;--text3:#666;
   --surf:#201f17;--border:#38362f;
   --gray-50:#18170f;--gray-100:#28271e;--gray-200:#38362f;
-  --purple-50:#1a1828;--teal-50:#0a1e16;--amber-50:#251e0a;--red-50:#200c0c;--green-50:#0c1e10
+  --purple-50:#1a1828;--teal-50:#1a1828;--amber-50:#251e0a;--red-50:#200c0c;--green-50:#0c1e10
 }}
 html{scroll-behavior:smooth}
 body{font-family:var(--sans);background:var(--gray-50);color:var(--text);font-size:15px;line-height:1.65}
@@ -36,8 +36,8 @@ body{font-family:var(--sans);background:var(--gray-50);color:var(--text);font-si
 .logo-text .ls{font-size:10px;opacity:.6}
 .btn-print{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;padding:6px 13px;border-radius:var(--r);font-size:12px;cursor:pointer;font-family:var(--sans)}
 .btn-print:hover{background:rgba(255,255,255,.22)}
-.btn-back{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;padding:6px 13px;border-radius:var(--r);font-size:12px;cursor:pointer;font-family:var(--sans);text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:background .15s}
-.btn-back:hover{background:rgba(255,255,255,.22)}
+.back-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;padding:7px 14px;border-radius:var(--r);font-size:12.5px;cursor:pointer;font-family:var(--sans);text-decoration:none;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;transition:background .15s}
+.back-btn:hover{background:rgba(255,255,255,.22);color:#fff}
 
 /* layout */
 .page{max-width:1000px;margin:0 auto;padding:28px 24px 64px;display:grid;grid-template-columns:220px 1fr;gap:24px;align-items:start}
@@ -138,7 +138,7 @@ body{font-family:var(--sans);background:var(--gray-50);color:var(--text);font-si
         <div class="ls">Texas Residential Property Owners Protection Act</div>
       </div>
     </a>
-    <a href="#" id="back-link" class="btn-back">← Back to Portal</a>
+    <a href="#" id="back-link" class="back-btn">← Back to Portal</a>
     <button class="btn-print" onclick="window.print()">🖨 Print / PDF</button>
   </div>
 </header>

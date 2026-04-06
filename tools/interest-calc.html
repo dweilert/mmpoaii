@@ -10,7 +10,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --navy:#1a2540;--navy2:#253050;--navy3:#2e3d66;
-  --teal:#0d9e7a;--teal2:#0b8a6a;--teal-light:#e1f5ee;
+  --teal:#534AB7;--teal2:#3C3489;--teal-light:#EEEDFE;
   --gold:#c8a84b;--gold-light:#fdf3da;
   --red:#b83232;--red-light:#fdeaea;
   --gray:#f5f4f0;--gray2:#ebe9e3;--gray3:#c8c5bd;--gray4:#7a7770;
@@ -37,8 +37,8 @@ body{font-family:var(--sans);background:var(--gray);color:var(--text);font-size:
 .assoc-input-wrap input::placeholder{opacity:.4}
 .btn-print{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;padding:7px 14px;border-radius:var(--r);font-size:12px;cursor:pointer;font-family:var(--sans);white-space:nowrap}
 .btn-print:hover{background:rgba(255,255,255,.2)}
-.btn-back{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;padding:7px 14px;border-radius:var(--r);font-size:12px;cursor:pointer;font-family:var(--sans);text-decoration:none;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;transition:background .15s}
-.btn-back:hover{background:rgba(255,255,255,.2)}
+.back-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;padding:7px 14px;border-radius:var(--r);font-size:12.5px;cursor:pointer;font-family:var(--sans);text-decoration:none;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;transition:background .15s}
+.back-btn:hover{background:rgba(255,255,255,.22);color:#fff}
 
 /* ── MAIN LAYOUT ── */
 .app-body{max-width:1100px;margin:0 auto;padding:24px 28px 60px;display:grid;grid-template-columns:340px 1fr;gap:20px;align-items:start}
@@ -104,7 +104,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 /* formula display */
 .formula-card{background:var(--navy);border-radius:var(--r2);padding:18px 22px;color:#fff}
 .formula-card .fc-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.5);margin-bottom:12px;display:flex;align-items:center;gap:6px}
-.formula-card .fc-eq{font-family:var(--mono);font-size:13.5px;color:#9FE1CB;line-height:1.8;background:rgba(0,0,0,.2);border-radius:var(--r);padding:10px 14px;margin-bottom:6px;white-space:pre-wrap;word-break:break-word}
+.formula-card .fc-eq{font-family:var(--mono);font-size:13.5px;color:#CECBF6;line-height:1.8;background:rgba(0,0,0,.2);border-radius:var(--r);padding:10px 14px;margin-bottom:6px;white-space:pre-wrap;word-break:break-word}
 .formula-card .fc-plain{font-family:var(--mono);font-size:12px;color:rgba(255,255,255,.7);line-height:1.8;background:rgba(0,0,0,.15);border-radius:var(--r);padding:10px 14px;white-space:pre-wrap;word-break:break-word}
 .formula-card .fc-result{font-family:var(--mono);font-size:15px;color:#FAC775;font-weight:600;margin-top:10px;padding:10px 14px;background:rgba(0,0,0,.25);border-radius:var(--r);border-left:3px solid var(--gold)}
 
@@ -192,7 +192,7 @@ td.balance-col{color:var(--navy);font-weight:500}
         <label for="assoc-name">Association</label>
         <input type="text" id="assoc-name" placeholder="[Your HOA Name]" oninput="saveSettings()">
       </div>
-      <a href="#" id="back-link" class="btn-back">← Back to Portal</a>
+      <a href="#" id="back-link" class="back-btn">← Back to Portal</a>
       <button class="btn-print" onclick="window.print()">🖨 Print / Save PDF</button>
     </div>
   </div>
@@ -578,7 +578,7 @@ function buildPriorityCard(principal, interest, lateFees, attyFees) {
   const items = [
     { order: '1st', label: 'Delinquent Assessments', amount: principal, color: '#1a2540' },
     { order: '2nd', label: 'Current Assessments', amount: null, color: '#253050' },
-    { order: '3rd', label: 'Late Fees & Interest', amount: (interest + lateFees) || null, color: '#0d9e7a' },
+    { order: '3rd', label: 'Late Fees & Interest', amount: (interest + lateFees) || null, color: '#534AB7' },
     { order: '4th', label: "Collection & Attorney's Fees", amount: attyFees || null, color: '#c8a84b' },
   ];
   document.getElementById('priority-breakdown').innerHTML = items.map(it => `
