@@ -5,131 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MMPOAII-A Property Owners Association</title>
 <link rel="stylesheet" href="/css/site.css">
-<style>
-/* Home-page specific styles */
-.hero {
-  background: linear-gradient(135deg, var(--purple-900) 0%, var(--purple-800) 50%, #1a3a5c 100%);
-  color: #fff; text-align: center;
-  padding: 72px 24px 80px;
-  position: relative; overflow: hidden;
-}
-.hero::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-}
-.hero-content { position: relative; max-width: 680px; margin: 0 auto; }
-.hero-eyebrow {
-  font-size: 11px; font-weight: 700; letter-spacing: .15em;
-  text-transform: uppercase; opacity: .7; margin-bottom: 12px;
-}
-.hero h1 {
-  font-family: var(--serif);
-  font-size: clamp(28px, 5vw, 44px);
-  font-weight: 700; line-height: 1.2;
-  margin-bottom: 14px;
-}
-.hero p { font-size: 17px; opacity: .8; line-height: 1.6; margin-bottom: 32px; }
-.hero-btns {
-  display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
-}
-.hero-btns .btn {
-  min-width: 180px; justify-content: center;
-  font-size: 15px; padding: 13px 24px;
-}
-.btn-hero-primary {
-  background: var(--purple-600); color: #fff;
-}
-.btn-hero-primary:hover { background: var(--purple-800); }
-.btn-hero-secondary {
-  background: rgba(255,255,255,.12);
-  border: 1.5px solid rgba(255,255,255,.35);
-  color: #fff;
-}
-.btn-hero-secondary:hover { background: rgba(255,255,255,.22); }
-
-/* Announcements */
-.announce-bar {
-  background: var(--surf); border-bottom: 1px solid var(--border);
-}
-.announce-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
-.announce-item {
-  padding: 14px 0; border-bottom: 1px solid var(--border);
-  display: flex; align-items: flex-start; gap: 12px;
-}
-.announce-item:last-child { border-bottom: none; }
-.announce-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
-.announce-body .title { font-weight: 700; font-size: 14px; margin-bottom: 2px; }
-.announce-body .text  { font-size: 13px; color: var(--text2); }
-.announce-item.info .announce-icon { color: var(--purple-600); }
-.announce-item.warning .announce-icon { color: var(--amber-600); }
-.announce-item.success .announce-icon { color: var(--green-600); }
-
-/* Feature sections */
-.features { background: var(--gray-50); padding: 56px 24px; }
-.features-inner { max-width: 1100px; margin: 0 auto; }
-.features-intro { text-align: center; margin-bottom: 40px; }
-.features-intro h2 { font-family: var(--serif); font-size: 28px; font-weight: 600; margin-bottom: 8px; }
-.features-intro p { font-size: 15px; color: var(--text2); max-width: 540px; margin: 0 auto; }
-.feature-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
-}
-.feature-card {
-  background: var(--surf);
-  border: 1px solid var(--border);
-  border-radius: var(--r3);
-  padding: 28px 24px;
-  text-align: center;
-}
-.feature-card .fi { font-size: 36px; margin-bottom: 14px; }
-.feature-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
-.feature-card p  { font-size: 13.5px; color: var(--text2); line-height: 1.6; margin-bottom: 18px; }
-.feature-card .fc-btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: var(--purple-50); color: var(--purple-800);
-  border: 1px solid var(--purple-200); border-radius: var(--r);
-  padding: 8px 16px; font-size: 13px; font-weight: 600;
-  text-decoration: none; transition: all .13s; cursor: pointer; font-family: var(--sans);
-}
-.feature-card .fc-btn:hover { background: var(--purple-600); color: #fff; border-color: var(--purple-600); }
-
-/* Quick info strip */
-.info-strip { background: var(--purple-900); color: #fff; padding: 40px 24px; }
-.info-strip-inner {
-  max-width: 1100px; margin: 0 auto;
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 32px;
-}
-.info-item .ii-label { font-size: 10.5px; font-weight: 700; letter-spacing: .08em;
-  text-transform: uppercase; opacity: .55; margin-bottom: 5px; }
-.info-item .ii-value { font-size: 14.5px; font-weight: 600; }
-.info-item .ii-sub { font-size: 12px; opacity: .6; margin-top: 2px; }
-.info-item a { color: #CECBF6; }
-
-/* Links section */
-.links-section { background: var(--surf); padding: 40px 24px; border-top: 1px solid var(--border); }
-.links-inner { max-width: 1100px; margin: 0 auto; }
-.links-inner h2 { font-family: var(--serif); font-size: 20px; font-weight: 600; margin-bottom: 18px; }
-.quick-links { display: flex; flex-wrap: wrap; gap: 10px; }
-.quick-link {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 8px 14px; border-radius: var(--r);
-  border: 1px solid var(--border);
-  background: var(--gray-50); color: var(--text2);
-  text-decoration: none; font-size: 13px;
-  transition: all .13s;
-}
-.quick-link:hover { border-color: var(--purple-600); color: var(--purple-600); background: var(--purple-50); }
-
-@media (max-width: 600px) {
-  .hero { padding: 48px 20px 56px; }
-  .hero-btns { flex-direction: column; align-items: center; }
-  .hero-btns .btn { width: 100%; max-width: 300px; }
-  .info-strip-inner { grid-template-columns: 1fr 1fr; }
-}
-</style>
+<link rel="stylesheet" href="/css/home.css">
 </head>
 <body>
 
@@ -150,99 +26,53 @@
   </div>
 </header>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-content">
-    <div class="hero-eyebrow">Texas Property Owners Association</div>
-    <h1 id="hero-name">Welcome to MMPOAII</h1>
-    <p id="hero-tagline">Your community portal for board resources, homeowner information, and community documents.</p>
-    <div class="hero-btns">
-      <!-- <a href="/login.html?area=homeowners" class="btn btn-hero-primary">Homeowner Portal →</a>
-      <a href="/login.html?area=board" class="btn btn-hero-secondary">Board Member Login</a> -->
+<!-- CAROUSEL -->
+<section class="carousel">
+  <div class="carousel-container">
+    <div class="carousel-slide active">
+      <img src="/images/image01.png" alt="Community Image 1">
     </div>
+    <div class="carousel-slide">
+      <img src="/images/image02.png" alt="Community Image 2">
+    </div>
+    <div class="carousel-slide">
+      <img src="/images/image03.png" alt="Community Image 3">
+    </div>
+    <div class="carousel-slide">
+      <img src="/images/image04.png" alt="Community Image 4">
+    </div>
+    <div class="carousel-slide">
+      <img src="/images/image05.png" alt="Community Image 5">
+    </div>
+    <div class="carousel-slide">
+      <img src="/images/image06.png" alt="Community Image 6">
+    </div>
+  </div>
+  <button class="carousel-btn prev">&#10094;</button>
+  <button class="carousel-btn next">&#10095;</button>
+  <div class="carousel-dots">
+    <span class="dot active"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
   </div>
 </section>
 
-<!-- ANNOUNCEMENTS -->
-<div class="announce-bar" id="announcements-bar">
-  <div class="announce-inner" id="announcements-list"></div>
-</div>
+<!-- HERO CONTENT -->
+<section class="hero" style="padding-top: 5px; padding-bottom: 0%;">
+  <div class="hero-content" style="padding: 10px;">
 
-<!-- FEATURES -->
-<section class="features">
-  <div class="features-inner">
-    <div class="features-intro">
-      <h2>Everything Your Community Needs</h2>
-      <p>Secure, organized access to all community resources for board members and homeowners alike.</p>
-    </div>
-    <div class="feature-grid">
-      <div class="feature-card">
-        <div class="fi">🏠</div>
-        <h3>Homeowner Portal</h3>
-        <p>Know your rights under Texas law, use the interest calculator, access payment plan information, review governing documents, and contact the board directly.</p>
-        <a href="/login.html?area=homeowners" class="fc-btn">Homeowner Login →</a>
-      </div>
-      <div class="feature-card">
-        <div class="fi">🏛</div>
-        <h3>Board Member Portal</h3>
-        <p>Access board training, Texas HOA law references, collections policies, meeting minutes, governing documents, and administrative forms — all in one secure place.</p>
-        <a href="/login.html?area=board" class="fc-btn">Board Login →</a>
-      </div>
-    </div>
+    <h2 id="hero-tagline">Building Community. Protecting Your Home.</h2>
+
+    <p style="font-size: 0.5em;">
+    This portal is for community members only.  
+    </p>
+
   </div>
 </section>
 
-<!-- INFO STRIP -->
-<div class="info-strip">
-  <!-- <div class="info-strip-inner">
-    <div class="info-item">
-      <div class="ii-label">Association</div>
-      <div class="ii-value" id="inf-name">MMPOAII HOA</div>
-      <div class="ii-sub" id="inf-sub">Texas Residential</div>
-    </div>
-    <div class="info-item">
-      <div class="ii-label">Location</div>
-      <div class="ii-value" id="inf-city">[City, TX]</div>
-      <div class="ii-sub" id="inf-addr">[Community Address]</div>
-    </div> -->
-    <!-- <div class="info-item">
-      <div class="ii-label">Board Contact</div>
-      <div class="ii-value"><a id="inf-email" href="#">board@mmpoaii.com</a></div>
-      <div class="ii-sub" id="inf-phone">[Phone]</div>
-    </div>
-    <div class="info-item">
-      <div class="ii-label">Emergency</div>
-      <div class="ii-value">911</div>
-      <div class="ii-sub">Police / Fire / Medical</div>
-    </div> -->
-  </div>
-</div>
-
-<!-- QUICK LINKS -->
-<div class="links-section">
-  <div class="links-inner">
-    <h2>Helpful External Resources</h2>
-    <div class="quick-links">
-      <a href="https://guides.sll.texas.gov/property-owners-associations" target="_blank" rel="noopener" class="quick-link">📚 TX State Law Library HOA Guide</a>
-      <a href="https://statutes.capitol.texas.gov/Docs/PR/htm/PR.209.htm" target="_blank" rel="noopener" class="quick-link">⚖ Texas Property Code Ch. 209</a>
-      <a href="https://statutes.capitol.texas.gov/Docs/PR/htm/PR.202.htm" target="_blank" rel="noopener" class="quick-link">⚖ Texas Property Code Ch. 202</a>
-      <a href="https://www.trec.texas.gov/forms/subdivision-information-including-resale-certificate-property-subject-mandatory-membership" target="_blank" rel="noopener" class="quick-link">📄 TREC Resale Certificate Form</a>
-      <a href="https://www.texasattorneygeneral.gov/consumer-protection" target="_blank" rel="noopener" class="quick-link">🏛 Texas Attorney General</a>
-      <a href="https://www.caihouston.org/" target="_blank" rel="noopener" class="quick-link">🤝 CAI Texas HOA Hotline</a>
-    </div>
-  </div>
-</div>
-
-<!-- FOOTER -->
-<footer class="site-footer">
-  <div id="foot-name">MMPOAII-A</div>
-  <!-- <div id="foot-city">Austin, TX</div> -->
-  <!-- <div>Questions? Email <a id="foot-email" href="#">board@mmpoaii.com</a></div> -->
-  <div class="footer-disclaimer">
-    This portal is for community members only. All content is for informational purposes and does not constitute legal advice.
-    Governed by Texas Property Code Chapter 209. For legal questions, consult a licensed Texas attorney.
-  </div>
-</footer>
 
 <!-- SCRIPTS -->
 <script src="/js/config.js"></script>
@@ -289,5 +119,6 @@ document.addEventListener('DOMContentLoaded', function () {
   document.title = name + ' — Community Portal';
 });
 </script>
+<script src="/js/home.js"></script>
 </body>
 </html>

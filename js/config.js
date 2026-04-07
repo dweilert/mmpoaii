@@ -29,7 +29,7 @@ const HOA_CONFIG = {
 
   // ── HOA DISPLAY INFORMATION ─────────────────────────────────────────────────
   // Replace with your association's actual information
-  hoaName:        'Meadow Mountain Property Owners Association II-A',
+  hoaName:        'Meadow Mountain Property Owners Association II',
   hoaTagline:     'Building Community. Protecting Your Home.',
   hoaSubdivision: 'Meadow Mountain Phase II',
   hoaCity:        'Austin, TX 78731',
@@ -81,7 +81,6 @@ const HOA_CONFIG = {
   emergencyContacts: [
     { label: 'Police / Fire / Medical', number: '911' },
     { label: 'Non-Emergency', number: '311' },
-
   ]
 
 };

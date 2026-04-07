@@ -5,162 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HOA Assessment Interest Calculator</title>
 <link rel="stylesheet" href="/css/site.css">
-<style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
-
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --navy:#1a2540;--navy2:#253050;--navy3:#2e3d66;
-  --teal:#534AB7;--teal2:#3C3489;--teal-light:#EEEDFE;
-  --gold:#c8a84b;--gold-light:#fdf3da;
-  --red:#b83232;--red-light:#fdeaea;
-  --gray:#f5f4f0;--gray2:#ebe9e3;--gray3:#c8c5bd;--gray4:#7a7770;
-  --text:#1a1a18;--text2:#4a4a45;--text3:#7a7770;
-  --surf:#ffffff;--border:#dddbd4;
-  --mono:'IBM Plex Mono',monospace;
-  --sans:'IBM Plex Sans',sans-serif;
-  --r:8px;--r2:12px;--r3:16px
-}
-html{scroll-behavior:smooth}
-body{font-family:var(--sans);background:var(--gray);color:var(--text);font-size:15px;line-height:1.6;min-height:100vh}
-
-/* header and toolbar styles now in site.css */
-
-/* ── MAIN LAYOUT ── */
-.app-body{padding:24px 28px 60px;display:grid;grid-template-columns:340px 1fr;gap:20px;align-items:start}
-
-/* ── INPUT PANEL ── */
-.input-panel{background:var(--surf);border-radius:var(--r3);border:1px solid var(--border);overflow:hidden;position:sticky;top:84px}
-.panel-head{background:var(--navy);color:#fff;padding:14px 18px;font-size:13px;font-weight:600;letter-spacing:.03em;display:flex;align-items:center;gap:8px}
-.panel-head .ph-icon{font-size:15px}
-.panel-body{padding:18px}
-
-.field-group{margin-bottom:18px}
-.field-group:last-child{margin-bottom:0}
-.field-label{font-size:11.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
-.field-label .tip{font-size:10px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--teal);cursor:pointer}
-
-.input-wrap{position:relative;display:flex;align-items:center}
-.input-prefix,.input-suffix{position:absolute;font-size:14px;color:var(--text3);pointer-events:none;font-family:var(--mono)}
-.input-prefix{left:12px}
-.input-suffix{right:12px}
-input[type=number],input[type=text],select{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--sans);font-size:14px;color:var(--text);background:var(--surf);transition:border-color .15s;-moz-appearance:textfield}
-input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
-input[type=number]:focus,input[type=text]:focus,select:focus{outline:none;border-color:var(--teal)}
-.has-prefix input{padding-left:28px}
-.has-suffix input{padding-right:36px}
-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a7770' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;cursor:pointer}
-
-.method-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}
-.mbtn{border:1.5px solid var(--border);border-radius:var(--r);padding:9px 6px;text-align:center;cursor:pointer;transition:all .13s;background:var(--surf)}
-.mbtn:hover{border-color:var(--teal);background:var(--teal-light)}
-.mbtn.active{border-color:var(--teal);background:var(--teal-light)}
-.mbtn .mb-label{font-size:11px;font-weight:600;color:var(--text2);display:block}
-.mbtn.active .mb-label{color:var(--teal2)}
-.mbtn .mb-sub{font-size:9.5px;color:var(--text3);margin-top:2px;display:block;font-family:var(--mono)}
-
-.divider{border:none;border-top:1px solid var(--gray2);margin:16px 0}
-
-.calc-btn{width:100%;background:var(--teal);color:#fff;border:none;padding:12px;border-radius:var(--r);font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;transition:background .13s;letter-spacing:.02em}
-.calc-btn:hover{background:var(--teal2)}
-
-.reset-btn{width:100%;background:transparent;color:var(--text3);border:1px solid var(--gray3);padding:8px;border-radius:var(--r);font-family:var(--sans);font-size:12px;cursor:pointer;margin-top:7px;transition:all .13s}
-.reset-btn:hover{border-color:var(--text3);color:var(--text2)}
-
-.day-year-toggle{display:grid;grid-template-columns:1fr 1fr;gap:5px}
-.dybtn{border:1.5px solid var(--border);border-radius:var(--r);padding:7px 10px;text-align:center;cursor:pointer;font-size:12px;font-weight:500;color:var(--text2);background:var(--surf);transition:all .13s}
-.dybtn:hover{border-color:var(--teal)}
-.dybtn.active{border-color:var(--teal);background:var(--teal-light);color:var(--teal2)}
-
-/* ── RESULTS PANEL ── */
-.results-panel{display:flex;flex-direction:column;gap:16px}
-
-/* summary cards */
-.summary-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-.scard{background:var(--surf);border:1px solid var(--border);border-radius:var(--r2);padding:16px 18px;position:relative;overflow:hidden}
-.scard::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--gray3)}
-.scard.accent::before{background:var(--red)}
-.scard.primary::before{background:var(--teal)}
-.scard .sc-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:6px}
-.scard .sc-val{font-size:24px;font-weight:600;font-family:var(--mono);color:var(--text);letter-spacing:-.5px}
-.scard.accent .sc-val{color:var(--red)}
-.scard.primary .sc-val{color:var(--teal2)}
-.scard .sc-sub{font-size:11px;color:var(--text3);margin-top:3px}
-
-/* formula display */
-.formula-card{background:var(--navy);border-radius:var(--r2);padding:18px 22px;color:#fff}
-.formula-card .fc-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.5);margin-bottom:12px;display:flex;align-items:center;gap:6px}
-.formula-card .fc-eq{font-family:var(--mono);font-size:13.5px;color:#CECBF6;line-height:1.8;background:rgba(0,0,0,.2);border-radius:var(--r);padding:10px 14px;margin-bottom:6px;white-space:pre-wrap;word-break:break-word}
-.formula-card .fc-plain{font-family:var(--mono);font-size:12px;color:rgba(255,255,255,.7);line-height:1.8;background:rgba(0,0,0,.15);border-radius:var(--r);padding:10px 14px;white-space:pre-wrap;word-break:break-word}
-.formula-card .fc-result{font-family:var(--mono);font-size:15px;color:#FAC775;font-weight:600;margin-top:10px;padding:10px 14px;background:rgba(0,0,0,.25);border-radius:var(--r);border-left:3px solid var(--gold)}
-
-/* schedule table */
-.schedule-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
-.schedule-head{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--gray2)}
-.schedule-head h3{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:7px}
-.schedule-controls{display:flex;align-items:center;gap:10px}
-.rows-select{padding:5px 10px;border:1px solid var(--border);border-radius:var(--r);font-size:12px;font-family:var(--sans);color:var(--text2);background:var(--surf);cursor:pointer}
-.export-btn{background:var(--navy);color:#fff;border:none;padding:6px 12px;border-radius:var(--r);font-size:11.5px;font-weight:500;cursor:pointer;font-family:var(--sans)}
-.export-btn:hover{background:var(--navy2)}
-.schedule-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:13px}
-thead th{background:var(--navy);color:#fff;padding:9px 14px;text-align:right;font-size:11px;font-weight:500;letter-spacing:.04em;white-space:nowrap}
-thead th:first-child{text-align:left}
-tbody tr{transition:background .1s}
-tbody tr:hover{background:var(--gray)}
-tbody tr:nth-child(even){background:var(--gray)}
-tbody tr:nth-child(even):hover{background:var(--gray2)}
-tbody tr.total-row{background:var(--navy) !important;color:#fff}
-tbody tr.total-row td{color:#fff;font-weight:600;font-family:var(--mono)}
-td{padding:8px 14px;border-bottom:1px solid var(--gray2);text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--text2)}
-td:first-child{text-align:left;font-family:var(--sans);font-size:12.5px;color:var(--text);font-weight:500}
-td.interest-col{color:var(--red)}
-td.balance-col{color:var(--navy);font-weight:500}
-.schedule-footer{padding:10px 18px;font-size:11.5px;color:var(--text3);background:var(--gray);border-top:1px solid var(--gray2);line-height:1.5}
-
-/* explanation box */
-.explain-card{background:var(--gold-light);border:1px solid #e8d090;border-radius:var(--r2);padding:18px 22px}
-.explain-card h3{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:10px;display:flex;align-items:center;gap:7px}
-.explain-card p{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:8px}
-.explain-card p:last-child{margin-bottom:0}
-
-/* disclaimer */
-.disclaimer{background:var(--surf);border:1px solid var(--border);border-radius:var(--r2);padding:14px 18px;font-size:12px;color:var(--text3);line-height:1.6}
-.disclaimer strong{color:var(--text2)}
-
-/* empty state */
-.empty-state{background:var(--surf);border:1px solid var(--border);border-radius:var(--r3);padding:48px 32px;text-align:center;color:var(--text3)}
-.empty-state .es-icon{font-size:40px;margin-bottom:12px}
-.empty-state p{font-size:13.5px;line-height:1.6}
-
-/* ── PRINT ── */
-@media print{
-  body{background:#fff;font-size:11pt}
-  .site-header{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .app-body{grid-template-columns:1fr;padding:12px}
-  .input-panel{display:none}
-  .summary-cards{grid-template-columns:1fr 1fr 1fr}
-  .scard,.formula-card,.schedule-card,.explain-card{break-inside:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .export-btn,.btn-print,.reset-btn,.calc-btn{display:none}
-  .schedule-controls{display:none}
-  table{page-break-inside:auto}
-  tr{page-break-inside:avoid;page-break-after:auto}
-}
-
-/* ── RESPONSIVE ── */
-@media(max-width:900px){
-  .app-body{grid-template-columns:1fr;padding:16px}
-  .input-panel{position:static}
-  .summary-cards{grid-template-columns:1fr 1fr}
-  .header-inner{flex-direction:column;align-items:flex-start;gap:10px}
-  .assoc-input-wrap input{width:140px}
-}
-@media(max-width:540px){
-  .summary-cards{grid-template-columns:1fr}
-  .header-meta{flex-direction:column;align-items:flex-start}
-  .method-btns{grid-template-columns:1fr}
-}
-</style>
+<link rel="stylesheet" href="/css/interest-calc.css">
 </head>
 <body>
 
@@ -169,35 +14,30 @@ td.balance-col{color:var(--navy);font-weight:500}
     <a href="/" class="site-logo">
       <div class="logo-mark">🏡</div>
       <div class="logo-text">
-        <div class="logo-name" data-hoa-name>MMPOAII HOA</div>
+        <div class="logo-name" data-hoa-name>Meadow Mountain Property Owners Association II-A</div>
         <div class="logo-sub">Interest Calculator</div>
       </div>
     </a>
-    <nav class="site-nav"></nav>
+    <nav class="site-nav">
+      <a href="#" id="back-link" class="back-btn">← Back to Portal</a>
+    </nav>
   </div>
 </header>
 
 <div id="page-content">
-<div class="page-wrap" style="max-width:1100px">
-
+<div class="page-wrap">
   <div class="welcome-banner">
     <div class="wb-left">
       <h2>HOA Assessment Interest Calculator</h2>
-      <p>How interest will be calculated for Homeowner late fees.</p>
+      <p>Texas Property Code Chapter 209 — for informational purposes only, not legal advice</p>
     </div>
-    <a href="#" id="back-link" class="back-btn">← Back to Portal</a>
+    
   </div>
-
   <div class="page-toolbar">
-    <div class="assoc-input-wrap" style="display:flex;align-items:center;gap:8px;background:var(--gray-50);border:1px solid var(--border);border-radius:8px;padding:6px 12px">
-      <label for="assoc-name" style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap">Association</label>
-      <input type="text" id="assoc-name" placeholder="[Your HOA Name]" oninput="saveSettings()" style="background:transparent;border:none;font-size:13px;width:180px;outline:none;color:var(--text)">
-    </div>
-    <button class="btn-print" onclick="window.print()">🖨 Print / Save PDF</button>
+    <button class="btn-print" onclick="window.print()">🖨 Print / PDF</button>
   </div>
 
-<div class="app-body">
-
+  <div class="app-body">
   <!-- ═══ INPUT PANEL ═══ -->
   <div class="input-panel">
     <div class="panel-head"><span class="ph-icon">⚙</span> Calculator Inputs</div>
@@ -366,6 +206,8 @@ td.balance-col{color:var(--navy);font-weight:500}
 
   </div>
 </div>
+</div>
+</div>
 
 <script>
 // ── STORAGE ──────────────────────────────────────────────────
@@ -377,8 +219,7 @@ function saveSettings() {
       principal: v('principal'), rate: v('rate'),
       months: v('months'), days: v('days'),
       monthlyPmt: v('monthly-pmt'), periods: v('periods'),
-      lateFees: v('late-fees'), attyFees: v('atty-fees'),
-      assoc: document.getElementById('assoc-name').value
+      lateFees: v('late-fees'), attyFees: v('atty-fees')
     }));
   } catch(e){}
 }
@@ -395,7 +236,6 @@ function loadSettings() {
     if (s.periods !== undefined) set('periods', s.periods);
     if (s.lateFees !== undefined) set('late-fees', s.lateFees);
     if (s.attyFees !== undefined) set('atty-fees', s.attyFees);
-    if (s.assoc) document.getElementById('assoc-name').value = s.assoc;
     applyMethodUI();
   } catch(e){}
 }
@@ -576,7 +416,7 @@ function buildPriorityCard(principal, interest, lateFees, attyFees) {
   const items = [
     { order: '1st', label: 'Delinquent Assessments', amount: principal, color: '#1a2540' },
     { order: '2nd', label: 'Current Assessments', amount: null, color: '#253050' },
-    { order: '3rd', label: 'Late Fees & Interest', amount: (interest + lateFees) || null, color: '#534AB7' },
+    { order: '3rd', label: 'Late Fees & Interest', amount: (interest + lateFees) || null, color: '#0d9e7a' },
     { order: '4th', label: "Collection & Attorney's Fees", amount: attyFees || null, color: '#c8a84b' },
   ];
   document.getElementById('priority-breakdown').innerHTML = items.map(it => `
@@ -662,7 +502,7 @@ function renderSchedule() {
 
   const showing = rows.length;
   const total = scheduleData.length;
-  const assoc = document.getElementById('assoc-name').value || '[Association Name]';
+  const assoc = 'Meadow Mountain Property Owners Association II-A';
   document.getElementById('schedule-footer').textContent =
     `${assoc} · Showing ${showing} of ${total} period${total !== 1 ? 's' : ''} · ` +
     `Interest rate: ${v('rate')}% p.a. · Method: ${currentMethod} · ` +
@@ -673,7 +513,7 @@ function renderSchedule() {
 function exportCSV() {
   if (!scheduleData.length) return;
   const isRunning = currentMethod === 'running';
-  const assoc = document.getElementById('assoc-name').value || 'HOA';
+  const assoc = 'Meadow Mountain Property Owners Association II-A';
   const headers = isRunning
     ? ['Period','Prior Balance','Assessment','Balance (pre-interest)','Interest Rate','Period Interest','Closing Balance']
     : ['Period','Opening Balance','Period Rate','Interest Charge','Cumulative Interest','Closing Balance'];
@@ -715,9 +555,6 @@ try {
 <script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6/dist/amazon-cognito-identity.min.js"></script>
 <script src="/js/config.js"></script>
 <script src="/js/auth.js"></script>
-</div><!-- /page-wrap -->
-</div><!-- /page-content -->
-
 <script src="/js/guard.js"></script>
 <script>
 // Set back button destination based on user's portal
@@ -732,4 +569,3 @@ const _navCheck = setInterval(function () {
 }, 50);
 </script>
 </body>
-</html>

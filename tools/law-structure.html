@@ -4,152 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Texas HOA Law Structure — Complete Interactive Reference</title>
-<link rel="stylesheet" href="/css/site.css">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --blue-50:#E6F1FB;--blue-100:#B5D4F4;--blue-200:#85B7EB;--blue-600:#185FA5;--blue-800:#0C447C;
-  --green-50:#EAF3DE;--green-100:#C0DD97;--green-600:#3B6D11;--green-800:#27500A;
-  --gray-50:#F1EFE8;--gray-100:#D3D1C7;--gray-400:#888780;--gray-600:#5F5E5A;
-  --purple-50:#EEEDFE;--purple-100:#CECBF6;--purple-200:#AFA9EC;--purple-600:#534AB7;--purple-800:#3C3489;
-  --amber-50:#FAEEDA;--amber-100:#FAC775;--amber-400:#BA7517;--amber-600:#854F0B;
-  --coral-50:#FAECE7;--coral-100:#F5C4B3;--coral-600:#993C1D;
-  --teal-50:#EEEDFE;--teal-100:#CECBF6;--teal-600:#534AB7;
-  --pink-50:#FBEAF0;--pink-100:#F4C0D1;--pink-600:#993556;
-  --red-50:#FCEBEB;--red-100:#F7C1C1;--red-600:#A32D2D;
-  --text-primary:#1a1a1a;--text-secondary:#555;--text-muted:#888;
-  --border:#d0cfc8;--border-light:#e8e7e0;
-  --bg:#f9f8f5;--surface:#ffffff;--surface-alt:#f3f2ed;
-  --radius-sm:6px;--radius-md:8px;--radius-lg:12px
-}
-/* back-btn styles now in site.css */
-@media(prefers-color-scheme:dark){
-  :root{
-    --text-primary:#e8e6df;--text-secondary:#aaa;--text-muted:#666;
-    --border:#3a3936;--border-light:#2e2d2a;
-    --bg:#1a1918;--surface:#232220;--surface-alt:#2a2927;
-    --blue-50:#0c2035;--blue-100:#1a3a5c;
-    --green-50:#0d2010;--green-100:#1a3c1e;
-    --gray-50:#1e1d1a;--gray-100:#2e2d2a;
-    --purple-50:#1a1830;--purple-100:#2d2a52;--purple-200:#3d3870;
-    --amber-50:#2a2010;--amber-100:#3d2f10;
-    --coral-50:#2a1810;--coral-100:#3d2210;
-    --teal-50:#1a1828;--teal-100:#2a2545;
-    --pink-50:#250d18;--pink-100:#3d1628;
-    --red-50:#1f0d0d;--red-100:#3a1818
-  }
-}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text-primary);line-height:1.5;font-size:14px}
-
-/* page-header styles now in site.css (site-header + welcome-banner) */
-
-/* LAYOUT */
-.main{display:flex;min-height:calc(100vh - 200px)}
-
-/* Page layout */
-.page-wrap { max-width: 1200px; }
-.diagram-col{flex:1 1 0;overflow-y:auto;padding:16px 14px 40px;border-right:1px solid var(--border)}
-.detail-col{width:350px;flex-shrink:0;overflow-y:auto;background:var(--surface);padding:18px 16px}
-
-/* LAYERS */
-.layer-wrap{margin-bottom:5px}
-.layer-label{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;padding-left:2px;display:flex;align-items:center;gap:6px}
-.layer-label .count{background:var(--surface-alt);border-radius:20px;padding:1px 6px;font-size:9px;color:var(--text-muted)}
-.layer{border-radius:var(--radius-lg);border:1px solid var(--border);padding:8px}
-.layer.federal{background:var(--blue-50);border-color:var(--blue-100)}
-.layer.constitution{background:var(--green-50);border-color:var(--green-100)}
-.layer.codes{background:var(--gray-50);border-color:var(--gray-100)}
-.layer.title11{background:var(--purple-50);border-color:var(--purple-100)}
-.layer.title5{background:var(--teal-50);border-color:var(--teal-100)}
-.layer.other-tx{background:var(--pink-50);border-color:var(--pink-100)}
-.layer.hoadocs{background:var(--amber-50);border-color:var(--amber-100)}
-
-/* GRIDS */
-.grid{display:grid;gap:5px}
-.g2{grid-template-columns:1fr 1fr}
-.g3{grid-template-columns:1fr 1fr 1fr}
-.g4{grid-template-columns:1fr 1fr 1fr 1fr}
-.g5{grid-template-columns:1fr 1fr 1fr 1fr 1fr}
-.mt4{margin-top:5px}
-
-/* CARDS */
-.card{background:var(--surface);border:1px solid var(--border-light);border-radius:var(--radius-md);padding:7px 9px;cursor:pointer;transition:border-color .15s,box-shadow .15s;user-select:none}
-.card:hover{border-color:var(--purple-600);box-shadow:0 1px 5px rgba(83,74,183,.1)}
-.card.active{border-color:var(--purple-600);border-width:2px;background:var(--purple-50)}
-.card .cn{font-size:11px;font-weight:600;color:var(--text-primary)}
-.card .cs{font-size:10.5px;color:var(--text-secondary);margin-top:2px;line-height:1.4}
-.badge{display:inline-block;font-size:9.5px;padding:1px 7px;border-radius:20px;margin-top:4px;font-weight:500}
-.b-fed{background:var(--blue-50);color:var(--blue-600);border:1px solid var(--blue-100)}
-.b-const{background:var(--green-50);color:var(--green-600);border:1px solid var(--green-100)}
-.b-all{background:var(--teal-50);color:var(--teal-600);border:1px solid var(--teal-100)}
-.b-condo{background:var(--coral-50);color:var(--coral-600);border:1px solid var(--coral-100)}
-.b-disc{background:var(--amber-50);color:var(--amber-600);border:1px solid var(--amber-100)}
-.b-core{background:var(--purple-50);color:var(--purple-800);border:1px solid var(--purple-100)}
-.b-lien{background:var(--teal-50);color:var(--teal-600);border:1px solid var(--teal-100)}
-.b-limit{background:var(--red-50);color:var(--red-600);border:1px solid var(--red-100)}
-.b-county{background:var(--gray-50);color:var(--gray-600);border:1px solid var(--gray-100)}
-
-/* CH209 INNER BOX */
-.ch209-box{border:2px solid var(--purple-600);border-radius:var(--radius-md);padding:7px 9px;margin:5px 0;background:var(--surface)}
-.ch209-title{font-size:10px;font-weight:600;color:var(--purple-800);margin-bottom:5px;display:flex;align-items:center;gap:5px}
-.ch209-title::before{content:'★';font-size:11px}
-.ch209-inner .card{border-color:var(--purple-200)}
-.ch209-inner .card:hover{border-color:var(--purple-600)}
-.ch209-inner .card.active{border-color:var(--purple-600);background:var(--purple-50)}
-
-/* ARROWS */
-.arrow-row{display:flex;align-items:center;justify-content:center;gap:7px;padding:2px 0;color:var(--text-muted);font-size:10px;font-style:italic}
-.arrow-row svg{flex-shrink:0}
-
-/* DETAIL PANEL */
-.detail-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:calc(100% - 40px);color:var(--text-muted);text-align:center;padding:20px;gap:10px}
-.detail-placeholder p{font-size:12px;line-height:1.6}
-.detail-content{display:none}
-.detail-content.visible{display:block}
-.detail-layer-tag{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--purple-600);margin-bottom:8px;display:block}
-.detail-content h2{font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:8px;line-height:1.4}
-.detail-content p{font-size:12px;color:var(--text-secondary);line-height:1.7;margin-bottom:10px}
-.detail-content h3{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px}
-.rels{display:flex;flex-direction:column;gap:4px}
-.rel-item{font-size:11.5px;color:var(--text-secondary);background:var(--surface-alt);border-radius:var(--radius-sm);padding:5px 9px;border-left:3px solid var(--purple-200);line-height:1.4}
-
-/* SEARCH */
-.search-wrap{margin-bottom:14px}
-#search{width:100%;padding:7px 10px;font-size:12px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--surface);color:var(--text-primary)}
-#search:focus{outline:none;border-color:var(--purple-600)}
-.search-results{margin-top:8px;display:none;flex-direction:column;gap:3px}
-.search-result{padding:6px 10px;border-radius:var(--radius-sm);background:var(--surface-alt);cursor:pointer;font-size:12px;color:var(--text-secondary)}
-.search-result:hover{background:var(--purple-50);color:var(--purple-800)}
-.search-result strong{color:var(--text-primary)}
-
-/* LEGEND */
-.legend{display:flex;flex-wrap:wrap;gap:8px;padding:9px 14px;border-top:1px solid var(--border);background:var(--surface);font-size:10.5px;color:var(--text-muted)}
-.leg{display:flex;align-items:center;gap:4px}
-.leg-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
-.leg-note{margin-left:auto;font-style:italic;color:var(--text-muted);font-size:10px}
-
-/* SECTION DIVIDER */
-.sec-div{font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--purple-600);padding:3px 4px 2px;margin-top:4px;margin-bottom:2px;border-bottom:1px solid var(--purple-100)}
-
-@media(max-width:900px){
-  .main{flex-direction:column;min-height:auto}
-  .detail-col{width:100%;border-top:1px solid var(--border)}
-  .g4,.g5{grid-template-columns:1fr 1fr}
-  .diagram-col{border-right:none}
-}
-@media(max-width:580px){
-  .g3,.g4,.g5{grid-template-columns:1fr 1fr}
-  .g2{grid-template-columns:1fr}
-}
-@media print{
-  .main{min-height:auto;flex-direction:column}
-  .detail-col{display:none}
-  .diagram-col{overflow:visible;border:none;padding:8px}
-  .card.active{border-color:var(--border-light)!important;background:var(--surface)!important}
-}
 </style>
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/law-structure.css">
 </head>
-<body>
+<body> 
+
 
 <header class="site-header">
   <div class="inner">
@@ -157,22 +19,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       <div class="logo-mark">🏡</div>
       <div class="logo-text">
         <div class="logo-name" data-hoa-name>MMPOAII HOA</div>
-        <div class="logo-sub">Law Structure</div>
+        <div class="logo-sub">Texas HOA Law — Complete Legal Structure & Relationships</div>
       </div>
     </a>
-    <nav class="site-nav"></nav>
+    <nav class="site-nav">
+      <a href="#" id="back-link" class="back-btn">← Back to Portal</a>
+    </nav>
   </div>
-</header>
+</header> 
 
-<div id="page-content">
 <div class="page-wrap">
   <div class="welcome-banner">
     <div class="wb-left">
-      <h2>Texas HOA Law — Complete Legal Structure &amp; Relationships</h2>
-      <p>An interactive reference map for homeowners, board members, and property managers. Click any box to learn more. For informational purposes only — not legal advice.</p>
+      <h2>Texas HOA Law Structure</h2>
+      <p>An interactive reference map for board members</p>
+      <p class="sub">Click any box to learn more &nbsp;·&nbsp; Use the search box in the right panel &nbsp;·&nbsp; For informational purposes only — not legal advice. .</p>
     </div>
-    <a href="#" id="back-link" class="back-btn">← Back to Portal</a>
   </div>
+</div>
+
 
 <div class="main">
 <!-- ═══ LEFT DIAGRAM ════════════════════════════════════════ -->
@@ -359,9 +224,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   <div class="leg"><div class="leg-dot" style="background:#FAC775"></div>HOA governing documents</div>
   <div class="leg-note">v2.0 — Updated with Ch. 41, Ch. 51, CPRC, Election Code §259, SCRA, Gov. Code Ch. 551/552 &amp; full Title 11 inventory</div>
 </div>
-
-</div><!-- /page-wrap -->
-</div><!-- /page-content -->
 
 <script>
 const DATA = {

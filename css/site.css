@@ -31,6 +31,8 @@
   --text3:      #7a7870;
   --surf:       #ffffff;
   --border:     #dddbd4;
+  --border2:    #eae9e1;
+  --surf2:      #f3f2ed;
   --r:          8px;
   --r2:         12px;
   --r3:         16px;
@@ -112,7 +114,7 @@ body {
 .logout-btn:hover { background: rgba(255,0,0,.25) !important; color: #fff !important; }
 
 /* ── PAGE WRAPPER ── */
-.page-wrap { max-width: 1100px; margin: 0 auto; padding: 32px 24px 64px; }
+.page-wrap { max-width: 1100px; margin: 0 auto; padding: 18px 18px 18px; }
 .page-wrap.narrow { max-width: 760px; }
 
 /* ── PAGE HEADER ── */
@@ -274,6 +276,7 @@ body {
 .back-btn {
   background: rgba(255,255,255,.12);
   border: 1px solid rgba(255,255,255,.2);
+  border-color: #fff;
   color: #fff;
   padding: 7px 14px;
   border-radius: var(--r);

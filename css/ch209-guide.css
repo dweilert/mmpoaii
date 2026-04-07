@@ -1,0 +1,135 @@
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple-900:#26215C;
+  --purple-800:#3C3489;
+  --purple-600:#534AB7;
+  --purple-200:#AFA9EC;
+  --purple-50:#EEEDFE;
+  --teal-600:#534AB7;
+  --teal-50:#EEEDFE;
+  --amber-600:#854F0B;
+  --amber-50:#FAEEDA;
+  --red-600:#A32D2D;
+  --red-50:#FCEBEB;
+  --green-600:#3B6D11;
+  --green-50:#EAF3DE;
+  --gray-50:#F7F6F2;
+  --gray-100:#EEECE6;
+  --gray-200:#DDDBD4;
+  --text:#1a1a18;
+  --text2:#444;
+  --text3:#7a7870;
+  --surf:#fff;
+  --border:#dddbd4;
+  --r:8px;
+  --r2:12px;
+  --r3:16px;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
+}
+@media(prefers-color-scheme:dark){:root{
+  --text:#e6e4dc;
+  --text2:#aaa;
+  --text3:#666;
+  --surf:#201f17;
+  --border:#38362f;
+  --gray-50:#18170f;
+  --gray-100:#28271e;
+  --gray-200:#38362f;
+  --purple-50:#1a1828;
+  --teal-50:#1a1828;
+  --amber-50:#251e0a;
+  --red-50:#200c0c;
+  --green-50:#0c1e10
+}}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--gray-50);color:var(--text);font-size:15px;line-height:1.65}
+
+/* header styles now in site.css */
+/* back-btn styles now in site.css */
+.btn-print{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;padding:6px 13px;border-radius:var(--r);font-size:12px;cursor:pointer;font-family:var(--sans)}
+.btn-print:hover{background:rgba(255,255,255,.22)}
+
+/* layout */
+.page{max-width:1000px;margin:0 auto;padding:0 0 64px;display:grid;grid-template-columns:220px 1fr;gap:24px;align-items:start}
+
+/* sidebar nav */
+.sidebar{position:sticky;top:92px;background:var(--surf);border:1px solid var(--border);border-radius:var(--r3);overflow:hidden}
+.sb-head{background:var(--purple-800);color:#fff;padding:11px 14px;font-size:12px;font-weight:600;letter-spacing:.03em}
+.sb-nav a{display:block;padding:8px 14px;font-size:12.5px;color:var(--text2);text-decoration:none;border-bottom:1px solid var(--border);transition:all .12s}
+.sb-nav a:hover{background:var(--purple-50);color:var(--purple-800)}
+.sb-nav a:last-child{border-bottom:none}
+
+/* main content */
+.main-content{}
+/* welcome-banner styles now in site.css */
+.hero-badges{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.hbadge{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:3px 10px;font-size:11px}
+
+/* section */
+.guide-section{background:var(--surf);border:1px solid var(--border);border-radius:var(--r3);margin-bottom:18px;overflow:hidden;scroll-margin-top:80px}
+.gs-head{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);cursor:pointer;background:var(--surf);user-select:none}
+.gs-head:hover{background:var(--gray-50)}
+.gs-num{width:32px;height:32px;border-radius:50%;background:var(--purple-50);border:1.5px solid var(--purple-200);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--purple-800);flex-shrink:0}
+.gs-title{flex:1}
+.gs-title h2{font-size:14.5px;font-weight:700;margin-bottom:1px}
+.gs-title .gs-stat{font-size:11.5px;color:var(--text3)}
+.gs-chevron{font-size:12px;color:var(--text3);transition:transform .2s}
+.gs-chevron.open{transform:rotate(180deg)}
+.gs-body{padding:18px;display:none}
+.gs-body.open{display:block}
+
+/* statute ref */
+.stat-ref{font-size:11px;font-weight:700;color:var(--teal-600);background:var(--teal-50);padding:2px 7px;border-radius:4px;margin-left:6px;text-decoration:none}
+.stat-ref:hover{text-decoration:underline}
+
+/* callouts */
+.callout{border-radius:var(--r2);padding:11px 14px;margin:12px 0;font-size:13px;line-height:1.6}
+.callout-law{background:var(--purple-50);border-left:4px solid var(--purple-600)}
+.callout-warn{background:var(--amber-50);border-left:4px solid var(--amber-600)}
+.callout-good{background:var(--green-50);border-left:4px solid var(--green-600)}
+.callout-danger{background:var(--red-50);border-left:4px solid var(--red-600)}
+.cl-title{font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.callout-law .cl-title{color:var(--purple-800)}
+.callout-warn .cl-title{color:var(--amber-600)}
+.callout-good .cl-title{color:var(--green-600)}
+.callout-danger .cl-title{color:var(--red-600)}
+
+/* rights table */
+.rights-table{width:100%;border-collapse:collapse;font-size:13px;margin:12px 0}
+.rights-table th{background:var(--purple-800);color:#fff;padding:8px 12px;text-align:left;font-size:12px;font-weight:500}
+.rights-table td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top}
+.rights-table tr:nth-child(even) td{background:var(--gray-50)}
+.rights-table td:first-child{font-weight:600;color:var(--text);white-space:nowrap}
+.rights-table td:last-child{font-size:11.5px;color:var(--teal-600);font-weight:600}
+
+/* process steps */
+.proc-steps{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.proc-step{display:flex;gap:11px;align-items:flex-start;padding:10px 13px;background:var(--gray-50);border-radius:var(--r2);border:1px solid var(--border)}
+.ps-num{width:24px;height:24px;border-radius:50%;background:var(--purple-600);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.ps-body .ps-title{font-size:13px;font-weight:600;margin-bottom:2px}
+.ps-body .ps-desc{font-size:12.5px;color:var(--text2);line-height:1.5}
+.ps-body .ps-stat{font-size:11px;color:var(--teal-600);font-weight:600;margin-top:4px}
+
+/* inline content */
+.gs-body p{font-size:13.5px;color:var(--text2);margin-bottom:10px;line-height:1.7}
+.gs-body h3{font-size:13.5px;font-weight:700;color:var(--text);margin:14px 0 6px;display:flex;align-items:center;gap:6px}
+.gs-body h3::before{content:'';width:3px;height:14px;background:var(--purple-600);border-radius:2px;flex-shrink:0}
+.gs-body ul,.gs-body ol{padding-left:18px;margin-bottom:10px}
+.gs-body li{font-size:13.5px;color:var(--text2);margin-bottom:5px;line-height:1.6}
+
+/* footer */
+.site-footer{background:var(--purple-900);color:rgba(255,255,255,.6);text-align:center;padding:22px;font-size:12px;margin-top:24px}
+.site-footer a{color:rgba(255,255,255,.7)}
+
+/* responsive */
+@media(max-width:720px){
+  .page{grid-template-columns:1fr;padding:16px 14px 48px}
+  .sidebar{position:static}
+}
+@media print{
+  .site-header,.sidebar,.btn-print{display:none!important}
+  .page{grid-template-columns:1fr;padding:0}
+  .guide-section{break-inside:avoid}
+  .gs-body{display:block!important}
+  .gs-chevron{display:none}
+}
