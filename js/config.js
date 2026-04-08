@@ -22,9 +22,11 @@ const HOA_CONFIG = {
   s3BucketName: 'hoa-documents-mmpoaii',                                  // e.g. hoa-documents-mmpoaii
   s3Region:     'us-east-1',                                              // must match where you create the bucket
   uploadApiUrl: 'https://vbttai9kma.execute-api.us-east-1.amazonaws.com', // e.g. https://abc123.execute-api.us-east-1.amazonaws.com/prod
+
+  // ── FINANCIAL REPORTS API ──────────────────────────────────────────────────
+  // API Gateway endpoint that returns the account balance PDF
+  financialReportApiUrl: 'https://604iprtdt1.execute-api.us-east-1.amazonaws.com/prod/financial/account-balance',
   
-
-
   
 
   // ── HOA DISPLAY INFORMATION ─────────────────────────────────────────────────
