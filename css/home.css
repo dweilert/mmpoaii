@@ -1,4 +1,5 @@
 /* Home page specific styles */
+body { background: var(--purple-900); }
 .hero {
   background: linear-gradient(135deg, var(--purple-900) 0%, var(--purple-800) 50%, #1a3a5c 100%);
   color: #fff; text-align: center;
