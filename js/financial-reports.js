@@ -41,17 +41,46 @@ function showToast(message, type = 'info', duration = 4000) {
 }
 
 /**
- * Set the visual state of the report button (or fall back to a toast).
+ * Show/hide a full-screen processing overlay with spinner.
+ */
+function showProcessingOverlay(message) {
+  let overlay = document.getElementById('report-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'report-overlay';
+    overlay.style.cssText =
+      'position:fixed;inset:0;background:rgba(20,18,50,.55);z-index:9998;' +
+      'display:flex;flex-direction:column;align-items:center;justify-content:center;' +
+      'font-family:system-ui,sans-serif;color:#fff;backdrop-filter:blur(2px);';
+    overlay.innerHTML =
+      '<div style="width:56px;height:56px;border:5px solid rgba(255,255,255,.25);' +
+      'border-top-color:#fff;border-radius:50%;animation:reportSpin 1s linear infinite;"></div>' +
+      '<div id="report-overlay-msg" style="margin-top:18px;font-size:15px;font-weight:500;' +
+      'text-align:center;max-width:80%;"></div>';
+    const style = document.createElement('style');
+    style.textContent = '@keyframes reportSpin{to{transform:rotate(360deg)}}';
+    document.head.appendChild(style);
+    document.body.appendChild(overlay);
+  }
+  overlay.querySelector('#report-overlay-msg').textContent = message || 'Processing…';
+  overlay.style.display = 'flex';
+}
+
+function hideProcessingOverlay() {
+  const overlay = document.getElementById('report-overlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
+/**
+ * Set the visual state of the report button and overlay.
  */
 function setReportBtnState(btn, state) {
-  const arrow = btn ? btn.querySelector('.financial-report-btn') : null;
   if (state === 'loading') {
     if (btn) { btn.style.pointerEvents = 'none'; btn.style.opacity = '.7'; }
-    if (arrow) arrow.textContent = 'Downloading...';
-    showToast('Preparing your account balance report…', 'info', 2000);
+    showProcessingOverlay('Preparing your account balance report…');
   } else {
     if (btn) { btn.style.pointerEvents = ''; btn.style.opacity = ''; }
-    if (arrow) arrow.textContent = 'Download Report';
+    hideProcessingOverlay();
   }
 }
 
