@@ -22,6 +22,22 @@
 
 .gov-card:hover::before{background:var(--purple-600)}
 
+/* DRAFT watermark — diagonal red text overlay on every gov-card */
+.gov-card::after{
+  content:"DRAFT";
+  position:absolute;
+  top:50%; left:50%;
+  transform:translate(-50%,-50%) rotate(-45deg);
+  font-size:64px;
+  font-weight:900;
+  color:rgba(220,20,20,.25);
+  letter-spacing:6px;
+  pointer-events:none;
+  user-select:none;
+  z-index:2;
+  white-space:nowrap;
+}
+
 .gc-icon{
   width:52px;height:52px;border-radius:var(--r2);
   background:var(--purple-50);display:flex;align-items:center;
