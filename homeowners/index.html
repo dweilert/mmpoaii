@@ -105,6 +105,15 @@
         </div>
         <div class="tc-arrow">→</div>
       </a>
+      <div class="tool-card amber-card" onclick="fetchAccountBalanceReport()">
+        <div class="tc-icon">📄</div>
+        <div class="tc-body">
+          <div class="tc-title">Account Balance Report</div>
+          <div class="tc-desc">Download your personalized account balance report showing dues, payments, and current balance. Reports are generated from Google Sheets data.</div>
+          <div class="tc-meta">Personalized PDF · Secure download</div>
+        </div>
+        <div class="tc-arrow financial-report-btn">Download Report</div>
+      </div>
     </div>
   </div>
 
@@ -148,6 +157,7 @@
 <script src="/js/config.js"></script>
 <script src="/js/auth.js"></script>
 <script src="/js/guard.js"></script>
+<script src="/js/financial-reports.js"></script>
 <script>
 HoaGuard.protect('homeowners');
 
