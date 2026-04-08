@@ -302,6 +302,10 @@ body {
 .site-footer a { color: rgba(255,255,255,.7); }
 .site-footer .footer-disclaimer { margin-top: 6px; font-size: 11px; opacity: .5; }
 
+/* ── HOA NAME RESPONSIVE SWAP ── */
+.hoa-name-full  { display: inline; }
+.hoa-name-short { display: none; }
+
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
   .site-header .inner { padding: 0 16px; }
@@ -309,6 +313,8 @@ body {
   .page-wrap { padding: 20px 16px 48px; }
   .card-grid { grid-template-columns: 1fr; }
   .card-grid.two-col { grid-template-columns: 1fr; }
+  .hoa-name-full  { display: none; }
+  .hoa-name-short { display: inline; }
 }
 @media (max-width: 500px) {
   .site-nav .nav-cta { padding: 7px 12px; font-size: 12.5px; }

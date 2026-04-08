@@ -196,8 +196,13 @@ let   forgotUsername        = '';
 // ── Populate page from config ──────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function () {
   const c = typeof HOA_CONFIG !== 'undefined' ? HOA_CONFIG : {};
-  document.getElementById('hdr-name').textContent = c.hoaName || 'MMPOAII HOA';
-  document.getElementById('foot-name').textContent = c.hoaName || 'MMPOAII HOA';
+  var full  = c.hoaName || 'MMPOAII HOA';
+  var short = c.hoaShortName || full;
+  var nameHtml =
+    '<span class="hoa-name-full">'  + full  + '</span>' +
+    '<span class="hoa-name-short">' + short + '</span>';
+  document.getElementById('hdr-name').innerHTML  = nameHtml;
+  document.getElementById('foot-name').innerHTML = nameHtml;
   const emailEl = document.getElementById('foot-email');
   emailEl.textContent = c.hoaEmail || 'board@mmpoaii.com';
   emailEl.href = 'mailto:' + (c.hoaEmail || 'board@mmpoaii.com');

@@ -32,6 +32,7 @@ const HOA_CONFIG = {
   // ── HOA DISPLAY INFORMATION ─────────────────────────────────────────────────
   // Replace with your association's actual information
   hoaName:        'Meadow Mountain Property Owners Association II',
+  hoaShortName:   'MMPOAII',
   hoaTagline:     'Building Community. Protecting Your Home.',
   hoaSubdivision: 'Meadow Mountain Phase II',
   hoaCity:        'Austin, TX 78731',

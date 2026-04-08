@@ -94,9 +94,14 @@ const HoaGuard = (function () {
     document.querySelectorAll('[data-user-role]').forEach(function (el) {
       el.textContent = isBoard ? 'Board Member' : 'Homeowner';
     });
-    // Set HOA name wherever it appears
+    // Set HOA name wherever it appears. Inject both a full and short version
+    // so CSS can swap between them responsively.
+    var fullName  = HOA_CONFIG.hoaName || '';
+    var shortName = HOA_CONFIG.hoaShortName || fullName;
     document.querySelectorAll('[data-hoa-name]').forEach(function (el) {
-      el.textContent = HOA_CONFIG.hoaName;
+      el.innerHTML =
+        '<span class="hoa-name-full">'  + fullName  + '</span>' +
+        '<span class="hoa-name-short">' + shortName + '</span>';
     });
   }
 
