@@ -82,7 +82,10 @@ document.addEventListener('DOMContentLoaded', function () {
   const c = typeof HOA_CONFIG !== 'undefined' ? HOA_CONFIG : {};
   const name = c.hoaName || 'MMPOAII HOA';
 
-  document.getElementById('hdr-name').textContent = name;
+  var shortName = c.hoaShortName || name;
+  document.getElementById('hdr-name').innerHTML =
+    '<span class="hoa-name-full">'  + name      + '</span>' +
+    '<span class="hoa-name-short">' + shortName + '</span>';
   document.getElementById('hero-name').textContent = 'Welcome to ' + name;
   document.getElementById('hero-tagline').textContent = c.hoaTagline || 'Your community portal for board resources and homeowner information.';
   document.getElementById('inf-name').textContent = name;
