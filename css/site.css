@@ -40,7 +40,7 @@
   --serif:      'Lora', Georgia, serif;
 }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; background: var(--purple-900); }
 
 body {
   font-family: var(--sans);
