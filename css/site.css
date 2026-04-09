@@ -315,6 +315,9 @@ body {
   .card-grid.two-col { grid-template-columns: 1fr; }
   .hoa-name-full  { display: none; }
   .hoa-name-short { display: inline; }
+  .nav-user .avatar { display: none; }
+  .nav-user .uname { display: none; }
+  .nav-user .urole { display: none; }
 }
 @media (max-width: 500px) {
   .site-nav .nav-cta { padding: 7px 12px; font-size: 12.5px; }
