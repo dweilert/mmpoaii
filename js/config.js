@@ -66,7 +66,7 @@ const HOA_CONFIG = {
 
   // ── BOARD MEMBERS (displayed on homeowner contact page) ─────────────────────
   boardMembers: [
-    { name: 'Dale Emanual',    title: 'President',  email: 'dale83152@yahoo.com' },
+    { name: 'Dale Emanuel',    title: 'President',  email: 'dale83152@yahoo.com' },
     { name: 'Gene Willard',    title: 'Vice President', email: 'deargenewillard@gmail.com' },
     { name: 'Dave Weilert',    title: 'Sec./Treasurer',  email: 'daveweilert@gmail.com' },
   ],
