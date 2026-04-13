@@ -129,6 +129,9 @@
   cursor: pointer; transition: all .13s;
   color: var(--text2);
 }
+.vote-btn.approve   { background: #e6f4ea; border-color: #a8d5b8; color: #1e7e34; }
+.vote-btn.disapprove { background: #fde8e8; border-color: #f5aaaa; color: #b71c1c; }
+.vote-btn.discuss   { background: #f0f0f0; border-color: #c8c8c8; color: #555; }
 .vote-btn:hover { border-color: var(--purple-600); color: var(--purple-800); }
 .vote-btn.selected { color: #fff; border-color: transparent; }
 .vote-btn.selected.approve   { background: var(--green-600); }
