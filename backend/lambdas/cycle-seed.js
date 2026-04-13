@@ -98,7 +98,7 @@ exports.handler = async (event) => {
     }
 
     console.log(`[cycle-seed] user=${userSub} cycle=${cycleId} seeded ${written} sections`);
-    return ok({ cycleId, sectionsSeeded: written });
+    return ok({ cycleId, sectionsSeeded: written, documentSetId: seedData.documentSetId || null });
   } catch (err) {
     console.error('[cycle-seed] error writing:', err);
     return serverError();

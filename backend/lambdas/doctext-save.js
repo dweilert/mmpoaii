@@ -92,7 +92,7 @@ exports.handler = async (event) => {
     }
 
     console.log(`[doctext-save] user=${userSub} cycle=${cycleId} saved ${written} sections`);
-    return ok({ cycleId, sectionsLoaded: written });
+    return ok({ cycleId, sectionsLoaded: written, documentSetId: docData.documentSetId || null });
   } catch (err) {
     console.error('[doctext-save] error writing:', err);
     return serverError();
