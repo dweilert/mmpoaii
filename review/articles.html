@@ -46,6 +46,7 @@
       <span id="progress-text">0 / 0 sections voted</span>
     </div>
     <div class="progress-bar"><div class="fill" id="progress-fill" style="width:0%"></div></div>
+    <div id="overall-totals" style="display:none;font-size:13px;margin-top:6px;"></div>
   </div>
 
   <div id="submit-section" style="display:none;margin-bottom:20px;">
@@ -100,6 +101,7 @@ async function loadArticles() {
 
     totalSections = 0;
     totalVoted = 0;
+    var totalApprove = 0, totalDisapprove = 0, totalDiscuss = 0;
     var articles = data.articles || [];
 
     var html = '<div class="article-list">';
@@ -107,6 +109,9 @@ async function loadArticles() {
       var a = articles[i];
       totalSections += a.totalSections;
       totalVoted += a.votedSections;
+      totalApprove += a.approveCount || 0;
+      totalDisapprove += a.disapproveCount || 0;
+      totalDiscuss += a.discussCount || 0;
       var complete = a.votedSections === a.totalSections;
       var pct = a.totalSections > 0 ? Math.round((a.votedSections / a.totalSections) * 100) : 0;
 
@@ -142,6 +147,16 @@ async function loadArticles() {
     document.getElementById('progress-text').textContent = totalVoted + ' / ' + totalSections + ' sections voted';
     document.getElementById('progress-fill').style.width = overallPct + '%';
     document.getElementById('overall-progress').style.display = 'block';
+
+    // Overall vote totals
+    var totalParts = [];
+    totalParts.push('<span style="color:#1e7e34;font-weight:700;">' + totalApprove + ' approved</span>');
+    totalParts.push('<span style="color:#b71c1c;font-weight:700;">' + totalDisapprove + ' disapproved</span>');
+    totalParts.push('<span style="color:#7a6100;font-weight:700;">' + totalDiscuss + ' discuss</span>');
+    var totalWaiting = totalSections - totalVoted;
+    totalParts.push('<span style="color:#888;font-weight:700;">' + totalWaiting + ' waiting</span>');
+    document.getElementById('overall-totals').innerHTML = totalParts.join(' &middot; ');
+    document.getElementById('overall-totals').style.display = 'block';
 
     // Show submit section
     var submitSection = document.getElementById('submit-section');
