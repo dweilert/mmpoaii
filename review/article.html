@@ -36,6 +36,9 @@
 <div class="review-wrap">
 
   <div class="article-header">
+    <div style="margin-bottom:8px;">
+      <a href="#" id="back-to-articles" style="font-size:14px;color:var(--purple-800);text-decoration:none;font-weight:600;">← Back to Articles</a>
+    </div>
     <div class="ah-nav" id="art-nav">
       <a href="#" id="prev-link" style="display:none;">← Previous Article</a>
       <span style="flex:1"></span>
@@ -60,6 +63,9 @@
     <a href="#" id="prev-link-bottom">← Previous Article</a>
     <span style="flex:1"></span>
     <a href="#" id="next-link-bottom">Next Article →</a>
+  </div>
+  <div style="margin-top:16px;text-align:center;">
+    <a href="#" id="back-to-articles-bottom" style="font-size:14px;color:var(--purple-800);text-decoration:none;font-weight:600;">← Back to Articles</a>
   </div>
 
 </div>
@@ -100,8 +106,11 @@ if (!cycleId || !articleId) {
   window.location.href = '/review/index.html';
 }
 
-// Set back link
-document.getElementById('back-link').href = '/review/articles.html?cycleId=' + encodeURIComponent(cycleId);
+// Set back links
+var articlesUrl = '/review/articles.html?cycleId=' + encodeURIComponent(cycleId);
+document.getElementById('back-link').href = articlesUrl;
+document.getElementById('back-to-articles').href = articlesUrl;
+document.getElementById('back-to-articles-bottom').href = articlesUrl;
 
 // Debounce timers for notes autosave
 var noteTimers = {};
