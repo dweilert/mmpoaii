@@ -19,8 +19,11 @@ exports.handler = async (event) => {
   }
 
   const cycleId = event.pathParameters?.cycleId;
-  const sectionId = event.pathParameters?.sectionId;
-  if (!cycleId || !sectionId) return badRequest('cycleId and sectionId are required');
+  const rawSectionId = event.pathParameters?.sectionId;
+  if (!cycleId || !rawSectionId) return badRequest('cycleId and sectionId are required');
+
+  // Frontend sends ART-01--SEC-01 (double dash) to avoid # in URL path
+  const sectionId = rawSectionId.replace('--', '#');
 
   try {
     const { GetCommand } = require('@aws-sdk/lib-dynamodb');

@@ -113,7 +113,9 @@ const ReviewApi = (function () {
 
   /** GET /cycles/{cycleId}/doctext/{sectionId} — get section text */
   function getDocText(cycleId, sectionId) {
-    return apiFetch('GET', '/cycles/' + encodeURIComponent(cycleId) + '/doctext/' + encodeURIComponent(sectionId));
+    // Replace # with -- to avoid URL fragment issues in API Gateway
+    var safeSectionId = sectionId.replace('#', '--');
+    return apiFetch('GET', '/cycles/' + encodeURIComponent(cycleId) + '/doctext/' + encodeURIComponent(safeSectionId));
   }
 
   return {
