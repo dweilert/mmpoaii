@@ -36,10 +36,6 @@ exports.handler = async (event) => {
     const voteResult = await ddb.send(new QueryCommand({
       TableName: TABLE_NAME,
       KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
-      ExpressionAttributeValues: {
-        ':pk': `CYCLE#${cycleId}`,
-        ':sk': `VOTE#`,
-      },
       FilterExpression: 'contains(SK, :userFilter)',
       ExpressionAttributeValues: {
         ':pk': `CYCLE#${cycleId}`,
