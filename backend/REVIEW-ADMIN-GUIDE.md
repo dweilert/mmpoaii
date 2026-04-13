@@ -1,67 +1,81 @@
 # Document Review System — Admin Guide
 
-This guide walks you through the complete process of setting up and running a document review cycle, from preparing the Field Guide to recording final decisions.
+This guide walks you through the complete process of setting up and running a document review cycle. Follow these steps in order for each new review.
 
 ---
 
 ## Overview
 
-The review system lets a small committee vote on each section of a governing document (CC&Rs, Bylaws, or Rules of Conduct). The workflow is:
+The review system lets a small committee vote on each section of a governing document (CC&Rs, Bylaws, or Rules of Conduct). There are two data files that must be prepared and loaded:
 
-1. **Prepare** — Convert a Field Guide Word document into seed data
-2. **Create** — Create a new review cycle in the Admin Console
-3. **Seed** — Load the section content into the cycle
-4. **Review** — Reviewers vote on each section (Approve / Disapprove / Discuss)
-5. **Submit** — Each reviewer submits their completed ballot
-6. **Aggregate** — View combined results across all reviewers
-7. **Decide** — Record final decisions on the Summary Ballot
-8. **Next Cycle** — Optionally carry forward unresolved sections into a new cycle
+1. **Field Guide seed data** — The annotated Field Guide with classifications, "Why it's here", and "What you can do" for each section. This is what reviewers see and vote on.
+2. **Governing document text** — The actual legal text from the governing document (e.g., CC&Rs). This is displayed when reviewers click "View Text" on a section.
+
+### Complete Workflow
+
+| Step | What | Where | Required? |
+|------|------|-------|-----------|
+| 1 | Parse the Field Guide (.docx → JSON) | Terminal | Yes |
+| 2 | Parse the Governing Document (.docx → JSON) | Terminal | Yes |
+| 3 | Upload both JSON files to S3 | Terminal (or auto with --upload) | Yes |
+| 4 | Create a new review cycle | Admin Console | Yes |
+| 5 | Seed the review content (Field Guide data) | Admin Console | Yes |
+| 6 | Upload the document text (Governing Doc data) | Admin Console | Yes |
+| 7 | Add reviewers to Cognito group | Terminal | As needed |
+| 8 | Notify reviewers | Email/Slack/etc. | Yes |
+| 9 | Monitor progress | Admin Console / Review Dashboard | Ongoing |
+| 10 | View aggregate results | Review Dashboard | After submissions |
+| 11 | Record final decisions | Admin Console → Summary Ballot | Yes |
+| 12 | Start next cycle (optional) | Admin Console | If needed |
 
 ---
 
 ## Prerequisites
 
-- You must be in the **review-admins** Cognito group
-- Reviewers must be in the **reviewers** Cognito group
-- **pandoc** must be installed on your computer (`brew install pandoc`)
-- **AWS CLI** must be configured (for S3 upload)
-- The Field Guide Word document must follow the standard format (see "Field Guide Format" below)
+Before starting, ensure you have:
 
-### Adding users to groups
+- [ ] **Admin access** — You must be in the `review-admins` Cognito group
+- [ ] **pandoc** installed — `brew install pandoc` (used to convert Word docs)
+- [ ] **Node.js** installed — Required to run the parse scripts
+- [ ] **AWS CLI** configured — Required for S3 uploads (`aws configure`)
+- [ ] **Field Guide** Word document (.docx) — The annotated guide for the document being reviewed
+- [ ] **Governing Document** Word document (.docx) — The actual legal document (CC&Rs, Bylaws, etc.)
 
-To add a user to the reviewers or review-admins group:
+### Important file locations
 
-```bash
-aws cognito-idp admin-add-user-to-group \
-  --user-pool-id us-east-1_tfk0ub8lC \
-  --username user@example.com \
-  --group-name reviewers \
-  --region us-east-1
-```
-
-Replace `reviewers` with `review-admins` for admin access. Users must sign out and sign back in for group changes to take effect.
+| Item | Location |
+|------|----------|
+| Parse scripts | `backend/scripts/` |
+| Seed data files (JSON) | `backend/seeds/` |
+| S3 bucket for seeds | `s3://mmpoa-review-seeds/` |
+| Admin Console | Board Portal → Review Admin Console (bottom of page) |
+| Review Dashboard | Board or Homeowner Portal → Review Documents (bottom of page) |
 
 ---
 
-## Step 1: Prepare the Seed Data
+## Step 1: Parse the Field Guide
 
-The Field Guide Word document (.docx) must be converted into JSON before it can be loaded into the review system. A script in the repo handles this automatically.
+The Field Guide is a Word document that contains the committee's annotations for each section of the governing document — classifications, explanations, and guidance. This is what reviewers see and vote on.
 
-### Run the conversion script
+### 1a. Run the parse script
 
 From the project root directory:
 
 ```bash
-node backend/scripts/parse-field-guide.js "path/to/Field_Guide.docx" backend/seeds/my-cycle.json
+node backend/scripts/parse-field-guide.js "path/to/MMPOA_CCRs_Field_Guide_V1.docx" backend/seeds/ccrs-2026-01.json --upload
 ```
 
-The script will:
-- Convert the Word document to markdown using pandoc
-- Parse all articles, sections, classifications, and field content
-- Write the seed JSON file
-- Print a summary showing article counts and classification breakdown
+**Arguments:**
+| Argument | Description |
+|----------|-------------|
+| First arg | Path to the Field Guide .docx file |
+| Second arg | Output path for the JSON file (saved locally) |
+| `--upload` | (Optional) Also uploads to S3 bucket `mmpoa-review-seeds` |
 
-Example output:
+### 1b. Review the output
+
+The script prints a summary to the terminal:
+
 ```
 Converting MMPOA_CCRs_Field_Guide_V1.docx to markdown...
 Parsing field guide content...
@@ -69,6 +83,7 @@ Parsing field guide content...
 Articles found: 14
   Article  1 — Definitions (24 sections)
   Article  2 — Property Rights in Common Areas (3 sections)
+  Article  3 — Membership and Voting Rights (6 sections)
   ...
 Total sections: 140
 
@@ -78,33 +93,130 @@ Classification breakdown:
   required_by_law: 31
   (with community impact: 38)
 
-Seed JSON written to: backend/seeds/my-cycle.json
+Seed JSON written to: backend/seeds/ccrs-2026-01.json
+Uploaded to S3: mmpoa-review-seeds/ccrs-2026-01.json
 ```
 
-### Upload to S3 (recommended for large documents)
+### 1c. Spot-check the JSON
 
-Add the `--upload` flag to also upload the JSON to the S3 seed bucket:
-
-```bash
-node backend/scripts/parse-field-guide.js "path/to/Field_Guide.docx" backend/seeds/ccrs-2026-01.json --upload
-```
-
-This uploads the file to `s3://mmpoa-review-seeds/ccrs-2026-01.json` so you can reference it by key in the Admin Console.
-
-### Verify the output
-
-Open the JSON file and spot-check a few sections to confirm:
+Open `backend/seeds/ccrs-2026-01.json` and verify:
 - Article numbers and titles are correct
 - Section numbers match (watch for alphanumeric like "19A")
-- Classifications are mapped correctly
-- "Why it's here" and "What you can do" text is complete
-- "Community Impact" is present where expected
+- Classifications are one of: `required_by_law`, `required_by_city`, `best_practice`, `community_choice`
+- `whyItsHere` and `whatYouCanDo` fields have content
+- `communityImpact` is present where expected (not all sections have it)
+
+### Field Guide Word Document Format
+
+The parse script expects this structure in the .docx file:
+
+**Article headings** (Roman numerals):
+```
+Article I — Definitions
+Article II — Property Rights in Common Areas
+```
+
+**Section cards** (within each article):
+```
+Art. I, §1 — Association
+RECOMMENDED BEST PRACTICE
+
+Why it's here: [explanation text]
+
+What you can do: [guidance text]
+
+Community Impact: [optional — only for some sections]
+
+☐ Approve  ☐ Disapprove  ☐ Discuss
+Notes: _______________
+```
+
+**Classification labels** — exactly one per section:
+- `REQUIRED BY TEXAS LAW`
+- `REQUIRED BY CITY OF AUSTIN`
+- `RECOMMENDED BEST PRACTICE`
+- `COMMUNITY CHOICE`
 
 ---
 
-## Step 2: Create a Review Cycle
+## Step 2: Parse the Governing Document
 
-1. Log in to the website and go to the **Board Portal** or **Homeowner Portal**
+The governing document is the actual legal text (e.g., CC&Rs). This is displayed when reviewers click the "View Text" button on a section.
+
+### 2a. Run the parse script
+
+```bash
+node backend/scripts/parse-governing-doc.js "path/to/MMPOA_CCRs_V1.docx" backend/seeds/ccrs-text.json --upload
+```
+
+**Arguments:**
+| Argument | Description |
+|----------|-------------|
+| First arg | Path to the governing document .docx file |
+| Second arg | Output path for the JSON file (saved locally) |
+| `--upload` | (Optional) Also uploads to S3 bucket `mmpoa-review-seeds` |
+
+### 2b. Review the output
+
+```
+Converting MMPOA_CCRs_V1.docx to markdown...
+Parsing governing document...
+
+Articles found: 14
+  Article  1 — DEFINITIONS (24 sections)
+  Article  2 — PROPERTY RIGHTS IN COMMON AREAS (3 sections)
+  ...
+Total sections: 141
+
+Written to: backend/seeds/ccrs-text.json
+Uploaded to S3: mmpoa-review-seeds/ccrs-text.json
+```
+
+**Note:** The governing document may have a slightly different section count than the Field Guide (e.g., 141 vs 140). This is expected — some sections in the legal text may not have a corresponding Field Guide entry. The "View Text" popup simply won't show for those unmatched sections.
+
+### Governing Document Word Format
+
+The script expects this structure:
+
+**Article headings**:
+```
+# ARTICLE I - DEFINITIONS
+```
+
+**Section headings**:
+```
+## Section 1. "Association."
+```
+
+The full text below each section heading is captured as the legal text.
+
+---
+
+## Step 3: Upload Files to S3
+
+If you used `--upload` in Steps 1 and 2, the files are already in S3. Otherwise, upload manually:
+
+```bash
+# Upload Field Guide seed data
+aws s3 cp backend/seeds/ccrs-2026-01.json s3://mmpoa-review-seeds/ccrs-2026-01.json
+
+# Upload Governing Document text
+aws s3 cp backend/seeds/ccrs-text.json s3://mmpoa-review-seeds/ccrs-text.json
+```
+
+Verify the uploads:
+
+```bash
+aws s3 ls s3://mmpoa-review-seeds/
+```
+
+You should see both files listed.
+
+---
+
+## Step 4: Create a Review Cycle
+
+1. Log in to the website and go to the **Board Portal**
 2. Scroll to the bottom and click the **Review Admin Console** card
 3. On the **Create Cycle** tab, fill in:
 
@@ -113,7 +225,7 @@ Open the JSON file and spot-check a few sections to confirm:
 | **Document** | Which governing document | `CCRS`, `BYLAWS`, or `CONDUCT` |
 | **Cycle ID** | Unique identifier for this review round | `CCRS-2026-01` |
 | **Title** | Human-readable title shown to reviewers | `CC&Rs Review — April 2026` |
-| **Copy from prior cycle** | Optional — enter a prior Cycle ID to carry forward unresolved sections | `CCRS-2025-01` |
+| **Copy from prior cycle** | Optional — prior Cycle ID to carry forward unresolved sections | `CCRS-2025-01` |
 
 4. Click **Create Cycle**
 
@@ -121,7 +233,7 @@ Open the JSON file and spot-check a few sections to confirm:
 
 Use the format `DOCUMENT-YEAR-SEQUENCE`:
 - `CCRS-2026-01` — first CC&Rs review in 2026
-- `CCRS-2026-02` — second round (after carrying forward)
+- `CCRS-2026-02` — second round (carrying forward unresolved items)
 - `BYLAWS-2026-01` — first Bylaws review in 2026
 - `CONDUCT-2026-01` — first Rules of Conduct review in 2026
 
@@ -129,168 +241,188 @@ Use the format `DOCUMENT-YEAR-SEQUENCE`:
 
 When you enter a prior Cycle ID in the "Copy from" field, the system will:
 - Look at the Summary Ballot decisions from the prior cycle
-- Copy forward only sections that were **not Approved** and **not Removed**
-- Sections marked Disapprove or with no decision are carried into the new cycle
+- Copy forward only sections that were **NOT Approved** and **NOT Removed**
+- Sections marked Disapprove or with no decision carry into the new cycle
 - This lets the committee focus on unresolved items in subsequent rounds
 
 ---
 
-## Step 3: Seed the Content
+## Step 5: Seed the Review Content (Field Guide Data)
 
-After creating the cycle, load the section content:
+This loads the Field Guide annotations — what reviewers see and vote on.
 
 1. Go to the **Seed Content** tab in the Admin Console
 2. Enter the **Cycle ID** you just created (e.g., `CCRS-2026-01`)
 3. Choose the seed source:
 
-**Option A — S3 file (recommended for large documents):**
+**Option A — S3 file (recommended):**
 - Select **S3 file key**
 - Enter the filename: `ccrs-2026-01.json`
 - This loads from the `mmpoa-review-seeds` S3 bucket
 
-**Option B — Paste JSON (for small documents or testing):**
+**Option B — Paste JSON (for testing):**
 - Select **Paste JSON**
 - Paste the full JSON content into the text area
 
 4. Click **Seed Content**
-5. You should see a success message like: `Seeded 140 sections into cycle "CCRS-2026-01"`
+5. You should see: `Seeded 140 sections into cycle "CCRS-2026-01"`
 
 ---
 
-## Step 4: Notify Reviewers
+## Step 6: Upload the Document Text (Governing Doc Data)
 
-Once the cycle is seeded, reviewers can begin voting. Let them know:
+This loads the actual legal text so reviewers can click "View Text" to see the original language.
 
-- Log in to the portal (Board or Homeowner)
-- Scroll to the bottom and click the **Document Review** card
+1. Go to the **Document Text** tab in the Admin Console
+2. Enter the **Cycle ID** (e.g., `CCRS-2026-01`)
+3. Choose the source:
+
+**Option A — S3 file (recommended):**
+- Select **S3 file key**
+- Enter the filename: `ccrs-text.json`
+
+**Option B — Paste JSON (for testing):**
+- Select **Paste JSON**
+- Paste the full JSON content
+
+4. Click **Upload Document Text**
+5. You should see: `Loaded 141 sections of document text`
+
+---
+
+## Step 7: Add Reviewers
+
+Each reviewer needs to be added to the `reviewers` Cognito group. Admins need to be in the `review-admins` group.
+
+### Add a reviewer
+
+```bash
+aws cognito-idp admin-add-user-to-group \
+  --user-pool-id us-east-1_tfk0ub8lC \
+  --username user@example.com \
+  --group-name reviewers \
+  --region us-east-1
+```
+
+### Add an admin
+
+```bash
+aws cognito-idp admin-add-user-to-group \
+  --user-pool-id us-east-1_tfk0ub8lC \
+  --username user@example.com \
+  --group-name review-admins \
+  --region us-east-1
+```
+
+### List group members
+
+```bash
+aws cognito-idp list-users-in-group \
+  --user-pool-id us-east-1_tfk0ub8lC \
+  --group-name reviewers \
+  --region us-east-1 \
+  --query 'Users[*].Username' --output table
+```
+
+**Important:** Users must sign out and sign back in for group changes to take effect.
+
+---
+
+## Step 8: Notify Reviewers
+
+Tell reviewers:
+
+- Log in at **mmpoaii.org**
+- Go to the **Board Portal** or **Homeowner Portal**
+- Scroll to the bottom and click **Review Documents**
 - Select the review cycle
-- Work through each article, voting on every section
-- Votes and notes are saved automatically — no need to click "save"
+- For each article, vote on every section (Approve / Disapprove / Discuss)
+- Click "View Text" to see the original legal language
+- Votes and notes save automatically
 - When all sections are voted, click **Submit Ballot** on the articles page
 
-There is no deadline built into the system. Communicate deadlines separately.
-
 ---
 
-## Step 5: Monitor Progress
+## Step 9: Monitor Progress
 
-As an admin, you can track reviewer progress:
-
-- Go to the **Document Review Dashboard** (click the reviewer card, not admin)
+As an admin, go to the Review Dashboard (click the reviewer card, not admin):
 - Select the cycle to see the article list
-- The progress bars show how many sections have been voted on
-- Note: progress shown is for your own ballot — you cannot see other reviewers' progress until they submit
+- Each article shows colored badges: Approved (green), Disapproved (red), Discuss (yellow), Waiting (grey)
+- Overall progress bar and totals are shown at the top
+- **Note:** You see only your own progress until ballots are submitted
 
 ---
 
-## Step 6: View Aggregate Results
+## Step 10: View Aggregate Results
 
 After reviewers submit their ballots:
-
 1. Go to the article list for the cycle
 2. Click **View Aggregate Results** (appears after you submit your own ballot)
 3. The aggregate view shows:
    - Vote counts per section (Approve / Disapprove / Discuss)
+   - All reviewer notes
    - Unanimous approvals are highlighted
-   - All reviewer notes are listed
 
-Reviewers must submit their ballot before viewing aggregate results. This prevents vote influence. Admins can view aggregates at any time.
+**Important:** Reviewers must submit their ballot before viewing aggregates. This prevents vote influence.
 
 ---
 
-## Step 7: Record Final Decisions
+## Step 11: Record Final Decisions
 
 1. Go to the **Admin Console** → **Summary Ballot** tab
 2. Enter the Cycle ID and click **Load Summary**
-3. For each section, you'll see:
-   - The aggregate vote counts from all reviewers
-   - Reviewer notes
-   - Three decision buttons: **Approve**, **Disapprove**, **Remove**
+3. For each section, you'll see aggregate votes and notes
 4. Click a decision button for each section — it saves immediately
 
-### Decision meanings
-
-| Decision | What it means |
-|----------|---------------|
-| **Approve** | Section is accepted as-is. It will NOT carry forward to the next cycle. |
-| **Disapprove** | Section needs revision. It WILL carry forward to the next cycle. |
-| **Remove** | Section should be deleted from the document. It will NOT carry forward. |
+| Decision | Meaning | Carries Forward? |
+|----------|---------|-----------------|
+| **Approve** | Section accepted as-is | No |
+| **Disapprove** | Section needs revision | Yes |
+| **Remove** | Section should be deleted | No |
 
 ---
 
-## Step 8: Start the Next Cycle (if needed)
+## Step 12: Start Next Cycle (if needed)
 
-If some sections were marked Disapprove (or left undecided), start a new cycle:
+If some sections were marked Disapprove or left undecided:
 
 1. Go to **Create Cycle** tab
-2. Fill in the new Cycle ID (e.g., `CCRS-2026-02`)
-3. In the **Copy from prior cycle** field, enter the previous Cycle ID (e.g., `CCRS-2026-01`)
+2. Enter a new Cycle ID (e.g., `CCRS-2026-02`)
+3. In **Copy from prior cycle**, enter the previous Cycle ID (e.g., `CCRS-2026-01`)
 4. Click **Create Cycle**
-
-Only unresolved sections carry forward. You can then update the seed data for those sections if the document has been revised, or let reviewers vote on the same content again.
-
----
-
-## Field Guide Format
-
-The parse script expects a Word document (.docx) with this structure:
-
-### Article headings
-
-```
-Article I — Definitions
-Article II — Property Rights in Common Areas
-```
-
-Articles use Roman numerals (I, II, III...) and are separated by `---` from the title.
-
-### Section cards
-
-Each section must have:
-
-```
-Art. I, §1 — Association
-RECOMMENDED BEST PRACTICE
-
-Why it's here: [explanation text]
-
-What you can do: [guidance text in italics]
-
-Community Impact: [optional — only when applicable]
-
-☐ Approve  ☐ Disapprove  ☐ Discuss
-Notes: _______________
-```
-
-### Classification labels
-
-Use exactly one of these labels per section:
-- `REQUIRED BY TEXAS LAW`
-- `REQUIRED BY CITY OF AUSTIN`
-- `RECOMMENDED BEST PRACTICE`
-- `COMMUNITY CHOICE`
-
-### Section numbering
-
-Section numbers are typically integers (1, 2, 3...) but alphanumeric values like `19A` are supported.
+5. Seed content again (Step 5) — only unresolved sections carry forward
+6. Upload document text again (Step 6) — needed for the new cycle's "View Text" feature
 
 ---
 
 ## Quick Reference
 
-| Task | Where | What to do |
-|------|-------|------------|
-| Convert Field Guide | Terminal | `node backend/scripts/parse-field-guide.js input.docx output.json --upload` |
-| Create cycle | Admin Console → Create Cycle | Fill in Document, Cycle ID, Title |
-| Seed content | Admin Console → Seed Content | Enter Cycle ID + S3 key |
-| Add a reviewer | Terminal | `aws cognito-idp admin-add-user-to-group --user-pool-id us-east-1_tfk0ub8lC --username email --group-name reviewers --region us-east-1` |
-| Add an admin | Terminal | Same command but `--group-name review-admins` |
-| View results | Admin Console → Summary Ballot | Enter Cycle ID → Load Summary |
-| Start next round | Admin Console → Create Cycle | Enter prior Cycle ID in "Copy from" field |
+| Task | Command / Location |
+|------|-------------------|
+| Parse Field Guide | `node backend/scripts/parse-field-guide.js input.docx output.json --upload` |
+| Parse Governing Doc | `node backend/scripts/parse-governing-doc.js input.docx output.json --upload` |
+| Upload to S3 manually | `aws s3 cp file.json s3://mmpoa-review-seeds/file.json` |
+| List S3 files | `aws s3 ls s3://mmpoa-review-seeds/` |
+| Create cycle | Admin Console → Create Cycle tab |
+| Seed content | Admin Console → Seed Content tab |
+| Upload doc text | Admin Console → Document Text tab |
+| Add a reviewer | `aws cognito-idp admin-add-user-to-group --user-pool-id us-east-1_tfk0ub8lC --username EMAIL --group-name reviewers --region us-east-1` |
+| Add an admin | Same command with `--group-name review-admins` |
+| List reviewers | `aws cognito-idp list-users-in-group --user-pool-id us-east-1_tfk0ub8lC --group-name reviewers --region us-east-1` |
+| View results | Admin Console → Summary Ballot tab |
+| Start next round | Admin Console → Create Cycle → enter prior Cycle ID in "Copy from" |
 
 ---
 
 ## Troubleshooting
+
+**"pandoc: command not found"**
+- Install pandoc: `brew install pandoc`
+
+**Parse script shows 0 articles or wrong count**
+- Verify the Word document follows the expected format (see Field Guide / Governing Doc format sections above)
+- Try running pandoc manually to inspect the markdown: `pandoc input.docx -t markdown -o debug.md`
+- Check for missing classification labels or "Why it's here" fields
 
 **"Failed to fetch" in Admin Console**
 - Sign out and sign back in to refresh your authentication token
@@ -301,12 +433,55 @@ Section numbers are typically integers (1, 2, 3...) but alphanumeric values like
 - They must sign out and sign back in after being added to the group
 
 **"Cycle already exists" error**
-- Each Cycle ID must be unique. Use a different ID (e.g., increment the sequence number)
+- Each Cycle ID must be unique. Use a different ID (increment the sequence number)
 
 **Seed says "0 sections seeded"**
 - Verify the JSON file has an `articles` array with `sections` inside each article
 - Check the S3 key matches the uploaded file name exactly
 
-**Parse script shows wrong section count**
-- Verify the Word document follows the expected format (see "Field Guide Format" above)
-- Check for missing classification labels or "Why it's here" fields
+**"Document text not available for this section"**
+- The document text has not been uploaded for this cycle
+- Go to Admin Console → Document Text tab and upload the governing document JSON
+- Make sure you use the same Cycle ID
+
+**Votes not showing in article list or aggregate**
+- This was a known bug (URL encoding issue with `#` in section IDs) that has been fixed
+- If you see stale data, votes may need to be re-cast on affected sections
+
+**S3 upload fails with "access denied"**
+- Ensure your AWS CLI is configured with credentials that have access to the `mmpoa-review-seeds` bucket
+- Run `aws sts get-caller-identity` to verify your credentials
+
+---
+
+## Architecture Notes
+
+### Data stored in DynamoDB (`mmpoa-reviews` table)
+
+| Data | PK | SK Pattern |
+|------|-----|------------|
+| Cycle metadata | `CYCLE#{cycleId}` | `META` |
+| Section content (Field Guide) | `CYCLE#{cycleId}` | `CONTENT#ART-{nn}#SEC-{nn}` |
+| Document text (legal) | `CYCLE#{cycleId}` | `DOCTEXT#ART-{nn}#SEC-{nn}` |
+| Reviewer votes | `CYCLE#{cycleId}` | `VOTE#ART-{nn}#SEC-{nn}#USER#{sub}` |
+| Ballot status | `CYCLE#{cycleId}` | `BALLOT#USER#{sub}` |
+| Admin decisions | `CYCLE#{cycleId}` | `SUMMARY#ART-{nn}#SEC-{nn}` |
+
+### Two parallel data paths
+
+```
+Field Guide (.docx)                    Governing Document (.docx)
+       |                                        |
+  parse-field-guide.js                  parse-governing-doc.js
+       |                                        |
+  seed JSON → S3                       text JSON → S3
+       |                                        |
+  Admin Console: Seed Content          Admin Console: Document Text
+       |                                        |
+  cycle-seed Lambda                    doctext-save Lambda
+       |                                        |
+  CONTENT# items in DynamoDB           DOCTEXT# items in DynamoDB
+       |                                        |
+  Reviewer sees annotations            Reviewer clicks "View Text"
+  and votes on each section            to see original legal language
+```
