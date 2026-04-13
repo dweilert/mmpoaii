@@ -43,12 +43,12 @@ exports.handler = async (event) => {
       },
     }));
 
-    // Build a set of sections the user has voted on
-    const votedSections = new Set();
+    // Build a map of sections the user has voted on -> vote value
+    const votedSections = new Map();
     for (const item of (voteResult.Items || [])) {
       // SK = VOTE#ART-01#SEC-01#USER#<sub>
       const match = item.SK.match(/VOTE#(ART-\d+#SEC-\d+)#USER#/);
-      if (match) votedSections.add(match[1]);
+      if (match) votedSections.set(match[1], item.vote || 'unknown');
     }
 
     // Group sections by article
@@ -61,12 +61,19 @@ exports.handler = async (event) => {
           articleTitle: item.articleTitle,
           totalSections: 0,
           votedSections: 0,
+          approveCount: 0,
+          disapproveCount: 0,
+          discussCount: 0,
         };
       }
       articleMap[artKey].totalSections++;
       const sectionKey = `ART-${String(item.articleNumber).padStart(2, '0')}#SEC-${String(item.sectionNumber).padStart(2, '0')}`;
-      if (votedSections.has(sectionKey)) {
+      const vote = votedSections.get(sectionKey);
+      if (vote) {
         articleMap[artKey].votedSections++;
+        if (vote === 'approve') articleMap[artKey].approveCount++;
+        else if (vote === 'disapprove') articleMap[artKey].disapproveCount++;
+        else if (vote === 'discuss') articleMap[artKey].discussCount++;
       }
     }
 
