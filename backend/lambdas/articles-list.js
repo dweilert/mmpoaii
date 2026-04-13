@@ -32,15 +32,14 @@ exports.handler = async (event) => {
       },
     }));
 
-    // Get this user's votes for this cycle
+    // Get this user's votes for this cycle via GSI1
     const voteResult = await ddb.send(new QueryCommand({
       TableName: TABLE_NAME,
-      KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
-      FilterExpression: 'contains(SK, :userFilter)',
+      IndexName: 'GSI1',
+      KeyConditionExpression: 'GSI1PK = :gsi1pk AND GSI1SK = :gsi1sk',
       ExpressionAttributeValues: {
-        ':pk': `CYCLE#${cycleId}`,
-        ':sk': 'VOTE#',
-        ':userFilter': `USER#${userSub}`,
+        ':gsi1pk': `USER#${userSub}`,
+        ':gsi1sk': `CYCLE#${cycleId}`,
       },
     }));
 

@@ -35,21 +35,20 @@ exports.handler = async (event) => {
       },
     }));
 
-    // Get this user's votes for this article
+    // Get this user's votes for this article via GSI1, then filter by article
     const voteResult = await ddb.send(new QueryCommand({
       TableName: TABLE_NAME,
-      KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
+      IndexName: 'GSI1',
+      KeyConditionExpression: 'GSI1PK = :gsi1pk AND GSI1SK = :gsi1sk',
       ExpressionAttributeValues: {
-        ':pk': `CYCLE#${cycleId}`,
-        ':sk': `VOTE#ART-${artNum}#`,
-      },
-      FilterExpression: 'contains(SK, :userFilter)',
-      ExpressionAttributeValues: {
-        ':pk': `CYCLE#${cycleId}`,
-        ':sk': `VOTE#ART-${artNum}#`,
-        ':userFilter': `USER#${userSub}`,
+        ':gsi1pk': `USER#${userSub}`,
+        ':gsi1sk': `CYCLE#${cycleId}`,
       },
     }));
+    // Filter to only votes for this article (SK starts with VOTE#ART-XX#)
+    voteResult.Items = (voteResult.Items || []).filter(item =>
+      item.SK && item.SK.startsWith(`VOTE#ART-${artNum}#`)
+    );
 
     // Index votes by section
     const voteMap = {};

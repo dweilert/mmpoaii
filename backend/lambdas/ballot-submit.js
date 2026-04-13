@@ -45,41 +45,21 @@ exports.handler = async (event) => {
     }));
     const totalSections = contentResult.Count || 0;
 
-    // Count this user's votes
+    // Count this user's votes via GSI1
     const voteResult = await ddb.send(new QueryCommand({
       TableName: TABLE_NAME,
-      KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
+      IndexName: 'GSI1',
+      KeyConditionExpression: 'GSI1PK = :gsi1pk AND GSI1SK = :gsi1sk',
       ExpressionAttributeValues: {
-        ':pk': `CYCLE#${cycleId}`,
-        ':sk': 'VOTE#',
+        ':gsi1pk': `USER#${userSub}`,
+        ':gsi1sk': `CYCLE#${cycleId}`,
       },
-      FilterExpression: 'contains(SK, :userFilter)',
-      ExpressionAttributeValues: {
-        ':pk': `CYCLE#${cycleId}`,
-        ':sk': 'VOTE#',
-        ':userFilter': `USER#${userSub}`,
-      },
-      Select: 'COUNT',
     }));
 
-    // Only count votes that actually have a vote value (not just notes)
-    // Re-query with full items to verify
-    const fullVoteResult = await ddb.send(new QueryCommand({
-      TableName: TABLE_NAME,
-      KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
-      ExpressionAttributeValues: {
-        ':pk': `CYCLE#${cycleId}`,
-        ':sk': 'VOTE#',
-      },
-      FilterExpression: 'contains(SK, :userFilter) AND attribute_exists(vote)',
-      ExpressionAttributeValues: {
-        ':pk': `CYCLE#${cycleId}`,
-        ':sk': 'VOTE#',
-        ':userFilter': `USER#${userSub}`,
-      },
-      Select: 'COUNT',
-    }));
-    const votedSections = fullVoteResult.Count || 0;
+    // Only count votes that have a vote value and are VOTE# items (not BALLOT#)
+    const votedSections = (voteResult.Items || []).filter(item =>
+      item.SK && item.SK.startsWith('VOTE#') && item.vote
+    ).length;
 
     if (votedSections < totalSections) {
       return badRequest(`You have voted on ${votedSections} of ${totalSections} sections. All sections must be voted on before submitting.`);
