@@ -48,6 +48,15 @@
     <button class="tab-btn" onclick="showTab('tab-summary')">Summary Ballot</button>
   </div>
 
+  <!-- ── Existing Cycles Panel (shown on all tabs) ── -->
+  <div id="existing-cycles" style="margin-bottom:20px;background:var(--surf);border:1px solid var(--border);border-radius:var(--r2);padding:16px 20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <label style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin:0;">Existing Cycles</label>
+      <button class="btn-secondary" style="padding:4px 12px;font-size:12px;" onclick="loadExistingCycles()">Refresh</button>
+    </div>
+    <div id="cycles-list" style="font-size:13px;color:var(--text2);">Loading…</div>
+  </div>
+
   <!-- ── Tab 1: Create Cycle ── -->
   <div class="tab-panel active" id="tab-create">
     <div class="admin-form">
@@ -69,7 +78,9 @@
       </div>
       <div class="form-row">
         <label for="create-from">Copy from prior cycle (optional)</label>
-        <input type="text" id="create-from" placeholder="e.g. CCRS-2025-01 (leave blank for new)">
+        <select id="create-from">
+          <option value="">— None (new cycle) —</option>
+        </select>
       </div>
       <div id="create-msg" style="margin-bottom:12px;"></div>
       <button class="btn-primary" onclick="doCreateCycle()">Create Cycle</button>
@@ -81,7 +92,9 @@
     <div class="admin-form">
       <div class="form-row">
         <label for="seed-cycle">Cycle ID</label>
-        <input type="text" id="seed-cycle" placeholder="e.g. CCRS-2026-01">
+        <select id="seed-cycle">
+          <option value="">— Select a cycle —</option>
+        </select>
       </div>
       <div class="form-row">
         <label for="seed-source">Seed Source</label>
@@ -110,7 +123,9 @@
       <code style="background:var(--surf);padding:2px 6px;border-radius:4px;font-size:12px;">node backend/scripts/parse-governing-doc.js "CCRs.docx" output.json --upload</code></p>
       <div class="form-row">
         <label for="doctext-cycle">Cycle ID</label>
-        <input type="text" id="doctext-cycle" placeholder="e.g. Cycle-01">
+        <select id="doctext-cycle">
+          <option value="">— Select a cycle —</option>
+        </select>
       </div>
       <div class="form-row">
         <label for="doctext-source">Source</label>
@@ -138,7 +153,9 @@
       <div class="form-row" style="margin-bottom:0;display:flex;gap:8px;align-items:flex-end;">
         <div style="flex:1;">
           <label for="summary-cycle">Cycle ID</label>
-          <input type="text" id="summary-cycle" placeholder="e.g. CCRS-2026-01">
+          <select id="summary-cycle" style="width:100%;">
+            <option value="">— Select a cycle —</option>
+          </select>
         </div>
         <button class="btn-primary" onclick="loadSummary()">Load Summary</button>
       </div>
@@ -234,7 +251,7 @@ async function doCreateCycle() {
   var doc = document.getElementById('create-doc').value;
   var id = document.getElementById('create-id').value.trim();
   var title = document.getElementById('create-title').value.trim();
-  var from = document.getElementById('create-from').value.trim() || undefined;
+  var from = document.getElementById('create-from').value || undefined;
   var msgEl = document.getElementById('create-msg');
 
   if (!id || !title) {
@@ -251,6 +268,7 @@ async function doCreateCycle() {
       msg += ' Carried forward ' + result.carriedForward + ' sections from prior cycle.';
     }
     msgEl.innerHTML = '<div class="alert alert-success">' + msg + '</div>';
+    loadExistingCycles();
   } catch (err) {
     msgEl.innerHTML = '<div class="alert alert-error">Failed: ' + escHtml(err.message) + '</div>';
   }
@@ -410,6 +428,76 @@ function escHtml(s) {
   return d.innerHTML;
 }
 
+// ── Load existing cycles ──
+var cachedCycles = [];
+
+async function loadExistingCycles() {
+  var listEl = document.getElementById('cycles-list');
+  listEl.textContent = 'Loading…';
+
+  try {
+    var data = await ReviewApi.listCycles();
+    cachedCycles = data.cycles || [];
+
+    if (cachedCycles.length === 0) {
+      listEl.innerHTML = '<span style="color:var(--text3);">No cycles created yet.</span>';
+    } else {
+      var html = '<table style="width:100%;border-collapse:collapse;">';
+      html += '<tr style="border-bottom:1px solid var(--border);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);">';
+      html += '<td style="padding:4px 8px;">Cycle ID</td><td style="padding:4px 8px;">Document</td><td style="padding:4px 8px;">Title</td><td style="padding:4px 8px;">Status</td><td style="padding:4px 8px;">Created</td></tr>';
+      for (var i = 0; i < cachedCycles.length; i++) {
+        var c = cachedCycles[i];
+        var statusColor = c.status === 'open' ? 'var(--green-600)' : 'var(--gray-600)';
+        html += '<tr style="border-bottom:1px solid var(--border2);">';
+        html += '<td style="padding:6px 8px;font-weight:600;">' + escHtml(c.cycleId) + '</td>';
+        html += '<td style="padding:6px 8px;">' + escHtml(c.document || '') + '</td>';
+        html += '<td style="padding:6px 8px;">' + escHtml(c.title || '') + '</td>';
+        html += '<td style="padding:6px 8px;"><span style="color:' + statusColor + ';font-weight:700;font-size:12px;text-transform:uppercase;">' + escHtml(c.status || 'open') + '</span></td>';
+        html += '<td style="padding:6px 8px;font-size:12px;color:var(--text3);">' + escHtml((c.createdAt || '').substring(0, 10)) + '</td>';
+        html += '</tr>';
+      }
+      html += '</table>';
+      listEl.innerHTML = html;
+    }
+
+    // Populate all cycle dropdowns
+    populateCycleDropdowns();
+
+  } catch (err) {
+    listEl.innerHTML = '<span style="color:var(--red-600);">Failed to load: ' + escHtml(err.message) + '</span>';
+  }
+}
+
+function populateCycleDropdowns() {
+  var selects = ['seed-cycle', 'doctext-cycle', 'summary-cycle'];
+  for (var i = 0; i < selects.length; i++) {
+    var sel = document.getElementById(selects[i]);
+    var currentVal = sel.value;
+    sel.innerHTML = '<option value="">— Select a cycle —</option>';
+    for (var j = 0; j < cachedCycles.length; j++) {
+      var c = cachedCycles[j];
+      var opt = document.createElement('option');
+      opt.value = c.cycleId;
+      opt.textContent = c.cycleId + ' — ' + (c.title || c.document || '');
+      sel.appendChild(opt);
+    }
+    if (currentVal) sel.value = currentVal;
+  }
+
+  // Also populate the "Copy from prior cycle" dropdown
+  var fromSel = document.getElementById('create-from');
+  var fromVal = fromSel.value;
+  fromSel.innerHTML = '<option value="">— None (new cycle) —</option>';
+  for (var j = 0; j < cachedCycles.length; j++) {
+    var c = cachedCycles[j];
+    var opt = document.createElement('option');
+    opt.value = c.cycleId;
+    opt.textContent = c.cycleId + ' — ' + (c.title || c.document || '');
+    fromSel.appendChild(opt);
+  }
+  if (fromVal) fromSel.value = fromVal;
+}
+
 var guardCheck = setInterval(function () {
   if (HoaGuard.getUser()) {
     clearInterval(guardCheck);
@@ -417,6 +505,7 @@ var guardCheck = setInterval(function () {
     if (uname && uname.textContent !== 'Loading…') {
       document.getElementById('nav-avatar').textContent = uname.textContent.charAt(0).toUpperCase();
     }
+    loadExistingCycles();
   }
 }, 100);
 </script>
