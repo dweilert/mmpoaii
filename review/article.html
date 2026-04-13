@@ -151,7 +151,16 @@ async function loadArticle() {
       html += '<div class="sc-title">Art. ' + artNum + ', §' + s.sectionNumber + ' — ' + escHtml(s.sectionTitle) + '</div>';
       html += '<span class="sc-classification cls-' + cls + '">' + escHtml(classLabels[cls] || cls) + '</span>';
       html += '</div>';
+      var voteStatusLabel = 'Waiting for Vote';
+      var voteStatusColor = '#888';
+      var voteStatusBg = '#f0f0f0';
+      if (currentVote === 'approve') { voteStatusLabel = 'Approved'; voteStatusColor = '#1e7e34'; voteStatusBg = '#e6f4ea'; }
+      else if (currentVote === 'disapprove') { voteStatusLabel = 'Disapproved'; voteStatusColor = '#b71c1c'; voteStatusBg = '#fde8e8'; }
+      else if (currentVote === 'discuss') { voteStatusLabel = 'Discuss'; voteStatusColor = '#7a6100'; voteStatusBg = '#fff8e1'; }
+      html += '<div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">';
+      html += '<span id="vote-status-' + secId + '" style="font-size:12px;font-weight:700;padding:4px 10px;border-radius:12px;background:' + voteStatusBg + ';color:' + voteStatusColor + ';">' + voteStatusLabel + '</span>';
       html += '<button onclick="showDocText(\'' + secId + '\', ' + artNum + ', \'' + escHtml(s.sectionTitle).replace(/'/g, "\\'") + '\', ' + s.sectionNumber + ')" style="white-space:nowrap;padding:6px 14px;font-size:13px;border:1px solid var(--purple-600);color:var(--purple-700);background:#fff;border-radius:var(--r1);cursor:pointer;font-weight:600;">View Text</button>';
+      html += '</div>';
       html += '</div></div>';
 
       // Body
@@ -234,6 +243,17 @@ async function onVoteClick(secId, vote, btn) {
   var buttons = btn.parentElement.querySelectorAll('.vote-btn');
   buttons.forEach(function (b) { b.classList.remove('selected'); });
   btn.classList.add('selected');
+
+  // Update vote status badge
+  var statusEl = document.getElementById('vote-status-' + secId);
+  if (statusEl) {
+    var labels = { approve: 'Approved', disapprove: 'Disapproved', discuss: 'Discuss' };
+    var colors = { approve: '#1e7e34', disapprove: '#b71c1c', discuss: '#7a6100' };
+    var bgs = { approve: '#e6f4ea', disapprove: '#fde8e8', discuss: '#fff8e1' };
+    statusEl.textContent = labels[vote] || vote;
+    statusEl.style.color = colors[vote] || '#888';
+    statusEl.style.background = bgs[vote] || '#f0f0f0';
+  }
 
   // Get current notes
   var notesEl = document.getElementById('notes-' + secId);
@@ -370,6 +390,8 @@ async function approveAllSections() {
     try {
       await ReviewApi.saveVote(cycleId, secId, 'approve', notes);
       setStatus(secId, 'saved', 'Saved ✓');
+      var voteStatusEl = document.getElementById('vote-status-' + secId);
+      if (voteStatusEl) { voteStatusEl.textContent = 'Approved'; voteStatusEl.style.color = '#1e7e34'; voteStatusEl.style.background = '#e6f4ea'; }
       saved++;
     } catch (err) {
       setStatus(secId, 'error', 'Save failed');
