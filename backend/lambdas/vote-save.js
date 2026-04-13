@@ -22,7 +22,7 @@ exports.handler = async (event) => {
   }
 
   const cycleId = event.pathParameters?.cycleId;
-  const sectionId = event.pathParameters?.sectionId;
+  const sectionId = decodeURIComponent(event.pathParameters?.sectionId || '');
   if (!cycleId || !sectionId) return badRequest('cycleId and sectionId are required');
 
   let body;
