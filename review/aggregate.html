@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aggregate Results — Document Review</title>
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/review.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="inner">
+    <a href="/" class="site-logo">
+      <div class="logo-mark">🏡</div>
+      <div class="logo-text">
+        <div class="logo-name" data-hoa-name>MMPOAII HOA</div>
+        <div class="logo-sub">Document Review</div>
+      </div>
+    </a>
+    <nav class="site-nav">
+      <a href="#" id="back-link">← Back to Articles</a>
+      <div class="nav-user">
+        <div class="avatar" id="nav-avatar">?</div>
+        <div>
+          <div class="uname" data-user-name>Loading…</div>
+          <div class="urole" data-user-role></div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="HoaGuard.logout()">Sign Out</button>
+    </nav>
+  </div>
+</header>
+
+<div id="page-content">
+<div class="review-wrap">
+
+  <div class="welcome-banner" style="background:var(--purple-800);color:#fff;padding:20px 24px;border-radius:var(--r2);margin-bottom:20px;">
+    <h2 style="font-family:var(--serif);margin-bottom:4px;">Aggregate Results</h2>
+    <p id="agg-subtitle" style="opacity:.8;font-size:14px;">Combined votes from all reviewers</p>
+  </div>
+
+  <div id="agg-container">
+    <div class="empty-state">
+      <div class="es-icon">⏳</div>
+      <div class="es-text">Loading results…</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<footer class="site-footer">
+  <div data-hoa-name>MMPOAII HOA</div>
+  <div>Document Review System — Confidential</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6/dist/amazon-cognito-identity.min.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/guard.js"></script>
+<script src="/js/review-api.js"></script>
+<script>
+HoaGuard.protect('reviewers');
+
+var params = new URLSearchParams(window.location.search);
+var cycleId = params.get('cycleId');
+
+if (!cycleId) {
+  window.location.href = '/review/index.html';
+}
+
+document.getElementById('back-link').href = '/review/articles.html?cycleId=' + encodeURIComponent(cycleId);
+
+async function loadAggregate() {
+  try {
+    var data = await ReviewApi.getAggregate(cycleId);
+    document.getElementById('agg-subtitle').textContent = 'Cycle: ' + cycleId + ' — Combined votes from all reviewers';
+
+    var articles = data.articles || [];
+    if (articles.length === 0) {
+      document.getElementById('agg-container').innerHTML =
+        '<div class="empty-state"><div class="es-icon">📋</div><div class="es-text">No results available.</div></div>';
+      return;
+    }
+
+    var html = '';
+    for (var i = 0; i < articles.length; i++) {
+      var art = articles[i];
+      html += '<div style="margin-bottom:24px;">';
+      html += '<h3 style="font-family:var(--serif);font-size:17px;margin-bottom:8px;">Article ' +
+              art.articleNumber + ' — ' + escHtml(art.articleTitle) + '</h3>';
+      html += '<div style="background:var(--surf);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;">';
+
+      for (var j = 0; j < art.sections.length; j++) {
+        var s = art.sections[j];
+        var v = s.votes || {};
+        var totalVotes = v.approve + v.disapprove + v.discuss;
+        var unanimous = (v.approve === totalVotes && totalVotes > 0);
+
+        html += '<div class="agg-section">';
+        html += '<div class="agg-title">';
+        html += '§' + s.sectionNumber + ' — ' + escHtml(s.sectionTitle);
+        if (unanimous) html += ' <span style="color:var(--green-600);font-size:12px;">✓ Unanimous</span>';
+        html += '</div>';
+        html += '<div class="agg-votes">';
+        if (v.approve > 0) html += '<span class="agg-badge approve">✓ ' + v.approve + '</span>';
+        if (v.disapprove > 0) html += '<span class="agg-badge disapprove">✗ ' + v.disapprove + '</span>';
+        if (v.discuss > 0) html += '<span class="agg-badge discuss">? ' + v.discuss + '</span>';
+        html += '</div>';
+        html += '</div>';
+
+        // Notes
+        if (s.notes && s.notes.length > 0) {
+          html += '<div style="padding:0 18px 12px;">';
+          html += '<ul class="agg-notes-list">';
+          for (var k = 0; k < s.notes.length; k++) {
+            html += '<li>' + escHtml(s.notes[k]) + '</li>';
+          }
+          html += '</ul></div>';
+        }
+      }
+
+      html += '</div></div>';
+    }
+
+    document.getElementById('agg-container').innerHTML = html;
+
+  } catch (err) {
+    var msg = err.message || 'Unknown error';
+    if (err.status === 403) {
+      msg = 'You must submit your ballot before viewing aggregate results.';
+    }
+    document.getElementById('agg-container').innerHTML =
+      '<div class="alert alert-error">' + escHtml(msg) + '</div>' +
+      '<a href="/review/articles.html?cycleId=' + encodeURIComponent(cycleId) + '" class="btn-secondary" style="display:inline-block;text-decoration:none;margin-top:8px;">← Return to articles</a>';
+  }
+}
+
+function escHtml(s) {
+  var d = document.createElement('div');
+  d.textContent = s || '';
+  return d.innerHTML;
+}
+
+var guardCheck = setInterval(function () {
+  if (HoaGuard.getUser()) {
+    clearInterval(guardCheck);
+    loadAggregate();
+    var uname = document.querySelector('[data-user-name]');
+    if (uname && uname.textContent !== 'Loading…') {
+      document.getElementById('nav-avatar').textContent = uname.textContent.charAt(0).toUpperCase();
+    }
+  }
+}, 100);
+</script>
+</body>
+</html>

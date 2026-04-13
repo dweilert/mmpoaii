@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Document Review — MMPOAII</title>
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/review.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="inner">
+    <a href="/" class="site-logo">
+      <div class="logo-mark">🏡</div>
+      <div class="logo-text">
+        <div class="logo-name" data-hoa-name>MMPOAII HOA</div>
+        <div class="logo-sub">Document Review</div>
+      </div>
+    </a>
+    <nav class="site-nav">
+      <a href="#" id="back-link" class="back-btn">← Back to Portal</a>
+      <div class="nav-user">
+        <div class="avatar" id="nav-avatar">?</div>
+        <div>
+          <div class="uname" data-user-name>Loading…</div>
+          <div class="urole" data-user-role></div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="HoaGuard.logout()">Sign Out</button>
+    </nav>
+  </div>
+</header>
+
+<div id="page-content">
+<div class="review-wrap">
+
+  <div class="welcome-banner" style="background:var(--purple-800);color:#fff;padding:20px 24px;border-radius:var(--r2);margin-bottom:20px;">
+    <h2 style="font-family:var(--serif);margin-bottom:4px;">Document Review Dashboard</h2>
+    <p style="opacity:.8;font-size:14px;">Review and vote on governing document sections. Select a review cycle below to begin.</p>
+  </div>
+
+  <div id="admin-link-bar" style="display:none;margin-bottom:16px;">
+    <a href="/review/admin.html" class="btn-secondary" style="display:inline-block;text-decoration:none;">Admin Console →</a>
+  </div>
+
+  <div id="cycles-container">
+    <div class="empty-state">
+      <div class="es-icon">⏳</div>
+      <div class="es-text">Loading review cycles…</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<footer class="site-footer">
+  <div data-hoa-name>MMPOAII HOA</div>
+  <div>Document Review System — Confidential: For Review Committee Use Only</div>
+</footer>
+
+<!-- SCRIPTS -->
+<script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6/dist/amazon-cognito-identity.min.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/guard.js"></script>
+<script src="/js/review-api.js"></script>
+<script>
+HoaGuard.protect('reviewers');
+
+// Set back link based on user group
+function setBackLink() {
+  var user = HoaGuard.getUser();
+  if (!user) return;
+  var link = document.getElementById('back-link');
+  if (user.groups.includes(HOA_CONFIG.boardGroup || 'board')) {
+    link.href = '/board/index.html';
+  } else {
+    link.href = '/homeowners/index.html';
+  }
+  // Show admin link if user is review-admin
+  if (user.groups.includes(HOA_CONFIG.reviewAdminsGroup || 'review-admins')) {
+    document.getElementById('admin-link-bar').style.display = 'block';
+  }
+}
+
+async function loadCycles() {
+  try {
+    var data = await ReviewApi.listCycles();
+    var container = document.getElementById('cycles-container');
+
+    if (!data.cycles || data.cycles.length === 0) {
+      container.innerHTML =
+        '<div class="empty-state">' +
+          '<div class="es-icon">📋</div>' +
+          '<div class="es-text">No review cycles available yet.<br>An administrator will create one when the review begins.</div>' +
+        '</div>';
+      return;
+    }
+
+    // For each cycle, get article progress
+    var html = '<div class="cycle-list">';
+    for (var i = 0; i < data.cycles.length; i++) {
+      var c = data.cycles[i];
+      var statusClass = c.status === 'open' ? 'open' : 'closed';
+      html +=
+        '<a class="cycle-card" href="/review/articles.html?cycleId=' + encodeURIComponent(c.cycleId) + '">' +
+          '<div class="cc-icon">📋</div>' +
+          '<div class="cc-body">' +
+            '<div class="cc-title">' + escHtml(c.title || c.cycleId) + '</div>' +
+            '<div class="cc-meta">Document: ' + escHtml(c.document || '') + ' · Created: ' + formatDate(c.createdAt) + '</div>' +
+          '</div>' +
+          '<div class="cc-status ' + statusClass + '">' + c.status + '</div>' +
+        '</a>';
+    }
+    html += '</div>';
+    container.innerHTML = html;
+
+  } catch (err) {
+    document.getElementById('cycles-container').innerHTML =
+      '<div class="alert alert-error">Failed to load review cycles: ' + escHtml(err.message) + '</div>';
+  }
+}
+
+function escHtml(s) {
+  var d = document.createElement('div');
+  d.textContent = s || '';
+  return d.innerHTML;
+}
+
+function formatDate(iso) {
+  if (!iso) return '';
+  try {
+    return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  } catch (e) { return iso; }
+}
+
+// Wait for guard to finish, then load
+var guardCheck = setInterval(function () {
+  if (HoaGuard.getUser()) {
+    clearInterval(guardCheck);
+    setBackLink();
+    loadCycles();
+    // Set avatar
+    var uname = document.querySelector('[data-user-name]');
+    if (uname && uname.textContent && uname.textContent !== 'Loading…') {
+      document.getElementById('nav-avatar').textContent = uname.textContent.charAt(0).toUpperCase();
+    }
+  }
+}, 100);
+
+document.addEventListener('DOMContentLoaded', function () {
+  document.title = 'Document Review — ' + (HOA_CONFIG.hoaName || 'MMPOAII HOA');
+});
+</script>
+</body>
+</html>

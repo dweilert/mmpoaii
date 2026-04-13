@@ -7,6 +7,16 @@ frontend:
   artifacts:
     baseDirectory: /
     files:
-      - '**/*'
+      - 'index.html'
+      - 'login.html'
+      - 'css/**/*'
+      - 'js/**/*'
+      - 'images/**/*'
+      - 'board/**/*'
+      - 'homeowners/**/*'
+      - 'library/**/*'
+      - 'tools/**/*'
+      - 'review/**/*'
+      - 'documents/**/*'
   cache:
     paths: []

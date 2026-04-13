@@ -1,0 +1,51 @@
+{
+  "document": "CCRS",
+  "cycleId": "CCRS-2026-01",
+  "title": "CC&Rs Review — April 2026",
+  "articles": [
+    {
+      "articleNumber": 1,
+      "articleTitle": "Definitions",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "Association",
+          "classification": "best_practice",
+          "whyItsHere": "The definition of Association establishes it as the legal entity governing the community and empowered to enforce CC&Rs. This foundation determines how authority flows through the governance structure.",
+          "whatYouCanDo": "Review whether the Association's defined powers align with current operational needs, including assessment authority, enforcement, and property management. Verify the nonprofit corporation structure matches actual practice.",
+          "communityImpact": null
+        },
+        {
+          "sectionNumber": 2,
+          "sectionTitle": "Owner",
+          "classification": "best_practice",
+          "whyItsHere": "The Owner definition determines who holds voting rights, who receives assessment obligations, and who can enforce covenants. Precision here prevents disputes about title and membership.",
+          "whatYouCanDo": "Confirm the definition matches current title records for all 16 lots. Check whether the definition covers executors, guardians, and other holders-in-trust who may claim ownership rights.",
+          "communityImpact": null
+        },
+        {
+          "sectionNumber": 4,
+          "sectionTitle": "Common Area",
+          "classification": "best_practice",
+          "whyItsHere": "The Common Area definition directly determines which infrastructure the Association must maintain — including the 20,323 sq. ft. private road, retaining walls, sewage lift station area, mail kiosk, and gate. Any ambiguity here affects maintenance budgets and liability for all 16 lots.",
+          "whatYouCanDo": "Confirm the definition includes all shared infrastructure: private road, retaining walls, gate/lighting, sewage lift station area, and mail kiosk. Specify whether landscaping, utility easements, and drainage areas are included. Note any exclusions (e.g., lot-specific easements) clearly.",
+          "communityImpact": "The Common Area definition directly determines which infrastructure the Association must maintain — including the 20,323 sq. ft. private road, retaining walls, sewage lift station area, mail kiosk, and gate. Any ambiguity here affects maintenance budgets and liability for all 16 lots."
+        }
+      ]
+    },
+    {
+      "articleNumber": 8,
+      "articleTitle": "Permitted Uses and Restrictions",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "Single Family Residential Use",
+          "classification": "community_choice",
+          "whyItsHere": "This provision restricts all lots to single-family residential use, preventing commercial or multi-family operations. This is the most fundamental land-use restriction in the CC&Rs.",
+          "whatYouCanDo": "Review whether the restriction should allow home-based businesses, short-term rentals, or accessory dwelling units. Consider whether \"single family\" needs a modern definition update.",
+          "communityImpact": "With only 16 lots on a steep hillside with a single entrance road and shared sewage infrastructure, multi-family or commercial use would strain infrastructure and change the community's character."
+        }
+      ]
+    }
+  ]
+}

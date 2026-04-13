@@ -26,8 +26,16 @@ const HOA_CONFIG = {
   // ── FINANCIAL REPORTS API ──────────────────────────────────────────────────
   // API Gateway endpoint that returns the account balance PDF
   financialReportApiUrl: 'https://604iprtdt1.execute-api.us-east-1.amazonaws.com/prod/financial/account-balance',
-  
-  
+
+  // ── DOCUMENT REVIEW API ───────────────────────────────────────────────────
+  // API Gateway endpoint for the governing document review system
+  reviewApiUrl: 'https://21pqepa0sc.execute-api.us-east-1.amazonaws.com/prod',
+
+  // ── COGNITO REVIEW GROUP NAMES ─────────────────────────────────────────────
+  reviewersGroup:    'reviewers',
+  reviewAdminsGroup: 'review-admins',
+
+
 
   // ── HOA DISPLAY INFORMATION ─────────────────────────────────────────────────
   // Replace with your association's actual information

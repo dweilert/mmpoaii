@@ -1,0 +1,11 @@
+{
+  "name": "mmpoa-review-lambdas",
+  "version": "1.0.0",
+  "description": "MMPOA Document Review System — Lambda handlers",
+  "private": true,
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.600.0",
+    "@aws-sdk/lib-dynamodb": "^3.600.0",
+    "@aws-sdk/client-s3": "^3.600.0"
+  }
+}

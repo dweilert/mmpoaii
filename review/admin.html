@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Admin — MMPOAII</title>
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/review.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="inner">
+    <a href="/" class="site-logo">
+      <div class="logo-mark">🏡</div>
+      <div class="logo-text">
+        <div class="logo-name" data-hoa-name>MMPOAII HOA</div>
+        <div class="logo-sub">Review Admin</div>
+      </div>
+    </a>
+    <nav class="site-nav">
+      <a href="/review/index.html">← Reviewer View</a>
+      <div class="nav-user">
+        <div class="avatar" id="nav-avatar">?</div>
+        <div>
+          <div class="uname" data-user-name>Loading…</div>
+          <div class="urole" data-user-role></div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="HoaGuard.logout()">Sign Out</button>
+    </nav>
+  </div>
+</header>
+
+<div id="page-content">
+<div class="review-wrap">
+
+  <div class="welcome-banner" style="background:var(--teal-700);color:#fff;padding:20px 24px;border-radius:var(--r2);margin-bottom:20px;">
+    <h2 style="font-family:var(--serif);margin-bottom:4px;">Review Admin Console</h2>
+    <p style="opacity:.8;font-size:14px;">Create cycles, seed content, and record final decisions.</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="showTab('tab-create')">Create Cycle</button>
+    <button class="tab-btn" onclick="showTab('tab-seed')">Seed Content</button>
+    <button class="tab-btn" onclick="showTab('tab-summary')">Summary Ballot</button>
+  </div>
+
+  <!-- ── Tab 1: Create Cycle ── -->
+  <div class="tab-panel active" id="tab-create">
+    <div class="admin-form">
+      <div class="form-row">
+        <label for="create-doc">Document</label>
+        <select id="create-doc">
+          <option value="CCRS">CC&Rs</option>
+          <option value="BYLAWS">Bylaws</option>
+          <option value="CONDUCT">Rules of Conduct</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label for="create-id">Cycle ID</label>
+        <input type="text" id="create-id" placeholder="e.g. CCRS-2026-01">
+      </div>
+      <div class="form-row">
+        <label for="create-title">Title</label>
+        <input type="text" id="create-title" placeholder="e.g. CC&Rs Review — April 2026">
+      </div>
+      <div class="form-row">
+        <label for="create-from">Copy from prior cycle (optional)</label>
+        <input type="text" id="create-from" placeholder="e.g. CCRS-2025-01 (leave blank for new)">
+      </div>
+      <div id="create-msg" style="margin-bottom:12px;"></div>
+      <button class="btn-primary" onclick="doCreateCycle()">Create Cycle</button>
+    </div>
+  </div>
+
+  <!-- ── Tab 2: Seed Content ── -->
+  <div class="tab-panel" id="tab-seed">
+    <div class="admin-form">
+      <div class="form-row">
+        <label for="seed-cycle">Cycle ID</label>
+        <input type="text" id="seed-cycle" placeholder="e.g. CCRS-2026-01">
+      </div>
+      <div class="form-row">
+        <label for="seed-source">Seed Source</label>
+        <select id="seed-source" onchange="toggleSeedSource()">
+          <option value="s3">S3 file key</option>
+          <option value="json">Paste JSON</option>
+        </select>
+      </div>
+      <div class="form-row" id="seed-s3-row">
+        <label for="seed-s3key">S3 Key</label>
+        <input type="text" id="seed-s3key" placeholder="e.g. ccrs-2026-01.json">
+      </div>
+      <div class="form-row" id="seed-json-row" style="display:none;">
+        <label for="seed-json">Seed JSON</label>
+        <textarea id="seed-json" rows="10" placeholder='Paste the full seed JSON here…' style="font-family:monospace;font-size:12px;"></textarea>
+      </div>
+      <div id="seed-msg" style="margin-bottom:12px;"></div>
+      <button class="btn-primary" onclick="doSeed()">Seed Content</button>
+    </div>
+  </div>
+
+  <!-- ── Tab 3: Summary Ballot ── -->
+  <div class="tab-panel" id="tab-summary">
+    <div class="admin-form" style="margin-bottom:16px;">
+      <div class="form-row" style="margin-bottom:0;display:flex;gap:8px;align-items:flex-end;">
+        <div style="flex:1;">
+          <label for="summary-cycle">Cycle ID</label>
+          <input type="text" id="summary-cycle" placeholder="e.g. CCRS-2026-01">
+        </div>
+        <button class="btn-primary" onclick="loadSummary()">Load Summary</button>
+      </div>
+    </div>
+    <div id="summary-container"></div>
+  </div>
+
+</div>
+</div>
+
+<footer class="site-footer">
+  <div data-hoa-name>MMPOAII HOA</div>
+  <div>Review Admin Console — Confidential</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6/dist/amazon-cognito-identity.min.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/guard.js"></script>
+<script src="/js/review-api.js"></script>
+<script>
+HoaGuard.protect('review-admins');
+
+// ── Tabs ──
+function showTab(tabId) {
+  document.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
+  document.getElementById(tabId).classList.add('active');
+  // Find the button that matches
+  var btns = document.querySelectorAll('.tab-btn');
+  btns.forEach(function (b) {
+    if (b.getAttribute('onclick').indexOf(tabId) >= 0) b.classList.add('active');
+  });
+}
+
+function toggleSeedSource() {
+  var val = document.getElementById('seed-source').value;
+  document.getElementById('seed-s3-row').style.display = val === 's3' ? '' : 'none';
+  document.getElementById('seed-json-row').style.display = val === 'json' ? '' : 'none';
+}
+
+// ── Create Cycle ──
+async function doCreateCycle() {
+  var doc = document.getElementById('create-doc').value;
+  var id = document.getElementById('create-id').value.trim();
+  var title = document.getElementById('create-title').value.trim();
+  var from = document.getElementById('create-from').value.trim() || undefined;
+  var msgEl = document.getElementById('create-msg');
+
+  if (!id || !title) {
+    msgEl.innerHTML = '<div class="alert alert-error">Cycle ID and Title are required.</div>';
+    return;
+  }
+
+  msgEl.innerHTML = '<div class="alert alert-info">Creating cycle…</div>';
+
+  try {
+    var result = await ReviewApi.createCycle(doc, id, title, from);
+    var msg = 'Cycle "' + escHtml(id) + '" created successfully.';
+    if (result.carriedForward > 0) {
+      msg += ' Carried forward ' + result.carriedForward + ' sections from prior cycle.';
+    }
+    msgEl.innerHTML = '<div class="alert alert-success">' + msg + '</div>';
+  } catch (err) {
+    msgEl.innerHTML = '<div class="alert alert-error">Failed: ' + escHtml(err.message) + '</div>';
+  }
+}
+
+// ── Seed Content ──
+async function doSeed() {
+  var cycleId = document.getElementById('seed-cycle').value.trim();
+  var source = document.getElementById('seed-source').value;
+  var msgEl = document.getElementById('seed-msg');
+
+  if (!cycleId) {
+    msgEl.innerHTML = '<div class="alert alert-error">Cycle ID is required.</div>';
+    return;
+  }
+
+  var payload;
+  if (source === 's3') {
+    var s3Key = document.getElementById('seed-s3key').value.trim();
+    if (!s3Key) {
+      msgEl.innerHTML = '<div class="alert alert-error">S3 key is required.</div>';
+      return;
+    }
+    payload = { s3Key: s3Key };
+  } else {
+    var jsonText = document.getElementById('seed-json').value.trim();
+    if (!jsonText) {
+      msgEl.innerHTML = '<div class="alert alert-error">Paste the seed JSON.</div>';
+      return;
+    }
+    try {
+      payload = JSON.parse(jsonText);
+    } catch (e) {
+      msgEl.innerHTML = '<div class="alert alert-error">Invalid JSON: ' + escHtml(e.message) + '</div>';
+      return;
+    }
+  }
+
+  msgEl.innerHTML = '<div class="alert alert-info">Seeding content…</div>';
+
+  try {
+    var result = await ReviewApi.seedCycle(cycleId, payload);
+    msgEl.innerHTML = '<div class="alert alert-success">Seeded ' + result.sectionsSeeded + ' sections into cycle "' + escHtml(cycleId) + '".</div>';
+  } catch (err) {
+    msgEl.innerHTML = '<div class="alert alert-error">Failed: ' + escHtml(err.message) + '</div>';
+  }
+}
+
+// ── Summary Ballot ──
+async function loadSummary() {
+  var cycleId = document.getElementById('summary-cycle').value.trim();
+  var container = document.getElementById('summary-container');
+
+  if (!cycleId) {
+    container.innerHTML = '<div class="alert alert-error">Enter a Cycle ID.</div>';
+    return;
+  }
+
+  container.innerHTML = '<div class="empty-state"><div class="es-icon">⏳</div><div class="es-text">Loading summary…</div></div>';
+
+  try {
+    var data = await ReviewApi.getSummary(cycleId);
+    var articles = data.articles || [];
+
+    if (articles.length === 0) {
+      container.innerHTML = '<div class="empty-state"><div class="es-icon">📋</div><div class="es-text">No content found for this cycle.</div></div>';
+      return;
+    }
+
+    var html = '';
+    for (var i = 0; i < articles.length; i++) {
+      var art = articles[i];
+      html += '<div style="margin-bottom:24px;">';
+      html += '<h3 style="font-family:var(--serif);font-size:17px;margin-bottom:8px;">Article ' +
+              art.articleNumber + ' — ' + escHtml(art.articleTitle) + '</h3>';
+      html += '<div style="background:var(--surf);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;">';
+
+      for (var j = 0; j < art.sections.length; j++) {
+        var s = art.sections[j];
+        var v = s.votes || {};
+        var secId = 'ART-' + pad(art.articleNumber) + '#SEC-' + pad(s.sectionNumber);
+        var currentDecision = s.summary ? s.summary.finalVote : '';
+
+        html += '<div class="agg-section" style="flex-wrap:wrap;">';
+
+        // Title + vote counts
+        html += '<div class="agg-title" style="min-width:200px;">';
+        html += '§' + s.sectionNumber + ' — ' + escHtml(s.sectionTitle);
+        html += '</div>';
+
+        html += '<div class="agg-votes">';
+        if (v.approve > 0) html += '<span class="agg-badge approve">✓ ' + v.approve + '</span>';
+        if (v.disapprove > 0) html += '<span class="agg-badge disapprove">✗ ' + v.disapprove + '</span>';
+        if (v.discuss > 0) html += '<span class="agg-badge discuss">? ' + v.discuss + '</span>';
+        html += '</div>';
+
+        // Decision buttons
+        html += '<div class="summary-btns">';
+        html += summaryBtn(cycleId, secId, 'approve', 'Approve', currentDecision);
+        html += summaryBtn(cycleId, secId, 'disapprove', 'Disapprove', currentDecision);
+        html += summaryBtn(cycleId, secId, 'remove', 'Remove', currentDecision);
+        html += '</div>';
+
+        html += '<div class="save-indicator" id="summary-status-' + secId + '" style="width:100%;"></div>';
+
+        html += '</div>';
+
+        // Notes
+        if (s.notes && s.notes.length > 0) {
+          html += '<div style="padding:0 18px 12px;">';
+          html += '<ul class="agg-notes-list">';
+          for (var k = 0; k < s.notes.length; k++) {
+            html += '<li>' + escHtml(s.notes[k]) + '</li>';
+          }
+          html += '</ul></div>';
+        }
+      }
+
+      html += '</div></div>';
+    }
+
+    container.innerHTML = html;
+
+  } catch (err) {
+    container.innerHTML = '<div class="alert alert-error">Failed: ' + escHtml(err.message) + '</div>';
+  }
+}
+
+function summaryBtn(cycleId, secId, value, label, currentDecision) {
+  var selected = currentDecision === value ? ' selected' : '';
+  return '<button class="summary-btn ' + value + selected + '" ' +
+    'onclick="onSummaryClick(\'' + cycleId + '\', \'' + secId + '\', \'' + value + '\', this)">' +
+    label + '</button>';
+}
+
+async function onSummaryClick(cycleId, secId, finalVote, btn) {
+  var buttons = btn.parentElement.querySelectorAll('.summary-btn');
+  buttons.forEach(function (b) { b.classList.remove('selected'); });
+  btn.classList.add('selected');
+
+  var statusEl = document.getElementById('summary-status-' + secId);
+  if (statusEl) { statusEl.className = 'save-indicator saving'; statusEl.textContent = 'Saving…'; }
+
+  try {
+    await ReviewApi.saveSummaryDecision(cycleId, secId, finalVote);
+    if (statusEl) { statusEl.className = 'save-indicator saved'; statusEl.textContent = 'Saved ✓'; }
+  } catch (err) {
+    if (statusEl) { statusEl.className = 'save-indicator error'; statusEl.textContent = 'Failed: ' + err.message; }
+  }
+}
+
+function pad(n) { return String(n).padStart(2, '0'); }
+
+function escHtml(s) {
+  var d = document.createElement('div');
+  d.textContent = s || '';
+  return d.innerHTML;
+}
+
+var guardCheck = setInterval(function () {
+  if (HoaGuard.getUser()) {
+    clearInterval(guardCheck);
+    var uname = document.querySelector('[data-user-name]');
+    if (uname && uname.textContent !== 'Loading…') {
+      document.getElementById('nav-avatar').textContent = uname.textContent.charAt(0).toUpperCase();
+    }
+  }
+}, 100);
+</script>
+</body>
+</html>

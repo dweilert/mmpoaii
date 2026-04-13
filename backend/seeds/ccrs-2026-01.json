@@ -1,0 +1,1106 @@
+{
+  "articles": [
+    {
+      "articleNumber": 1,
+      "articleTitle": "Definitions",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "Association",
+          "classification": "best_practice",
+          "whyItsHere": "The definition of Association establishes it as the legal entity governing the community and empowered to enforce CC&Rs. This foundation determines how authority flows through the governance structure.",
+          "whatYouCanDo": "Review whether the Association's defined powers align with current operational needs, including assessment authority, enforcement, and property management. Verify the nonprofit corporation structure matches actual practice."
+        },
+        {
+          "sectionNumber": 2,
+          "sectionTitle": "Owner",
+          "classification": "best_practice",
+          "whyItsHere": "The Owner definition determines who holds voting rights, who receives assessment obligations, and who can enforce covenants. Precision here prevents disputes about title and membership.",
+          "whatYouCanDo": "Confirm the definition matches current title records for all 16 lots. Check whether the definition covers executors, guardians, and other holders-in-trust who may claim ownership rights."
+        },
+        {
+          "sectionNumber": 3,
+          "sectionTitle": "Properties",
+          "classification": "best_practice",
+          "whyItsHere": "Properties refers to all lots and common areas subject to the Declaration. Accurate definition prevents disputes about which parcels are governed and assessed.",
+          "whatYouCanDo": "Verify all 16 Meadow Mountain II-A lots are explicitly listed or clearly defined by reference to the recorded Plat. Confirm that common areas (road, gate, mail kiosk) are included."
+        },
+        {
+          "sectionNumber": 4,
+          "sectionTitle": "Common Area",
+          "classification": "best_practice",
+          "whyItsHere": "The Common Area definition directly determines which infrastructure the Association must maintain — including the 20,323 sq. ft. private road, retaining walls, sewage lift station area, mail kiosk, and gate. Any ambiguity here affects maintenance budgets and liability for all 16 lots.",
+          "whatYouCanDo": "Confirm the definition includes all shared infrastructure: private road, retaining walls, gate/lighting, sewage lift station area, and mail kiosk. Specify whether landscaping, utility easements, and drainage areas are included. Note any exclusions (e.g., lot-specific easements) clearly.",
+          "communityImpact": "The Common Area definition directly determines which infrastructure the Association must maintain — including the 20,323 sq. ft. private road, retaining walls, sewage lift station area, mail kiosk, and gate. Any ambiguity here affects maintenance budgets and liability for all 16 lots."
+        },
+        {
+          "sectionNumber": 5,
+          "sectionTitle": "Lot",
+          "classification": "best_practice",
+          "whyItsHere": "The Lot definition specifies what each owner controls and is responsible for. It determines building footprints, exterior maintenance obligations, and individual easement rights.",
+          "whatYouCanDo": "Verify that the definition aligns with the recorded Plat and legal descriptions. Confirm whether individual lots include specific easement rights (utility, drainage, encroachment) and any restrictions on lot modification."
+        },
+        {
+          "sectionNumber": 6,
+          "sectionTitle": "Member",
+          "classification": "best_practice",
+          "whyItsHere": "Member status triggers voting rights, assessment obligations, and the right to enforce covenants. Clear definition prevents disputes over who can participate in governance.",
+          "whatYouCanDo": "Confirm that membership equals ownership and is mandatory for all lot holders. Verify whether tenants (non-owner residents) can vote or hold Board positions, and clarify the process for transferring membership upon sale."
+        },
+        {
+          "sectionNumber": 7,
+          "sectionTitle": "Board of Directors",
+          "classification": "best_practice",
+          "whyItsHere": "The Board definition establishes the governing body's composition and powers. This shapes how day-to-day decisions are made and how the community is represented externally.",
+          "whatYouCanDo": "Review the Board's defined size, tenure, and selection process. Verify whether the definition allows for advisory committees (like the Firewise Committee) and management company authority. Check whether conflict-of-interest rules are clearly stated."
+        },
+        {
+          "sectionNumber": 8,
+          "sectionTitle": "Bylaws",
+          "classification": "best_practice",
+          "whyItsHere": "Bylaws are the operating procedures for the Association and Board. The definition clarifies whether Bylaws can override CC&R provisions and how they are amended.",
+          "whatYouCanDo": "Verify that Bylaws are current and filed with the Association records. Identify any provisions that override or conflict with the CC&Rs, and clarify the amendment process for Bylaws."
+        },
+        {
+          "sectionNumber": 9,
+          "sectionTitle": "Architecture Review Committee",
+          "classification": "best_practice",
+          "whyItsHere": "The ARC definition establishes the committee's authority to approve architectural changes and enforce design standards. This prevents unauthorized modifications and maintains community aesthetic consistency.",
+          "whatYouCanDo": "Review the ARC's composition, appointment process, and authority (e.g., whether approval is automatic for certain improvements). Verify whether the ARC has written design guidelines and an appeal process for denials."
+        },
+        {
+          "sectionNumber": 10,
+          "sectionTitle": "Declaration",
+          "classification": "best_practice",
+          "whyItsHere": "The Declaration definition clarifies which document is the supreme governing instrument. This prevents confusion when CC&Rs, Bylaws, and Rules contain overlapping provisions.",
+          "whatYouCanDo": "Confirm that the Declaration is the original 1981 document (as amended and restated). Verify that the definition refers to the current version and specifies where it is recorded."
+        },
+        {
+          "sectionNumber": 11,
+          "sectionTitle": "Improvement and Alteration",
+          "classification": "best_practice",
+          "whyItsHere": "This definition determines what modifications require ARC approval and assessment. Precision here prevents disputes over what counts as an alteration vs. routine maintenance.",
+          "whatYouCanDo": "Verify the definition captures both structural improvements (additions, pools, grading) and aesthetic changes (exterior paint, landscaping, fences). Clarify thresholds (e.g., cost, visibility) that trigger review. Identify exemptions for routine maintenance."
+        },
+        {
+          "sectionNumber": 12,
+          "sectionTitle": "Annual Assessment and Special Assessment",
+          "classification": "best_practice",
+          "whyItsHere": "These definitions distinguish regular operating assessments from extraordinary capital assessments, each with different voting and notice requirements. Clarity here is essential for assessment enforcement and homeowner planning.",
+          "whatYouCanDo": "Confirm the definition separates annual recurring assessments (for operations) from special assessments (for capital improvements). Verify notice and voting thresholds match Texas Property Code and current practice."
+        },
+        {
+          "sectionNumber": 13,
+          "sectionTitle": "Canyonside Trail",
+          "classification": "best_practice",
+          "whyItsHere": "Canyonside Trail is the community's only entrance road and sole fire evacuation route for all 16 homes. Its definition determines shared maintenance obligations with MMPOA I (35% cost share).",
+          "whatYouCanDo": "Confirm the definition refers to the 15,989 sq. ft. shared entrance road and specifies the 35% cost-share arrangement with MMPOA I. Clarify whether maintenance decisions require MMPOA I consent and how disputes are resolved.",
+          "communityImpact": "Canyonside Trail is the community's only entrance road and sole fire evacuation route for all 16 homes. Its definition determines shared maintenance obligations with MMPOA I (35% cost share)."
+        },
+        {
+          "sectionNumber": 14,
+          "sectionTitle": "MMPOA I",
+          "classification": "best_practice",
+          "whyItsHere": "MMPOA I is the neighboring community that shares the entrance road and costs. The definition establishes the relationship and mutual obligations between the two associations.",
+          "whatYouCanDo": "Verify the definition identifies MMPOA I clearly and references any shared governance or cost-sharing agreements. Confirm that communication protocols exist for addressing issues affecting both communities."
+        },
+        {
+          "sectionNumber": 15,
+          "sectionTitle": "Conservation Easement Lot 11",
+          "classification": "best_practice",
+          "whyItsHere": "Lot 11 borders the 120-acre wildland area in the WUI zone. The conservation easement affects vegetation management and defensible space for surrounding lots.",
+          "whatYouCanDo": "Confirm the easement document is referenced and available to all homeowners. Clarify what activities are restricted on Lot 11 and how restrictions affect neighboring lot maintenance (e.g., defensible space requirements around perimeter).",
+          "communityImpact": "Lot 11 borders the 120-acre wildland area in the WUI zone. The conservation easement affects vegetation management and defensible space for surrounding lots."
+        },
+        {
+          "sectionNumber": 16,
+          "sectionTitle": "Common Property",
+          "classification": "best_practice",
+          "whyItsHere": "Common Property distinguishes areas the Association owns and controls from easement areas and private lots. This clarifies liability and maintenance responsibility.",
+          "whatYouCanDo": "Verify whether Common Property includes all common areas or is a subset. Confirm whether the Association has title to roads, utilities, and drainage systems or only easement rights."
+        },
+        {
+          "sectionNumber": 17,
+          "sectionTitle": "Tenant",
+          "classification": "best_practice",
+          "whyItsHere": "The Tenant definition determines who can rent lots and their obligations. This shapes rental restrictions and enforcement authority against non-owner occupants.",
+          "whatYouCanDo": "Verify whether Tenants are bound by CC&Rs and what remedies apply for violations. Confirm whether Tenants can serve on the Board or vote, and whether lease documents are required to reference the CC&Rs."
+        },
+        {
+          "sectionNumber": 18,
+          "sectionTitle": "Manager",
+          "classification": "best_practice",
+          "whyItsHere": "The Manager definition establishes the professional responsible for day-to-day operations, collections, and enforcement. This clarifies who acts on the Association's behalf.",
+          "whatYouCanDo": "Confirm whether a Manager is required or optional. Verify the Manager's defined duties (collections, maintenance oversight, tenant complaints) and authority limits (e.g., can Manager approve violations or only Board?)"
+        },
+        {
+          "sectionNumber": 19,
+          "sectionTitle": "Firewise Committee",
+          "classification": "best_practice",
+          "whyItsHere": "With 14 of 16 homes in WUI Proximity Zone A, the Firewise Committee definition establishes a critical safety body responsible for IWUIC compliance and wildfire evacuation planning.",
+          "whatYouCanDo": "Confirm the Committee's composition, appointment, and authority. Verify whether it has power to recommend enforcement of fire-safety rules and whether its meetings are open to all homeowners. Ensure the definition aligns with Texas WUI requirements.",
+          "communityImpact": "With 14 of 16 homes in WUI Proximity Zone A, the Firewise Committee definition establishes a critical safety body responsible for IWUIC compliance and wildfire evacuation planning."
+        },
+        {
+          "sectionNumber": "19A",
+          "sectionTitle": "Wildland-Urban Interface (WUI) Area",
+          "classification": "best_practice",
+          "whyItsHere": "The WUI definition establishes which properties are subject to heightened fire-safety regulations and defensible-space requirements. This provides legal basis for landscape enforcement and emergency planning.",
+          "whatYouCanDo": "Verify whether the definition references the official WUI maps used by Travis County or the State of Texas. Confirm that all 14 lots in Zone A are identified and understand their specific defensible-space and vegetation-management obligations."
+        },
+        {
+          "sectionNumber": 20,
+          "sectionTitle": "Fine Schedule",
+          "classification": "best_practice",
+          "whyItsHere": "The Fine Schedule definition establishes the maximum penalties for covenant violations. This provides enforcement predictability and due process while ensuring penalties are reasonable.",
+          "whatYouCanDo": "Review the current schedule of fines for common violations (e.g., exterior paint, vegetation, parking). Verify that fines are proportional to violations and are updated regularly to account for inflation. Confirm whether notice and cure periods apply before fines are assessed."
+        },
+        {
+          "sectionNumber": 21,
+          "sectionTitle": "Plat",
+          "classification": "best_practice",
+          "whyItsHere": "The Plat is the recorded survey showing all 16 lots and common areas. The definition clarifies which survey version governs boundary disputes and lot identification.",
+          "whatYouCanDo": "Confirm the Plat is recorded in Travis County and is referenced in all deed documents. Verify that all lot numbers, boundaries, and common areas match the current ownership records."
+        },
+        {
+          "sectionNumber": 22,
+          "sectionTitle": "Document Hierarchy and Precedence",
+          "classification": "best_practice",
+          "whyItsHere": "Establishes which document controls when provisions conflict. Essential when CC&Rs, Bylaws, and Rules contain overlapping provisions about assessments, enforcement, or architectural standards.",
+          "whatYouCanDo": "Verify the hierarchy: Declaration \\> Bylaws \\> Rules \\> Design Guidelines. Identify any provisions that conflict under the current hierarchy and determine whether amendments are needed to resolve ambiguities.",
+          "communityImpact": "Establishes which document controls when provisions conflict. Essential when CC&Rs, Bylaws, and Rules contain overlapping provisions about assessments, enforcement, or architectural standards."
+        },
+        {
+          "sectionNumber": 23,
+          "sectionTitle": "Reasonable/Reasonably",
+          "classification": "best_practice",
+          "whyItsHere": "This definition provides a legal standard for interpretation when CC&Rs use reasonableness as a test (e.g., reasonable approval, reasonable denial, reasonable use). Without it, disputes arise over what counts as reasonable.",
+          "whatYouCanDo": "Confirm the definition provides an objective standard for reasonableness (e.g., reference to industry standards, common practice, or specific criteria). Verify whether homeowners have a right to appeal denials of requests on reasonableness grounds."
+        }
+      ]
+    },
+    {
+      "articleNumber": 2,
+      "articleTitle": "Property Rights in Common Areas",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "Owner's Easements of Enjoyment",
+          "classification": "best_practice",
+          "whyItsHere": "Every owner's right to use the private road, retaining wall areas, gate, and mail kiosk depends on this easement. The Association's ability to restrict access (e.g., for delinquent assessments) is also governed here.",
+          "whatYouCanDo": "Verify the scope of easement rights: can owners use the road for vehicular access? foot traffic? guest parking? Clarify whether the Association can suspend or revoke easement rights for assessment delinquency or violations, and under what procedural safeguards.",
+          "communityImpact": "Every owner's right to use the private road, retaining wall areas, gate, and mail kiosk depends on this easement. The Association's ability to restrict access (e.g., for delinquent assessments) is also governed here."
+        },
+        {
+          "sectionNumber": 2,
+          "sectionTitle": "Delegation of Use",
+          "classification": "community_choice",
+          "whyItsHere": "This provision determines whether easement rights can be transferred to tenants or guests and what restrictions apply. It affects rental policies and visitor access.",
+          "whatYouCanDo": "Clarify whether owners can delegate easement rights to tenants (for rented lots) and whether non-owner residents have full access to common areas. Consider whether delegation rights have changed with the shift to COMMUNITY_CHOICE classification."
+        },
+        {
+          "sectionNumber": 3,
+          "sectionTitle": "Owner's Use",
+          "classification": "best_practice",
+          "whyItsHere": "This section clarifies the limits of owner use rights in common areas: no storage, no business operations, no alterations without permission. This protects the common area from degradation.",
+          "whatYouCanDo": "Verify what constitutes permitted use of common areas (e.g., can owners park on the road? store items near the mail kiosk?). Clarify enforcement for unpermitted use and whether remedies include fines or easement suspension."
+        }
+      ]
+    },
+    {
+      "articleNumber": 3,
+      "articleTitle": "Membership and Voting Rights",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "Mandatory Membership",
+          "classification": "required_by_law",
+          "whyItsHere": "Texas Property Code §209.003 requires that all homeowners be Association members. This ensures funding and accountability across all 16 lots.",
+          "whatYouCanDo": "Confirm that membership is automatically triggered by lot ownership and that all current owners are listed as members. Verify the process for transferring membership upon sale and whether disputes over membership can be appealed."
+        },
+        {
+          "sectionNumber": 2,
+          "sectionTitle": "Voting Membership",
+          "classification": "required_by_law",
+          "whyItsHere": "With only 16 lots, each vote represents 6.25% of the total. Voting thresholds like Two-Thirds Vote require 11 of 16 lots to agree — making every vote critical.",
+          "whatYouCanDo": "Clarify voting rights per lot (one vote per lot, or apportioned by lot size?). Verify voting thresholds for major decisions (board election, special assessments, architectural approval). Confirm whether proxy voting is allowed and whether electronic voting is permitted under Texas law.",
+          "communityImpact": "With only 16 lots, each vote represents 6.25% of the total. Voting thresholds like Two-Thirds Vote require 11 of 16 lots to agree — making every vote critical."
+        },
+        {
+          "sectionNumber": 3,
+          "sectionTitle": "Non-Owner Residents",
+          "classification": "best_practice",
+          "whyItsHere": "Tenants and other non-owner residents occupy lots but do not have voting rights or formal governance authority. The definition clarifies their status and what CC&R obligations bind them.",
+          "whatYouCanDo": "Verify whether non-owner residents can attend open meetings and whether they are bound by CC&Rs and fines. Confirm whether the Association must enforce covenant violations against tenants or only against lot-owning landlords."
+        },
+        {
+          "sectionNumber": 4,
+          "sectionTitle": "Board Member Conflicts of Interest",
+          "classification": "best_practice",
+          "whyItsHere": "With only 16 lot owners, conflicts of interest are inevitable (e.g., a Board member's lot needs special assessment for repair). The provision ensures fair governance when self-interest is at stake.",
+          "whatYouCanDo": "Review the disclosure requirements: must Board members disclose potential conflicts before voting? Can a Board member with a conflict vote on decisions affecting their lot? Verify whether conflicts are grounds for recusal or disqualification."
+        },
+        {
+          "sectionNumber": 5,
+          "sectionTitle": "Management Company Authority and Oversight",
+          "classification": "best_practice",
+          "whyItsHere": "The Manager or management company acts on the Association's behalf for daily operations, collections, and enforcement. The definition clarifies what authority is delegated and what decisions require Board approval.",
+          "whatYouCanDo": "Verify the scope of delegated authority: can the Manager approve architectural changes? assess fines? lock gates for assessment delinquency? Confirm Board oversight mechanisms and whether the Manager is independent or beholden to individual Board members."
+        },
+        {
+          "sectionNumber": 6,
+          "sectionTitle": "Electronic Meetings and Voting",
+          "classification": "required_by_law",
+          "whyItsHere": "Texas Property Code §209.0052 permits electronic meetings and voting if the CC&Rs allow it. This provision determines whether the Board and members can participate remotely.",
+          "whatYouCanDo": "Verify whether electronic meetings are permitted and under what technology requirements (email, Zoom, etc.). Confirm whether electronic voting is allowed for member votes (special assessments, board elections) and what security/authentication measures apply."
+        }
+      ]
+    },
+    {
+      "articleNumber": 4,
+      "articleTitle": "Covenant for Maintenance Assessments",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "Creation of the Lien and Personal Obligation of Assessments",
+          "classification": "required_by_law",
+          "whyItsHere": "Texas Property Code §209.0061 requires CC&Rs to create a lien on lots for unpaid assessments. This is the Association's primary enforcement tool and ensures funding for common area maintenance.",
+          "whatYouCanDo": "Verify that the lien is recorded and that notice procedures are clear. Confirm the Association's remedies for non-payment (lien sale, foreclosure) and whether homeowners have a right to reinstate the lien or negotiate payment plans."
+        },
+        {
+          "sectionNumber": 2,
+          "sectionTitle": "Purpose of Assessments",
+          "classification": "best_practice",
+          "whyItsHere": "Defines what assessments fund: road maintenance, retaining walls, lift station, gate, lighting, landscaping, insurance. For a community with \\$22,150 annual operating expenses and only \\$7,600 net contribution to reserves, every dollar matters.",
+          "whatYouCanDo": "Verify that the purpose statement covers all Association obligations and permitted uses. Confirm whether assessments can fund legal fees, professional management, or capital reserves, and whether homeowners have the right to audit how assessments are spent.",
+          "communityImpact": "Defines what assessments fund: road maintenance, retaining walls, lift station, gate, lighting, landscaping, insurance. For a community with \\$22,150 annual operating expenses and only \\$7,600 net contribution to reserves, every dollar matters."
+        },
+        {
+          "sectionNumber": 3,
+          "sectionTitle": "Maximum Annual Assessment",
+          "classification": "required_by_law",
+          "whyItsHere": "Current monthly assessment is \\$155/lot (\\$1,860/year). Any increase disproportionately affects the 6 retired homeowners on fixed incomes — nearly 40% of the community.",
+          "whatYouCanDo": "Verify the maximum annual assessment amount and any caps on year-to-year increases. Confirm whether increases require member vote or Board approval. Review the most recent assessment increase and any projections for future increases due to inflation or major capital needs.",
+          "communityImpact": "Current monthly assessment is \\$155/lot (\\$1,860/year). Any increase disproportionately affects the 6 retired homeowners on fixed incomes — nearly 40% of the community."
+        },
+        {
+          "sectionNumber": 4,
+          "sectionTitle": "Special Assessments for Capital Improvements",
+          "classification": "required_by_law",
+          "whyItsHere": "The \\$3,000 cap without member vote is the threshold between Board authority and community vote. The 2015 retaining wall collapse required \\$4,000 per lot — above this cap.",
+          "whatYouCanDo": "Verify the cap amount and whether it has been updated for inflation. Confirm voting thresholds for special assessments exceeding the cap (Two-Thirds Vote of members in good standing?). Review the 2015 special assessment and any disputes over whether the cap was properly applied.",
+          "communityImpact": "The \\$3,000 cap without member vote is the threshold between Board authority and community vote. The 2015 retaining wall collapse required \\$4,000 per lot — above this cap."
+        },
+        {
+          "sectionNumber": 5,
+          "sectionTitle": "Notice and Quorum for Any Action Authorized Under Sections 3 and 4",
+          "classification": "required_by_law",
+          "whyItsHere": "Texas law requires specific notice and quorum procedures for assessments. This ensures due process and that homeowners have a fair opportunity to approve major financial decisions.",
+          "whatYouCanDo": "Verify notice timing (typically 10-15 days before a meeting) and content requirements. Confirm quorum thresholds (e.g., 50% of members present or represented by proxy) and voting majorities. Review whether the Association has followed these procedures in recent assessments."
+        },
+        {
+          "sectionNumber": 6,
+          "sectionTitle": "Uniform Rate of Assessment",
+          "classification": "best_practice",
+          "whyItsHere": "All 16 lots are currently assessed uniformly (equal shares), which is simple and transparent. This provision prevents arbitrary or discriminatory assessment practices.",
+          "whatYouCanDo": "Confirm that assessments are equal per lot, not proportional to lot size or value. Verify whether the uniform rate has been changed or whether any lot has received a different assessment (e.g., for separate utilities or easement violations)."
+        },
+        {
+          "sectionNumber": 7,
+          "sectionTitle": "Date of Commencement of Annual Assessments; Due Dates",
+          "classification": "best_practice",
+          "whyItsHere": "Establishes assessment cycles and payment deadlines. Clear schedules prevent confusion and late fees.",
+          "whatYouCanDo": "Verify the annual commencement date (typically January 1) and payment due date (e.g., first of each month or annually). Confirm grace periods and late-fee policies. Review whether due dates align with property tax and mortgage payment cycles to avoid hardship."
+        },
+        {
+          "sectionNumber": 8,
+          "sectionTitle": "Effect of Nonpayment of Assessments; Remedies of the Association",
+          "classification": "required_by_law",
+          "whyItsHere": "Lien and collection procedures directly affect homeowners. In a 16-lot community, a single foreclosure would be highly visible and community-disrupting.",
+          "whatYouCanDo": "Review notice requirements before lien filing (typically 30 days). Confirm lien sale procedures and whether homeowners can reinstate liens by paying back assessments, late fees, and attorney costs. Verify the Association's enforcement discretion — are liens always filed for delinquency, or does the Association negotiate?",
+          "communityImpact": "Lien and collection procedures directly affect homeowners. In a 16-lot community, a single foreclosure would be highly visible and community-disrupting."
+        },
+        {
+          "sectionNumber": 9,
+          "sectionTitle": "Subordination of the Lien to Mortgages",
+          "classification": "required_by_law",
+          "whyItsHere": "Texas law subordinates Association liens to mortgages recorded before the lien. This makes mortgages senior, but limits the Association's leverage against lot owners with mortgages.",
+          "whatYouCanDo": "Verify whether the Association has elected non-subordination under Texas Property Code §209.0074. Confirm whether notice of non-subordination was properly recorded. Understand the practical impact: can the Association foreclose if the mortgage is senior?"
+        },
+        {
+          "sectionNumber": 10,
+          "sectionTitle": "Exempt Property",
+          "classification": "best_practice",
+          "whyItsHere": "Identifies any properties not subject to assessment (e.g., certain easements or rights-of-way). This clarifies the assessment base.",
+          "whatYouCanDo": "Verify which properties, if any, are exempt. Confirm that conservation easement Lot 11 is still subject to full assessments. Review whether any common areas or utility easements are exempt."
+        },
+        {
+          "sectionNumber": 11,
+          "sectionTitle": "All Assessments Pro Rata",
+          "classification": "best_practice",
+          "whyItsHere": "Confirms that each lot bears an equal share of assessment burdens. This ensures fairness and prevents disputes over cost allocation.",
+          "whatYouCanDo": "Verify that the pro rata share is one-sixteenth per lot (for 16 lots). Confirm that all assessments, including special assessments and reserves, follow the pro rata formula. Note any exceptions or preferential allocations."
+        },
+        {
+          "sectionNumber": 12,
+          "sectionTitle": "No Diminution or Abatement",
+          "classification": "best_practice",
+          "whyItsHere": "Assessments cannot be reduced or forgiven even if a homeowner does not use common areas. This ensures that maintenance obligations are funded regardless of individual participation.",
+          "whatYouCanDo": "Confirm that owners cannot claim abatement of assessments due to disrepair of common areas or disputes with the Association. Note exceptions for legitimate accounting errors or unintended duplicate billings."
+        },
+        {
+          "sectionNumber": 13,
+          "sectionTitle": "Reserve Fund and Reserve Analysis",
+          "classification": "best_practice",
+          "whyItsHere": "Current reserves of \\$19,000 with a 70% minimum funding threshold. The reserve analysis must account for major capital items: private road (\\$25K+ resealing), retaining walls (potential \\$48K+ replacement), and sewage lift station components.",
+          "whatYouCanDo": "Verify that the Association conducts annual reserve studies meeting Texas Property Code §209.012 standards. Confirm the reserve study identifies major capital components and funding needs. Review whether the \\$19,000 current reserve is adequate for a 16-lot community and whether the Board is funding reserves at the 70% recommended threshold.",
+          "communityImpact": "Current reserves of \\$19,000 with a 70% minimum funding threshold. The reserve analysis must account for major capital items: private road (\\$25K+ resealing), retaining walls (potential \\$48K+ replacement), and sewage lift station components."
+        },
+        {
+          "sectionNumber": 14,
+          "sectionTitle": "Assessment Payment Plans",
+          "classification": "required_by_law",
+          "whyItsHere": "Texas Property Code §209.0093 requires HOAs to offer payment plans. For fixed-income homeowners facing special assessments, this is a critical affordability protection.",
+          "whatYouCanDo": "Verify that the Association offers payment plans for special assessments and past-due regular assessments. Confirm the terms: what is the maximum period for payment? Are interest or fees charged? Is the payment plan discretionary or mandatory if requested?",
+          "communityImpact": "Texas Property Code §209.0093 requires HOAs to offer payment plans. For fixed-income homeowners facing special assessments, this is a critical affordability protection."
+        }
+      ]
+    },
+    {
+      "articleNumber": 5,
+      "articleTitle": "Maintenance By and Services",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "Common Area",
+          "classification": "best_practice",
+          "whyItsHere": "The Association maintains 20,323 sq. ft. of private road, retaining walls (including the section that collapsed in 2015), gate/lighting systems, sewage lift station area, mail kiosk, and landscaping. These are the core infrastructure obligations driving the annual budget.",
+          "whatYouCanDo": "Verify all maintenance obligations are listed and funded. Confirm responsibility allocation: does the Association maintain retaining walls, or do adjacent lot owners? Who maintains the sewage lift station (Association vs. Town of Lakeway)? Are routine vs. capital maintenance distinguished?",
+          "communityImpact": "The Association maintains 20,323 sq. ft. of private road, retaining walls (including the section that collapsed in 2015), gate/lighting systems, sewage lift station area, mail kiosk, and landscaping. These are the core infrastructure obligations driving the annual budget."
+        },
+        {
+          "sectionNumber": 2,
+          "sectionTitle": "Willful or Negligent Acts",
+          "classification": "best_practice",
+          "whyItsHere": "Clarifies that the Association is not liable for damage caused by members' negligence or intentional acts. This limits the Association's exposure to third-party injuries on the common areas.",
+          "whatYouCanDo": "Verify the liability waiver and whether it is enforceable under Texas law. Confirm whether the Association maintains property and liability insurance. Review whether the waiver covers the 2015 retaining wall collapse and any recent incidents."
+        },
+        {
+          "sectionNumber": 3,
+          "sectionTitle": "Maintenance of Canyonside Trail",
+          "classification": "best_practice",
+          "whyItsHere": "The shared entrance road (15,989 sq. ft.) with MMPOA I at a 35% cost share is the sole access point. The 2026 approved \\$25K road repair project covers only the MMPOAII private road, not this shared section.",
+          "whatYouCanDo": "Clarify the 35% cost-share arrangement: does MMPOA I pay 35% of all maintenance costs? Who decides when maintenance is needed? How are disputes resolved if one community wants repairs and the other refuses? Confirm the shared road is properly maintained for fire access.",
+          "communityImpact": "The shared entrance road (15,989 sq. ft.) with MMPOA I at a 35% cost share is the sole access point. The 2026 approved \\$25K road repair project covers only the MMPOAII private road, not this shared section."
+        }
+      ]
+    },
+    {
+      "articleNumber": 6,
+      "articleTitle": "Architectural and Environmental Management",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "Architecture Review Committee",
+          "classification": "best_practice",
+          "whyItsHere": "The ARC enforces design standards and ensures cohesiveness. With 14 of 16 homes in a WUI zone, the ARC also enforces wildfire defensible-space requirements.",
+          "whatYouCanDo": "Confirm the ARC's composition (how many members, how appointed, term limits). Verify the approval process (timeline for review, notice of denial, appeal rights). Confirm whether ARC decisions are final or subject to Board review."
+        },
+        {
+          "sectionNumber": 2,
+          "sectionTitle": "Extent of Architecture Review Committee's Authority",
+          "classification": "best_practice",
+          "whyItsHere": "Establishes what decisions the ARC can make without Board approval and what requires escalation. This prevents bottlenecks and ensures consistent design standards.",
+          "whatYouCanDo": "Clarify what improvements require ARC approval (paint, fences, landscaping, additions?). Verify thresholds: do small changes (e.g., mailbox color) need approval? Is approval automatic if the change meets design guidelines? What is the timeline for ARC review?"
+        },
+        {
+          "sectionNumber": 3,
+          "sectionTitle": "Association Approval of Improvements and Alterations",
+          "classification": "best_practice",
+          "whyItsHere": "Requires owner approval before making exterior changes. This prevents unauthorized alterations and protects property values.",
+          "whatYouCanDo": "Confirm that all exterior improvements require written approval before construction. Verify the approval criteria: are design guidelines available? Can approval be withheld for aesthetic reasons? What happens if an owner builds without approval?"
+        },
+        {
+          "sectionNumber": 4,
+          "sectionTitle": "Grading, Excavation and Runoff Control Plans",
+          "classification": "best_practice",
+          "whyItsHere": "On this hillside, every excavation and grading change affects drainage patterns. Improper runoff has caused erosion damage to townhome foundations and contributed to the retaining wall collapse.",
+          "whatYouCanDo": "Verify that all grading and excavation requires ARC approval with drainage and runoff plans. Confirm that owners cannot modify drainage patterns without hydrological analysis. Review whether the 2015 retaining wall collapse prompted new grading standards.",
+          "communityImpact": "On this hillside, every excavation and grading change affects drainage patterns. Improper runoff has caused erosion damage to townhome foundations and contributed to the retaining wall collapse."
+        },
+        {
+          "sectionNumber": 5,
+          "sectionTitle": "Landscaping Plan",
+          "classification": "community_choice",
+          "whyItsHere": "Landscaping affects community appearance and defensible space from wildfire. The landscaping plan standard is community-specific based on WUI requirements and aesthetic preferences.",
+          "whatYouCanDo": "Review the current landscaping plan and whether it enforces defensible-space standards (vegetation setbacks, dead-tree removal). Confirm whether owners can deviate from the plan and the ARC's authority to enforce. With 14 lots in WUI Zone A, verify whether the plan meets IWUIC standards."
+        },
+        {
+          "sectionNumber": 6,
+          "sectionTitle": "Building Encroachment Easements",
+          "classification": "best_practice",
+          "whyItsHere": "Encroachment easements allow buildings to overlap lot lines (e.g., for decks or patios overlapping neighbors' property). This prevents disputes over minor encroachments.",
+          "whatYouCanDo": "Verify that encroachment easements are standard and recorded. Confirm that encroachments require neighbor consent and ARC approval. Clarify remedies if an encroachment violates the easement (removal or compensation)."
+        },
+        {
+          "sectionNumber": 7,
+          "sectionTitle": "Minimum Floor Area and Exterior Walls",
+          "classification": "community_choice",
+          "whyItsHere": "Sets minimum building size and materials to maintain community character and prevent degradation. These standards are community-specific and evolve with market preferences.",
+          "whatYouCanDo": "Verify minimum floor area and exterior material standards (e.g., no vinyl siding, minimum setbacks). Confirm whether these standards apply to additions and accessory structures. Review whether standards need updating to reflect current design trends."
+        },
+        {
+          "sectionNumber": 8,
+          "sectionTitle": "Setbacks",
+          "classification": "community_choice",
+          "whyItsHere": "Setback requirements define how far buildings must be from lot lines and roads. These ensure privacy and prevent encroachments.",
+          "whatYouCanDo": "Verify setback distances for front, rear, and side yards. Confirm whether setbacks are uniform or lot-specific. Check whether the setbacks align with City of Lakeway zoning and whether any lots have received variances."
+        },
+        {
+          "sectionNumber": 9,
+          "sectionTitle": "Easements",
+          "classification": "best_practice",
+          "whyItsHere": "Easements for utilities, drainage, and access are essential for the community's infrastructure. Clarifying easement rights prevents disputes over right-of-way.",
+          "whatYouCanDo": "List all easements affecting the lots (utility, drainage, access). Confirm whether easement documents are on file and available to owners. Clarify what use is permitted within easement areas and whether owners can improve over easements."
+        },
+        {
+          "sectionNumber": 10,
+          "sectionTitle": "Construction Completion",
+          "classification": "best_practice",
+          "whyItsHere": "Requires owners to complete construction within a reasonable timeframe and not leave lots in disrepair. This prevents long-term vacant or unfinished properties.",
+          "whatYouCanDo": "Verify construction timelines (e.g., completion within 12-24 months of approval). Confirm enforcement for incomplete projects (fines, denial of further alterations, easement suspension). Review whether any current lots have incomplete construction."
+        },
+        {
+          "sectionNumber": 11,
+          "sectionTitle": "General Maintenance",
+          "classification": "best_practice",
+          "whyItsHere": "Maintenance standards for all 16 homes directly affect property values and community appearance. The current NOV and 2 courtesy notices show active enforcement of these standards.",
+          "whatYouCanDo": "Review maintenance standards (roof condition, exterior paint, landscape, trash containers). Confirm ARC/Board enforcement authority. Verify the notice and cure process before fines are assessed. Review recent NOVs and whether homeowners have resolved issues or appealed.",
+          "communityImpact": "Maintenance standards for all 16 homes directly affect property values and community appearance. The current NOV and 2 courtesy notices show active enforcement of these standards."
+        }
+      ]
+    },
+    {
+      "articleNumber": 7,
+      "articleTitle": "Privacy Walls and Fences",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "General Rules",
+          "classification": "community_choice",
+          "whyItsHere": "Fence standards directly affect the 8 townhome owners who share zero-lot-line walls. A fence decision on one side of the line inherently affects the adjoining owner.",
+          "whatYouCanDo": "Establishes baseline requirements for fence materials, heights, and appearance to maintain consistent visual standards while recognizing the unique constraints of shared walls on zero-lot-line townhomes.",
+          "communityImpact": "Fence standards directly affect the 8 townhome owners who share zero-lot-line walls. A fence decision on one side of the line inherently affects the adjoining owner."
+        },
+        {
+          "sectionNumber": 2,
+          "sectionTitle": "Destructive Acts",
+          "classification": "best_practice",
+          "whyItsHere": "Prohibits deliberate damage to fences or walls, protecting both shared and private structures from intentional harm.",
+          "whatYouCanDo": "Defines prohibited destructive acts and establishes liability for owners who deliberately damage fence or wall structures, whether shared or personal."
+        },
+        {
+          "sectionNumber": 3,
+          "sectionTitle": "Damage or Injury Not Caused by Either Owner",
+          "classification": "best_practice",
+          "whyItsHere": "Addresses responsibility when third-party damage occurs to fences or walls, clarifying liability when neither owner is at fault.",
+          "whatYouCanDo": "Establishes procedures for handling damage caused by external factors (weather, vandalism, acts of God) and determines responsibility for repair and cost-sharing."
+        },
+        {
+          "sectionNumber": 4,
+          "sectionTitle": "Sharing of Repair and Maintenance",
+          "classification": "community_choice",
+          "whyItsHere": "Shared wall maintenance between townhome owners is an ongoing concern. Clear cost-sharing rules prevent disputes between the 4 pairs of adjoining townhome owners.",
+          "whatYouCanDo": "Specifies how maintenance and repair costs are divided between owners of adjoining properties, particularly for structures that serve both parties.",
+          "communityImpact": "Shared wall maintenance between townhome owners is an ongoing concern. Clear cost-sharing rules prevent disputes between the 4 pairs of adjoining townhome owners."
+        },
+        {
+          "sectionNumber": 5,
+          "sectionTitle": "Application",
+          "classification": "best_practice",
+          "whyItsHere": "Clarifies how privacy wall and fence provisions apply to different property types and situations within the community.",
+          "whatYouCanDo": "Details the scope and applicability of fence and wall rules, distinguishing between townhome shared walls, single-family lot boundaries, and common area perimeters."
+        },
+        {
+          "sectionNumber": 6,
+          "sectionTitle": "Dispute Resolution",
+          "classification": "best_practice",
+          "whyItsHere": "Provides a clear process for resolving disagreements between neighbors regarding shared wall maintenance, alterations, or repair obligations.",
+          "whatYouCanDo": "Establishes procedures for mediation and resolution of disputes concerning fence and wall issues, preventing escalation to formal enforcement or litigation."
+        }
+      ]
+    },
+    {
+      "articleNumber": 8,
+      "articleTitle": "Permitted Uses and Restrictions",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "General Restrictions",
+          "classification": "community_choice",
+          "whyItsHere": "Single-family residential restriction with ADU prohibition. With only 16 lots on a private road, single entrance, and private sewage lift station, density restrictions directly affect infrastructure capacity and fire evacuation.",
+          "whatYouCanDo": "Restricts all land use to single-family residential purposes, preventing commercial, multi-family, or mixed-use development that would strain infrastructure.",
+          "communityImpact": "Single-family residential restriction with ADU prohibition. With only 16 lots on a private road, single entrance, and private sewage lift station, density restrictions directly affect infrastructure capacity and fire evacuation."
+        },
+        {
+          "sectionNumber": 2,
+          "sectionTitle": "Noxious Uses",
+          "classification": "best_practice",
+          "whyItsHere": "Prohibits uses that create nuisances or hazards, protecting neighborhood quality and safety.",
+          "whatYouCanDo": "Defines and prohibits noxious uses such as industrial operations, chemical storage, or activities that generate excessive noise, odor, or pollution."
+        },
+        {
+          "sectionNumber": 3,
+          "sectionTitle": "Use of Common Area",
+          "classification": "community_choice",
+          "whyItsHere": "Requires Firewise Committee coordination before any vegetation work on Common Area. With 14/16 homes in WUI Zone A, uncoordinated vegetation removal could worsen wildfire risk.",
+          "whatYouCanDo": "Specifies allowable uses of common property and requires approval for landscaping, maintenance, or improvements that affect shared areas.",
+          "communityImpact": "Requires Firewise Committee coordination before any vegetation work on Common Area. With 14/16 homes in WUI Zone A, uncoordinated vegetation removal could worsen wildfire risk."
+        },
+        {
+          "sectionNumber": 4,
+          "sectionTitle": "Animals",
+          "classification": "community_choice",
+          "whyItsHere": "Pet policies balance owner rights with community harmony and safety concerns in a densely situated hillside community.",
+          "whatYouCanDo": "Establishes limitations on types, numbers, and sizes of animals permitted on properties, with exceptions for service animals."
+        },
+        {
+          "sectionNumber": 5,
+          "sectionTitle": "Antennas and Signals",
+          "classification": "required_by_law",
+          "whyItsHere": "Texas Property Code and FCC OTARD rules protect owner rights to install and maintain satellite dishes and wireless antennas within specified standards.",
+          "whatYouCanDo": "Complies with FCC Over-The-Air Reception Devices (OTARD) rule and Texas Property Code to allow antennas while maintaining community aesthetics and safety."
+        },
+        {
+          "sectionNumber": 6,
+          "sectionTitle": "Temporary Occupancy",
+          "classification": "community_choice",
+          "whyItsHere": "Controls short-term guest housing to prevent impacts on parking, infrastructure, and community stability.",
+          "whatYouCanDo": "Establishes rules for temporary visitor accommodations, including limitations on duration and frequency to maintain residential character."
+        },
+        {
+          "sectionNumber": 7,
+          "sectionTitle": "Trailers, Boats and Motor Vehicles",
+          "classification": "community_choice",
+          "whyItsHere": "Controls parking and storage of large vehicles to maintain visual appearance and street safety in a compact gated community.",
+          "whatYouCanDo": "Restricts storage of RVs, boats, trailers, and oversized vehicles on properties, with designated locations where permitted."
+        },
+        {
+          "sectionNumber": 8,
+          "sectionTitle": "Nuisances",
+          "classification": "best_practice",
+          "whyItsHere": "Prohibits conduct that substantially interferes with others' enjoyment of their homes, protecting all residents.",
+          "whatYouCanDo": "Defines nuisances including excessive noise, noxious odors, and other activities that diminish neighborhood quality of life."
+        },
+        {
+          "sectionNumber": 9,
+          "sectionTitle": "Repair of Buildings",
+          "classification": "best_practice",
+          "whyItsHere": "On this hillside with erosion concerns, building repair standards affect structural integrity of neighboring properties. The 8 townhomes sharing walls have particular interdependence.",
+          "whatYouCanDo": "Requires proper maintenance and timely repair of structures to preserve property values and prevent deterioration that affects neighboring homes.",
+          "communityImpact": "On this hillside with erosion concerns, building repair standards affect structural integrity of neighboring properties. The 8 townhomes sharing walls have particular interdependence."
+        },
+        {
+          "sectionNumber": 10,
+          "sectionTitle": "Trash Containers and Collection",
+          "classification": "community_choice",
+          "whyItsHere": "Controls trash container placement and collection to maintain visual appeal and prevent pest attraction in a hillside community.",
+          "whatYouCanDo": "Establishes standards for trash container concealment, collection schedules, and requires prompt removal of debris."
+        },
+        {
+          "sectionNumber": 11,
+          "sectionTitle": "Clothes Drying Facilities",
+          "classification": "required_by_law",
+          "whyItsHere": "Texas Property Code §202.023(d) protects owner rights to air-dry clothes, promoting energy efficiency and sustainability.",
+          "whatYouCanDo": "Permits clotheslines and drying racks on private property subject to reasonable aesthetic and safety standards."
+        },
+        {
+          "sectionNumber": 12,
+          "sectionTitle": "Sidewalk Encroachment",
+          "classification": "community_choice",
+          "whyItsHere": "Prevents obstructions to pedestrian pathways and maintains emergency access on the private road.",
+          "whatYouCanDo": "Prohibits storage, vehicles, or landscaping from encroaching on sidewalks, walkways, and common circulation paths."
+        },
+        {
+          "sectionNumber": 13,
+          "sectionTitle": "Right of Entry for Inspection",
+          "classification": "required_by_law",
+          "whyItsHere": "Texas Property Code requires fair procedures for enforcement inspections, protecting owner privacy while allowing necessary compliance verification.",
+          "whatYouCanDo": "Permits authorized association representatives to enter properties for inspections with proper notice and reasonable access, subject to legal constraints."
+        },
+        {
+          "sectionNumber": 14,
+          "sectionTitle": "Mineral Exploration",
+          "classification": "best_practice",
+          "whyItsHere": "Prohibits mineral extraction or exploration, protecting surface stability and preventing subsurface hazards.",
+          "whatYouCanDo": "Restricts drilling, mining, and geological exploration activities to preserve property integrity and community safety."
+        },
+        {
+          "sectionNumber": 15,
+          "sectionTitle": "Machinery and Equipment",
+          "classification": "community_choice",
+          "whyItsHere": "Controls placement of visible equipment to maintain neighborhood aesthetics and reduce operational nuisances.",
+          "whatYouCanDo": "Requires screening and concealment of HVAC units, generators, utility boxes, and other external mechanical equipment."
+        },
+        {
+          "sectionNumber": 16,
+          "sectionTitle": "Diseases and Insects",
+          "classification": "best_practice",
+          "whyItsHere": "Requires owners to address pest infestations and diseases that could spread to neighboring properties.",
+          "whatYouCanDo": "Obligates owners to treat tree diseases, pest infestations, and other conditions that threaten adjacent properties or common areas."
+        },
+        {
+          "sectionNumber": 17,
+          "sectionTitle": "Restriction on Further Subdivision",
+          "classification": "community_choice",
+          "whyItsHere": "Prohibits subdivision of existing lots. Critical for maintaining the 16-lot density that the private road, lift station, and single entrance were designed to serve.",
+          "whatYouCanDo": "Prevents further division of platted lots, ensuring infrastructure capacity and maintaining original development design parameters.",
+          "communityImpact": "Prohibits subdivision of existing lots. Critical for maintaining the 16-lot density that the private road, lift station, and single entrance were designed to serve."
+        },
+        {
+          "sectionNumber": 18,
+          "sectionTitle": "Signs",
+          "classification": "community_choice",
+          "whyItsHere": "Controls size, placement, and duration of signs to maintain visual aesthetics while allowing reasonable communication.",
+          "whatYouCanDo": "Establishes guidelines for permitted signs such as real estate, security, and temporary announcements, with restrictions on commercial advertising."
+        },
+        {
+          "sectionNumber": 19,
+          "sectionTitle": "Tanks, Windmills, and Elevated Storage",
+          "classification": "community_choice",
+          "whyItsHere": "Propane tank placement near the WUI zone creates fire risk. Storage requirements are especially important given Proximity Zone A designation.",
+          "whatYouCanDo": "Requires screening and proper setbacks for storage tanks and elevated structures to minimize visual impact and maintain safety standards.",
+          "communityImpact": "Propane tank placement near the WUI zone creates fire risk. Storage requirements are especially important given Proximity Zone A designation."
+        },
+        {
+          "sectionNumber": 20,
+          "sectionTitle": "Rainwater Harvesting",
+          "classification": "required_by_law",
+          "whyItsHere": "Texas Property Code §202.007 protects owner rights to capture and use rainwater, promoting water conservation.",
+          "whatYouCanDo": "Permits rainwater collection systems subject to health and safety standards, supporting sustainable water resource management."
+        },
+        {
+          "sectionNumber": 21,
+          "sectionTitle": "Solar Energy Devices",
+          "classification": "required_by_law",
+          "whyItsHere": "Texas Property Code §202.010 protects owner rights to install solar equipment, reducing energy costs and promoting renewable energy.",
+          "whatYouCanDo": "Permits rooftop and ground-mounted solar panels subject to safety and aesthetic review, supporting energy independence."
+        },
+        {
+          "sectionNumber": 22,
+          "sectionTitle": "Solar Roofing Materials",
+          "classification": "required_by_law",
+          "whyItsHere": "Texas Property Code protects innovative solar technologies that integrate with roofing materials.",
+          "whatYouCanDo": "Permits solar shingles and integrated solar roofing materials that meet building codes and fire safety standards."
+        },
+        {
+          "sectionNumber": 23,
+          "sectionTitle": "Cameras",
+          "classification": "required_by_law",
+          "whyItsHere": "Texas Property Code §202.022 protects owner rights to install security cameras on their property.",
+          "whatYouCanDo": "Permits outdoor security cameras subject to privacy and community safety considerations, with restrictions on placement near neighbor properties."
+        },
+        {
+          "sectionNumber": 24,
+          "sectionTitle": "Religious Displays",
+          "classification": "required_by_law",
+          "whyItsHere": "Texas Property Code §202.018 protects constitutional rights to display religious symbols on private property.",
+          "whatYouCanDo": "Permits religious symbols, decorations, and displays subject to reasonable size and safety standards."
+        },
+        {
+          "sectionNumber": 25,
+          "sectionTitle": "Political Signs",
+          "classification": "required_by_law",
+          "whyItsHere": "Texas Property Code §202.009 protects political speech rights, allowing political signs during election periods.",
+          "whatYouCanDo": "Permits political signs subject to timing restrictions tied to election cycles and reasonable size limitations."
+        },
+        {
+          "sectionNumber": 26,
+          "sectionTitle": "Flags and Flagpoles",
+          "classification": "required_by_law",
+          "whyItsHere": "Texas Property Code §202.011 protects flag display rights, including United States flags and POW/MIA flags.",
+          "whatYouCanDo": "Permits flags and flagpoles subject to structural and aesthetic standards, with protections for patriotic display."
+        },
+        {
+          "sectionNumber": 27,
+          "sectionTitle": "Basketball Goals",
+          "classification": "required_by_law",
+          "whyItsHere": "Texas Property Code §202.023 protects homeowner rights to install basketball equipment for recreational use.",
+          "whatYouCanDo": "Permits basketball hoops and equipment subject to placement and safety standards that minimize neighbor impacts."
+        },
+        {
+          "sectionNumber": 28,
+          "sectionTitle": "Waste",
+          "classification": "best_practice",
+          "whyItsHere": "Establishes proper waste disposal procedures to protect environmental quality and prevent contamination.",
+          "whatYouCanDo": "Requires proper disposal of all waste materials including hazardous substances, with prohibitions on burning or ground contamination."
+        },
+        {
+          "sectionNumber": 29,
+          "sectionTitle": "Lighting",
+          "classification": "community_choice",
+          "whyItsHere": "Controls outdoor lighting to reduce glare, light pollution, and nighttime impacts on neighboring properties.",
+          "whatYouCanDo": "Establishes standards for exterior lighting fixtures, including wattage, direction, and darkness hours compliance."
+        },
+        {
+          "sectionNumber": 30,
+          "sectionTitle": "Accessory Dwelling Units",
+          "classification": "community_choice",
+          "whyItsHere": "Explicit ADU prohibition. Given Austin's ADU-friendly policies, this provision prevents density increases that would strain the private road, lift station, single entrance, and WUI evacuation capacity.",
+          "whatYouCanDo": "Prohibits construction or conversion of accessory dwelling units, secondary residences, or in-law suites on any property.",
+          "communityImpact": "Explicit ADU prohibition. Given Austin's ADU-friendly policies, this provision prevents density increases that would strain the private road, lift station, single entrance, and WUI evacuation capacity."
+        },
+        {
+          "sectionNumber": 31,
+          "sectionTitle": "Electric Vehicle Charging",
+          "classification": "required_by_law",
+          "whyItsHere": "Texas Property Code §202.023 protects owner rights to install EV charging infrastructure, supporting sustainable transportation.",
+          "whatYouCanDo": "Permits Level 1 and Level 2 EV charging stations subject to electrical safety and aesthetic standards."
+        },
+        {
+          "sectionNumber": 32,
+          "sectionTitle": "Generators and Standby Power",
+          "classification": "community_choice",
+          "whyItsHere": "Generator placement and fuel storage near the WUI zone. Screening and setback requirements protect against fire risk and neighbor impact.",
+          "whatYouCanDo": "Requires screening, setbacks, and noise limitations for permanent and portable generators, with fuel storage standards.",
+          "communityImpact": "Generator placement and fuel storage near the WUI zone. Screening and setback requirements protect against fire risk and neighbor impact."
+        },
+        {
+          "sectionNumber": 33,
+          "sectionTitle": "Community Surveillance and Privacy",
+          "classification": "best_practice",
+          "whyItsHere": "Balances community security interests with individual privacy rights, ensuring surveillance serves legitimate purposes.",
+          "whatYouCanDo": "Establishes guidelines for community security cameras and recording devices to prevent privacy violations."
+        },
+        {
+          "sectionNumber": 34,
+          "sectionTitle": "Unmanned Aerial Vehicles (Drones)",
+          "classification": "community_choice",
+          "whyItsHere": "Controls drone use to protect privacy and prevent safety hazards in the gated community.",
+          "whatYouCanDo": "Restricts commercial drone operations and requires approval for recreational use, with privacy protections for neighbors."
+        },
+        {
+          "sectionNumber": 35,
+          "sectionTitle": "Swimming Pools, Spas, Water Features",
+          "classification": "community_choice",
+          "whyItsHere": "Pool barrier requirements (48-inch minimum) and drainage provisions are safety-critical. Pool chemical storage and backwash drainage must account for the hillside topography.",
+          "whatYouCanDo": "Requires compliance with safety codes for pools and spas, including barrier fencing, drain covers, and proper chemical storage with drainage considerations.",
+          "communityImpact": "Pool barrier requirements (48-inch minimum) and drainage provisions are safety-critical. Pool chemical storage and backwash drainage must account for the hillside topography."
+        }
+      ]
+    },
+    {
+      "articleNumber": 9,
+      "articleTitle": "Rental Restrictions",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "Prohibited Uses and General Restrictions",
+          "classification": "community_choice",
+          "whyItsHere": "Restricts all lots to single-family residential leasing. Short-term rental prohibition protects the gated community from transient occupants unfamiliar with WUI safety and community rules.",
+          "whatYouCanDo": "Prohibits short-term rentals, vacation leasing, and transient occupancy, restricting use to permanent residential leases.",
+          "communityImpact": "Restricts all lots to single-family residential leasing. Short-term rental prohibition protects the gated community from transient occupants unfamiliar with WUI safety and community rules."
+        },
+        {
+          "sectionNumber": 2,
+          "sectionTitle": "Permitted Rentals; Minimum Term",
+          "classification": "community_choice",
+          "whyItsHere": "180-day minimum lease term. The 1-rental cap means this is currently maxed out — any policy change affects whether additional homes can become rentals.",
+          "whatYouCanDo": "Permits long-term leases (minimum 180 days) for single-family residences, subject to the rental property cap limitation.",
+          "communityImpact": "180-day minimum lease term. The 1-rental cap means this is currently maxed out — any policy change affects whether additional homes can become rentals."
+        },
+        {
+          "sectionNumber": 3,
+          "sectionTitle": "Lease Compliance Requirements",
+          "classification": "best_practice",
+          "whyItsHere": "Ensures tenant compliance with community rules and CC&Rs through owner responsibility.",
+          "whatYouCanDo": "Requires lease agreements to incorporate community rules and CC&R provisions, making tenants subject to enforcement procedures."
+        },
+        {
+          "sectionNumber": 4,
+          "sectionTitle": "Enforcement and Fines",
+          "classification": "best_practice",
+          "whyItsHere": "Fines calibrated to rental income provide meaningful deterrent. Standard flat fines may be insufficient against short-term rental revenue.",
+          "whatYouCanDo": "Establishes enforcement procedures and fine schedules for rental violations, with escalating penalties for repeat offenses.",
+          "communityImpact": "Fines calibrated to rental income provide meaningful deterrent. Standard flat fines may be insufficient against short-term rental revenue."
+        },
+        {
+          "sectionNumber": 5,
+          "sectionTitle": "Rental Registration",
+          "classification": "best_practice",
+          "whyItsHere": "Maintains association awareness of rental properties and ensures property information is current.",
+          "whatYouCanDo": "Requires owners to register rental properties with the association, providing tenant contact information and lease terms."
+        },
+        {
+          "sectionNumber": 6,
+          "sectionTitle": "Rental Property Cap",
+          "classification": "community_choice",
+          "whyItsHere": "The 1-of-16 rental cap is the community's primary tool for preserving owner-occupancy. Currently at maximum. Any increase affects community character and governance participation.",
+          "whatYouCanDo": "Limits the total number of rental-permitted properties in the community, currently set at 1 property maximum.",
+          "communityImpact": "The 1-of-16 rental cap is the community's primary tool for preserving owner-occupancy. Currently at maximum. Any increase affects community character and governance participation."
+        }
+      ]
+    },
+    {
+      "articleNumber": 10,
+      "articleTitle": "Deviations",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "Deviation Process",
+          "classification": "best_practice",
+          "whyItsHere": "Provides a fair and transparent procedure for requesting exceptions to restrictive covenants when circumstances warrant.",
+          "whatYouCanDo": "Establishes formal deviation request procedures, including documentation requirements, review criteria, and approval authority."
+        }
+      ]
+    },
+    {
+      "articleNumber": 11,
+      "articleTitle": "Easements and Rights",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "General Easement",
+          "classification": "best_practice",
+          "whyItsHere": "Grants necessary easements for association operations and community infrastructure maintenance.",
+          "whatYouCanDo": "Establishes general easement rights for the association to access properties as needed for maintenance and operations."
+        },
+        {
+          "sectionNumber": 2,
+          "sectionTitle": "Crossover Easement",
+          "classification": "best_practice",
+          "whyItsHere": "Critical for the 8 townhomes with shared walls. Crossover easements allow necessary access for maintenance and repair of shared structural components.",
+          "whatYouCanDo": "Permits necessary access across neighboring properties for maintenance and repair of shared walls and structural components.",
+          "communityImpact": "Critical for the 8 townhomes with shared walls. Crossover easements allow necessary access for maintenance and repair of shared structural components."
+        },
+        {
+          "sectionNumber": 3,
+          "sectionTitle": "Alteration Easement",
+          "classification": "best_practice",
+          "whyItsHere": "Allows necessary modifications to properties to maintain structural integrity and compliance with regulations.",
+          "whatYouCanDo": "Grants easement rights for alterations to shared structures and facilities needed to maintain safety and code compliance."
+        },
+        {
+          "sectionNumber": 4,
+          "sectionTitle": "Encroachment Easement",
+          "classification": "best_practice",
+          "whyItsHere": "Addresses situations where structures or landscaping legitimately encroach on adjacent properties by prior approval.",
+          "whatYouCanDo": "Permits formally recorded encroachments with proper documentation and neighbor consent to establish clear legal rights."
+        },
+        {
+          "sectionNumber": 5,
+          "sectionTitle": "Drainage Easement",
+          "classification": "best_practice",
+          "whyItsHere": "On this hillside, drainage easements are essential. All 8 townhomes have 8+ foot grade drops on the west side, and all 16 homes contend with drainage issues. These easements ensure water flows without causing erosion damage.",
+          "whatYouCanDo": "Establishes easement rights for stormwater drainage systems, ensuring water flows across properties without causing erosion or property damage.",
+          "communityImpact": "On this hillside, drainage easements are essential. All 8 townhomes have 8+ foot grade drops on the west side, and all 16 homes contend with drainage issues. These easements ensure water flows without causing erosion damage."
+        },
+        {
+          "sectionNumber": 6,
+          "sectionTitle": "Easement for Accoutrements",
+          "classification": "best_practice",
+          "whyItsHere": "Permits necessary appurtenances and fixtures to serve easement functions and community infrastructure.",
+          "whatYouCanDo": "Establishes easement rights for utility boxes, pipes, drains, and other appurtenances necessary to support association operations."
+        },
+        {
+          "sectionNumber": 7,
+          "sectionTitle": "Utility Easement",
+          "classification": "best_practice",
+          "whyItsHere": "Grants necessary easements for water, sewer, gas, electric, and communications infrastructure serving the community.",
+          "whatYouCanDo": "Establishes easement rights for utility lines, pipes, and service access across properties to support community infrastructure."
+        },
+        {
+          "sectionNumber": 8,
+          "sectionTitle": "Construction Easement",
+          "classification": "best_practice",
+          "whyItsHere": "Permits temporary access and workspace for authorized construction and maintenance projects.",
+          "whatYouCanDo": "Establishes easement rights for construction equipment, materials, and temporary structures during approved improvement projects."
+        },
+        {
+          "sectionNumber": 9,
+          "sectionTitle": "Blanket Easement",
+          "classification": "best_practice",
+          "whyItsHere": "Provides comprehensive easement authority to address unforeseen community infrastructure needs.",
+          "whatYouCanDo": "Establishes broad easement rights allowing the association to address future infrastructure and maintenance needs as they arise."
+        }
+      ]
+    },
+    {
+      "articleNumber": 12,
+      "articleTitle": "Complaints and Enforcement",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "Complaints by Owner",
+          "classification": "required_by_law",
+          "whyItsHere": "Texas Property Code requires fair procedures for owner complaints and enforcement actions.",
+          "whatYouCanDo": "Establishes procedures for owners to file complaints regarding alleged violations by other owners or the association."
+        },
+        {
+          "sectionNumber": 2,
+          "sectionTitle": "Complaints by the Association",
+          "classification": "required_by_law",
+          "whyItsHere": "Texas Property Code requires proper notice and hearing procedures before enforcement action.",
+          "whatYouCanDo": "Establishes procedures for the association to initiate enforcement regarding covenant violations."
+        },
+        {
+          "sectionNumber": 3,
+          "sectionTitle": "Remedy of Violations",
+          "classification": "required_by_law",
+          "whyItsHere": "The notice-hearing-fine sequence is actively in use (1 NOV, 2 courtesy notices currently). In a 16-lot community, enforcement disputes can strain neighbor relationships quickly — proper procedures protect both the Association and the homeowner.",
+          "whatYouCanDo": "Establishes the enforcement sequence including notice requirements, hearing opportunities, and remedial action timelines.",
+          "communityImpact": "The notice-hearing-fine sequence is actively in use (1 NOV, 2 courtesy notices currently). In a 16-lot community, enforcement disputes can strain neighbor relationships quickly — proper procedures protect both the Association and the homeowner."
+        },
+        {
+          "sectionNumber": 4,
+          "sectionTitle": "Fines and Penalty Schedule",
+          "classification": "required_by_law",
+          "whyItsHere": "Fine amounts (\\$150/\\$300/\\$450 escalating, \\$200/day continuing, \\$5,000 max) must balance deterrence with proportionality. For fixed-income homeowners, even moderate fines are significant.",
+          "whatYouCanDo": "Establishes specific fine amounts for violations, with escalating penalties and limitations on total fines per violation.",
+          "communityImpact": "Fine amounts (\\$150/\\$300/\\$450 escalating, \\$200/day continuing, \\$5,000 max) must balance deterrence with proportionality. For fixed-income homeowners, even moderate fines are significant."
+        }
+      ]
+    },
+    {
+      "articleNumber": 13,
+      "articleTitle": "General Provisions",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "Enforcement",
+          "classification": "best_practice",
+          "whyItsHere": "Establishes association authority and responsibility to enforce CC&R provisions uniformly and fairly.",
+          "whatYouCanDo": "Authorizes the association to enforce covenants through notice, hearings, fines, and legal action while respecting due process."
+        },
+        {
+          "sectionNumber": 2,
+          "sectionTitle": "Severability",
+          "classification": "best_practice",
+          "whyItsHere": "Ensures that if one provision is found invalid, the remaining CC&Rs remain enforceable.",
+          "whatYouCanDo": "Establishes that invalid provisions will be severed while leaving all other covenants intact and enforceable."
+        },
+        {
+          "sectionNumber": 3,
+          "sectionTitle": "Duration and Amendment",
+          "classification": "best_practice",
+          "whyItsHere": "Two-Thirds Vote (11 of 16 lots) required to amend the CC&Rs. The 20-year initial term means these provisions will govern the community through approximately 2046.",
+          "whatYouCanDo": "Establishes the 20-year initial term and specifies amendment procedures requiring two-thirds owner approval.",
+          "communityImpact": "Two-Thirds Vote (11 of 16 lots) required to amend the CC&Rs. The 20-year initial term means these provisions will govern the community through approximately 2046."
+        },
+        {
+          "sectionNumber": 4,
+          "sectionTitle": "Notices",
+          "classification": "required_by_law",
+          "whyItsHere": "Texas Property Code requires proper notice procedures to ensure owners receive and can respond to formal communications.",
+          "whatYouCanDo": "Establishes methods and requirements for official notice including personal delivery, mail, and electronic communication."
+        },
+        {
+          "sectionNumber": 5,
+          "sectionTitle": "Rules of Conduct",
+          "classification": "best_practice",
+          "whyItsHere": "Establishes standards for respectful interaction and dispute resolution among community members.",
+          "whatYouCanDo": "Defines expectations for civil discourse and prohibits harassment or abusive conduct in association proceedings."
+        },
+        {
+          "sectionNumber": 6,
+          "sectionTitle": "Compliance with TX Property Code Ch. 209",
+          "classification": "required_by_law",
+          "whyItsHere": "Incorporates Texas Property Code requirements for HOA governance and ensures CC&Rs comply with state law.",
+          "whatYouCanDo": "Affirms that the association will comply with all applicable Texas Property Code Chapter 209 requirements."
+        },
+        {
+          "sectionNumber": 7,
+          "sectionTitle": "Owner Requests for Records",
+          "classification": "required_by_law",
+          "whyItsHere": "Texas Property Code requires associations to provide financial and governance records upon owner request.",
+          "whatYouCanDo": "Establishes procedures and timelines for owners to request and obtain association records including budgets, minutes, and financial statements."
+        },
+        {
+          "sectionNumber": 8,
+          "sectionTitle": "Record Retention",
+          "classification": "best_practice",
+          "whyItsHere": "Ensures adequate documentation of association governance and financial transactions for transparency and accountability.",
+          "whatYouCanDo": "Establishes requirements for maintaining records including meeting minutes, financial statements, and enforcement documentation."
+        },
+        {
+          "sectionNumber": 9,
+          "sectionTitle": "Governing Law",
+          "classification": "best_practice",
+          "whyItsHere": "Establishes Texas law as the governing legal framework for interpreting and enforcing the CC&Rs.",
+          "whatYouCanDo": "Specifies that the CC&Rs will be interpreted and enforced under Texas law and Travis County jurisdiction."
+        },
+        {
+          "sectionNumber": 10,
+          "sectionTitle": "No Discrimination",
+          "classification": "required_by_law",
+          "whyItsHere": "Federal and Texas law prohibit discrimination based on protected characteristics in HOA governance and enforcement.",
+          "whatYouCanDo": "Affirms commitment to non-discrimination and equal treatment of all residents regardless of protected class status."
+        },
+        {
+          "sectionNumber": 11,
+          "sectionTitle": "Online Document Availability",
+          "classification": "best_practice",
+          "whyItsHere": "Modern governance transparency requires making key documents accessible to all owners.",
+          "whatYouCanDo": "Requires the association to maintain accessible online versions of CC&Rs, bylaws, rules, and financial information."
+        },
+        {
+          "sectionNumber": 12,
+          "sectionTitle": "Homeowner Insurance Requirements",
+          "classification": "best_practice",
+          "whyItsHere": "Association insurance covers only Common Area and D&O — not individual homes. Homeowners must carry their own coverage, which is especially important for the 8 townhomes sharing structural walls.",
+          "whatYouCanDo": "Requires individual homeowners to maintain hazard insurance covering their own properties and improvements.",
+          "communityImpact": "Association insurance covers only Common Area and D&O — not individual homes. Homeowners must carry their own coverage, which is especially important for the 8 townhomes sharing structural walls."
+        },
+        {
+          "sectionNumber": 13,
+          "sectionTitle": "Force Majeure",
+          "classification": "best_practice",
+          "whyItsHere": "Addresses circumstances beyond association control (natural disasters, pandemics) that may affect enforcement or operations.",
+          "whatYouCanDo": "Excuses non-performance of certain obligations during force majeure events, with procedures for resuming operations."
+        },
+        {
+          "sectionNumber": 14,
+          "sectionTitle": "Resale Certificates",
+          "classification": "required_by_law",
+          "whyItsHere": "Texas Property Code requires associations to provide resale certificates disclosing financial and governance information.",
+          "whatYouCanDo": "Obligates the association to provide resale certificates to selling owners containing current assessment amounts, financial status, and disclosures."
+        }
+      ]
+    },
+    {
+      "articleNumber": 14,
+      "articleTitle": "Ratification and Execution",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "Ratification by All Owners",
+          "classification": "best_practice",
+          "whyItsHere": "Requires owner approval to establish legitimacy and ensure consensus support for new governance framework.",
+          "whatYouCanDo": "Confirms that these CC&Rs have been properly ratified by all property owners or their legal representatives."
+        },
+        {
+          "sectionNumber": 2,
+          "sectionTitle": "Supersession of Original Declaration",
+          "classification": "best_practice",
+          "whyItsHere": "Replaces the 1981 CC&Rs that have governed the HOA for 45 years. This is a significant legal act — every owner must understand that the original Declaration will no longer be in effect.",
+          "whatYouCanDo": "Formally supersedes the 1981 CC&Rs and all prior amendments, establishing these provisions as the governing document.",
+          "communityImpact": "Replaces the 1981 CC&Rs that have governed the HOA for 45 years. This is a significant legal act — every owner must understand that the original Declaration will no longer be in effect."
+        },
+        {
+          "sectionNumber": 3,
+          "sectionTitle": "Existing Approvals and Variances",
+          "classification": "best_practice",
+          "whyItsHere": "Preserves the validity of prior variances and approvals granted under the original CC&Rs, protecting existing owner expectations.",
+          "whatYouCanDo": "Confirms that existing approved deviations, variances, and prior architectural approvals remain valid under the new CC&Rs."
+        },
+        {
+          "sectionNumber": 4,
+          "sectionTitle": "Recordation",
+          "classification": "best_practice",
+          "whyItsHere": "Formal recording in the Travis County property records establishes these CC&Rs as binding on all current and future owners.",
+          "whatYouCanDo": "Confirms that these CC&Rs have been properly recorded in the Travis County deed records as required by law."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+'use strict';
+
+const { PutCommand, QueryCommand, GetCommand } = require('@aws-sdk/lib-dynamodb');
+const { ddb, TABLE_NAME } = require('./shared/dynamo');
+const { requireGroup, getUserSub, ok, forbidden, badRequest, serverError } = require('./shared/auth');
+
+/**
+ * POST /cycles/{cycleId}/submit
+ * Finalize the reviewer's ballot. After submission, votes are locked and
+ * aggregate results become visible to the reviewer.
+ *
+ * Group: reviewers
+ */
+exports.handler = async (event) => {
+  try {
+    requireGroup(event, ['reviewers', 'review-admins']);
+  } catch (e) {
+    return forbidden(e.message);
+  }
+
+  const cycleId = event.pathParameters?.cycleId;
+  if (!cycleId) return badRequest('cycleId is required');
+
+  const userSub = getUserSub(event);
+
+  try {
+    // Check if already submitted
+    const existing = await ddb.send(new GetCommand({
+      TableName: TABLE_NAME,
+      Key: { PK: `CYCLE#${cycleId}`, SK: `BALLOT#USER#${userSub}` },
+    }));
+    if (existing.Item?.status === 'submitted') {
+      return badRequest('Ballot already submitted');
+    }
+
+    // Count total sections in the cycle
+    const contentResult = await ddb.send(new QueryCommand({
+      TableName: TABLE_NAME,
+      KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
+      ExpressionAttributeValues: {
+        ':pk': `CYCLE#${cycleId}`,
+        ':sk': 'CONTENT#',
+      },
+      Select: 'COUNT',
+    }));
+    const totalSections = contentResult.Count || 0;
+
+    // Count this user's votes
+    const voteResult = await ddb.send(new QueryCommand({
+      TableName: TABLE_NAME,
+      KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
+      ExpressionAttributeValues: {
+        ':pk': `CYCLE#${cycleId}`,
+        ':sk': 'VOTE#',
+      },
+      FilterExpression: 'contains(SK, :userFilter)',
+      ExpressionAttributeValues: {
+        ':pk': `CYCLE#${cycleId}`,
+        ':sk': 'VOTE#',
+        ':userFilter': `USER#${userSub}`,
+      },
+      Select: 'COUNT',
+    }));
+
+    // Only count votes that actually have a vote value (not just notes)
+    // Re-query with full items to verify
+    const fullVoteResult = await ddb.send(new QueryCommand({
+      TableName: TABLE_NAME,
+      KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
+      ExpressionAttributeValues: {
+        ':pk': `CYCLE#${cycleId}`,
+        ':sk': 'VOTE#',
+      },
+      FilterExpression: 'contains(SK, :userFilter) AND attribute_exists(vote)',
+      ExpressionAttributeValues: {
+        ':pk': `CYCLE#${cycleId}`,
+        ':sk': 'VOTE#',
+        ':userFilter': `USER#${userSub}`,
+      },
+      Select: 'COUNT',
+    }));
+    const votedSections = fullVoteResult.Count || 0;
+
+    if (votedSections < totalSections) {
+      return badRequest(`You have voted on ${votedSections} of ${totalSections} sections. All sections must be voted on before submitting.`);
+    }
+
+    // Mark ballot as submitted
+    const now = new Date().toISOString();
+    await ddb.send(new PutCommand({
+      TableName: TABLE_NAME,
+      Item: {
+        PK: `CYCLE#${cycleId}`,
+        SK: `BALLOT#USER#${userSub}`,
+        status: 'submitted',
+        submittedAt: now,
+        sectionsVoted: votedSections,
+        GSI1PK: `USER#${userSub}`,
+        GSI1SK: `CYCLE#${cycleId}`,
+      },
+    }));
+
+    console.log(`[ballot-submit] user=${userSub} cycle=${cycleId} sections=${votedSections}`);
+    return ok({ submitted: true, cycleId, sectionsVoted: votedSections, submittedAt: now });
+  } catch (err) {
+    console.error('[ballot-submit] error:', err);
+    return serverError();
+  }
+};

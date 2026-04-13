@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Article Review — MMPOAII</title>
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/review.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="inner">
+    <a href="/" class="site-logo">
+      <div class="logo-mark">🏡</div>
+      <div class="logo-text">
+        <div class="logo-name" data-hoa-name>MMPOAII HOA</div>
+        <div class="logo-sub">Document Review</div>
+      </div>
+    </a>
+    <nav class="site-nav">
+      <a href="#" id="back-link">← Back to Articles</a>
+      <div class="nav-user">
+        <div class="avatar" id="nav-avatar">?</div>
+        <div>
+          <div class="uname" data-user-name>Loading…</div>
+          <div class="urole" data-user-role></div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="HoaGuard.logout()">Sign Out</button>
+    </nav>
+  </div>
+</header>
+
+<div id="page-content">
+<div class="review-wrap">
+
+  <div class="article-header">
+    <div class="ah-nav" id="art-nav">
+      <a href="#" id="prev-link" style="display:none;">← Previous Article</a>
+      <span style="flex:1"></span>
+      <a href="#" id="next-link" style="display:none;">Next Article →</a>
+    </div>
+    <h2 id="article-title">Loading…</h2>
+    <p id="article-progress" style="font-size:13px;color:var(--text3);margin-top:4px;"></p>
+  </div>
+
+  <div id="sections-container">
+    <div class="empty-state">
+      <div class="es-icon">⏳</div>
+      <div class="es-text">Loading sections…</div>
+    </div>
+  </div>
+
+  <div id="nav-bottom" class="ah-nav" style="margin-top:24px;display:none;">
+    <a href="#" id="prev-link-bottom">← Previous Article</a>
+    <span style="flex:1"></span>
+    <a href="#" id="next-link-bottom">Next Article →</a>
+  </div>
+
+</div>
+</div>
+
+<footer class="site-footer">
+  <div data-hoa-name>MMPOAII HOA</div>
+  <div>Document Review System — Confidential</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6/dist/amazon-cognito-identity.min.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/guard.js"></script>
+<script src="/js/review-api.js"></script>
+<script>
+HoaGuard.protect('reviewers');
+
+var params = new URLSearchParams(window.location.search);
+var cycleId = params.get('cycleId');
+var articleId = params.get('articleId');
+
+if (!cycleId || !articleId) {
+  window.location.href = '/review/index.html';
+}
+
+// Set back link
+document.getElementById('back-link').href = '/review/articles.html?cycleId=' + encodeURIComponent(cycleId);
+
+// Debounce timers for notes autosave
+var noteTimers = {};
+
+// Classification labels
+var classLabels = {
+  required_by_law: 'Required by Texas Law',
+  required_by_city: 'Required by City of Austin',
+  best_practice: 'Recommended Best Practice',
+  community_choice: 'Community Choice'
+};
+
+async function loadArticle() {
+  try {
+    var data = await ReviewApi.getArticle(cycleId, articleId);
+    var artNum = parseInt(articleId, 10);
+
+    document.getElementById('article-title').textContent =
+      'Article ' + data.articleNumber + ' — ' + data.articleTitle;
+
+    var voted = 0;
+    var total = data.sections.length;
+    data.sections.forEach(function (s) { if (s.myVote && s.myVote.vote) voted++; });
+    document.getElementById('article-progress').textContent =
+      voted + ' of ' + total + ' sections voted in this article';
+
+    document.title = 'Art. ' + data.articleNumber + ' — ' + data.articleTitle + ' — Review';
+
+    // Nav links
+    setupNav(artNum);
+
+    // Render sections
+    var html = '<div class="section-list">';
+    for (var i = 0; i < data.sections.length; i++) {
+      var s = data.sections[i];
+      var secId = 'ART-' + pad(artNum) + '#SEC-' + pad(s.sectionNumber);
+      var cls = s.classification || 'best_practice';
+      var currentVote = (s.myVote && s.myVote.vote) || '';
+      var currentNotes = (s.myVote && s.myVote.notes) || '';
+
+      html += '<div class="section-card" id="sec-' + s.sectionNumber + '">';
+
+      // Header
+      html += '<div class="sc-header">';
+      html += '<div class="sc-title-group">';
+      html += '<div class="sc-title">Art. ' + artNum + ', §' + s.sectionNumber + ' — ' + escHtml(s.sectionTitle) + '</div>';
+      html += '<span class="sc-classification cls-' + cls + '">' + escHtml(classLabels[cls] || cls) + '</span>';
+      html += '</div></div>';
+
+      // Body
+      html += '<div class="sc-body">';
+
+      html += '<div class="sc-field">';
+      html += '<div class="sc-label">Why It\'s Here</div>';
+      html += '<div class="sc-text">' + escHtml(s.whyItsHere) + '</div>';
+      html += '</div>';
+
+      html += '<div class="sc-field">';
+      html += '<div class="sc-label">What You Can Do</div>';
+      html += '<div class="sc-text">' + escHtml(s.whatYouCanDo) + '</div>';
+      html += '</div>';
+
+      if (s.communityImpact) {
+        html += '<div class="sc-impact">';
+        html += '<div class="sc-label">Community Impact</div>';
+        html += '<div class="sc-text">' + escHtml(s.communityImpact) + '</div>';
+        html += '</div>';
+      }
+
+      html += '</div>'; // /sc-body
+
+      // Vote controls
+      html += '<div class="vote-controls">';
+      html += '<div class="vote-buttons">';
+      html += voteButton(secId, 'approve', 'Approve', currentVote);
+      html += voteButton(secId, 'disapprove', 'Disapprove', currentVote);
+      html += voteButton(secId, 'discuss', 'Discuss', currentVote);
+      html += '</div>';
+      html += '<textarea class="vote-notes" id="notes-' + secId + '" ' +
+              'placeholder="Optional notes or comments…" ' +
+              'oninput="onNotesInput(\'' + secId + '\')">' + escHtml(currentNotes) + '</textarea>';
+      html += '<div class="save-indicator" id="status-' + secId + '"></div>';
+      html += '</div>'; // /vote-controls
+
+      html += '</div>'; // /section-card
+    }
+    html += '</div>';
+    document.getElementById('sections-container').innerHTML = html;
+    document.getElementById('nav-bottom').style.display = 'flex';
+
+  } catch (err) {
+    document.getElementById('sections-container').innerHTML =
+      '<div class="alert alert-error">Failed to load article: ' + escHtml(err.message) + '</div>';
+  }
+}
+
+function voteButton(secId, value, label, currentVote) {
+  var selected = currentVote === value ? ' selected' : '';
+  return '<button class="vote-btn ' + value + selected + '" ' +
+    'onclick="onVoteClick(\'' + secId + '\', \'' + value + '\', this)">' +
+    label + '</button>';
+}
+
+function setupNav(artNum) {
+  // We know CC&Rs have articles 1-14, but let's just do prev/next based on artNum
+  var base = '/review/article.html?cycleId=' + encodeURIComponent(cycleId) + '&articleId=';
+
+  if (artNum > 1) {
+    document.getElementById('prev-link').href = base + (artNum - 1);
+    document.getElementById('prev-link').style.display = '';
+    document.getElementById('prev-link-bottom').href = base + (artNum - 1);
+  } else {
+    document.getElementById('prev-link').style.display = 'none';
+    document.getElementById('prev-link-bottom').style.display = 'none';
+  }
+
+  // Always show next (it'll 404 gracefully if there's no next article)
+  document.getElementById('next-link').href = base + (artNum + 1);
+  document.getElementById('next-link').style.display = '';
+  document.getElementById('next-link-bottom').href = base + (artNum + 1);
+}
+
+// ── Vote click handler (immediate save) ──
+async function onVoteClick(secId, vote, btn) {
+  // Update button states
+  var buttons = btn.parentElement.querySelectorAll('.vote-btn');
+  buttons.forEach(function (b) { b.classList.remove('selected'); });
+  btn.classList.add('selected');
+
+  // Get current notes
+  var notesEl = document.getElementById('notes-' + secId);
+  var notes = notesEl ? notesEl.value : undefined;
+
+  setStatus(secId, 'saving', 'Saving…');
+  try {
+    await ReviewApi.saveVote(cycleId, secId, vote, notes);
+    setStatus(secId, 'saved', 'Saved ✓');
+  } catch (err) {
+    setStatus(secId, 'error', 'Save failed: ' + err.message);
+  }
+}
+
+// ── Notes input handler (debounced 500ms) ──
+function onNotesInput(secId) {
+  if (noteTimers[secId]) clearTimeout(noteTimers[secId]);
+
+  setStatus(secId, 'saving', 'Typing…');
+
+  noteTimers[secId] = setTimeout(async function () {
+    var notesEl = document.getElementById('notes-' + secId);
+    var notes = notesEl ? notesEl.value : '';
+
+    // Find current vote
+    var container = notesEl.closest('.vote-controls');
+    var selectedBtn = container.querySelector('.vote-btn.selected');
+    var vote = selectedBtn ? selectedBtn.textContent.trim().toLowerCase() : undefined;
+
+    setStatus(secId, 'saving', 'Saving notes…');
+    try {
+      await ReviewApi.saveVote(cycleId, secId, vote, notes);
+      setStatus(secId, 'saved', 'Saved ✓');
+    } catch (err) {
+      setStatus(secId, 'error', 'Save failed: ' + err.message);
+    }
+  }, 500);
+}
+
+function setStatus(secId, cls, text) {
+  var el = document.getElementById('status-' + secId);
+  if (el) {
+    el.className = 'save-indicator ' + cls;
+    el.textContent = text;
+  }
+}
+
+function pad(n) { return String(n).padStart(2, '0'); }
+
+function escHtml(s) {
+  var d = document.createElement('div');
+  d.textContent = s || '';
+  return d.innerHTML;
+}
+
+var guardCheck = setInterval(function () {
+  if (HoaGuard.getUser()) {
+    clearInterval(guardCheck);
+    loadArticle();
+    var uname = document.querySelector('[data-user-name]');
+    if (uname && uname.textContent !== 'Loading…') {
+      document.getElementById('nav-avatar').textContent = uname.textContent.charAt(0).toUpperCase();
+    }
+  }
+}, 100);
+</script>
+</body>
+</html>

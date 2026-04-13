@@ -1,0 +1,18 @@
+# SAM deploy configuration for MMPOA Document Review System
+# Run: sam deploy  (uses these defaults)
+
+version = 0.1
+
+[default.deploy.parameters]
+stack_name = "mmpoa-review"
+region = "us-east-1"
+resolve_s3 = true
+capabilities = "CAPABILITY_IAM CAPABILITY_NAMED_IAM"
+confirm_changeset = true
+
+parameter_overrides = [
+  "CognitoUserPoolId=us-east-1_tfk0ub8lC",
+  "CognitoUserPoolArn=arn:aws:cognito-idp:us-east-1:378944200967:userpool/us-east-1_tfk0ub8lC",
+  "StageName=prod",
+  "SeedBucketName=mmpoa-review-seeds"
+]

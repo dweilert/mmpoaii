@@ -1,0 +1,311 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   DOCUMENT REVIEW SYSTEM — Styles
+   Matches existing site.css patterns (purple/teal/amber palette, Source Sans 3)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* ── Page layout ── */
+.review-wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+}
+
+/* ── Cycle list (dashboard) ── */
+.cycle-list { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+
+.cycle-card {
+  display: flex; align-items: center; gap: 16px;
+  background: var(--surf);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  padding: 18px 20px;
+  text-decoration: none; color: var(--text);
+  transition: box-shadow .15s, border-color .15s;
+}
+.cycle-card:hover { border-color: var(--purple-600); box-shadow: 0 2px 8px rgba(60,52,137,.12); }
+.cycle-card .cc-icon { font-size: 28px; flex-shrink: 0; }
+.cycle-card .cc-body { flex: 1; min-width: 0; }
+.cycle-card .cc-title { font-weight: 700; font-size: 15px; }
+.cycle-card .cc-meta { font-size: 12.5px; color: var(--text3); margin-top: 2px; }
+.cycle-card .cc-status {
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+  padding: 3px 10px; border-radius: 20px; flex-shrink: 0;
+}
+.cc-status.open { background: var(--green-50); color: var(--green-600); }
+.cc-status.closed { background: var(--gray-100); color: var(--gray-600); }
+
+/* ── Progress bar ── */
+.progress-bar {
+  height: 6px; border-radius: 3px; background: var(--gray-100);
+  margin-top: 8px; overflow: hidden;
+}
+.progress-bar .fill {
+  height: 100%; border-radius: 3px;
+  background: var(--purple-600);
+  transition: width .3s ease;
+}
+
+/* ── Article list ── */
+.article-list { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+
+.article-card {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--surf);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  padding: 14px 18px;
+  text-decoration: none; color: var(--text);
+  transition: border-color .15s;
+}
+.article-card:hover { border-color: var(--purple-600); }
+.article-card .ac-num {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--purple-50); color: var(--purple-800);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 14px; flex-shrink: 0;
+}
+.article-card .ac-body { flex: 1; }
+.article-card .ac-title { font-weight: 600; font-size: 14.5px; }
+.article-card .ac-progress { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.article-card.complete .ac-num { background: var(--green-50); color: var(--green-600); }
+
+/* ── Section cards (voting page) ── */
+.section-list { display: flex; flex-direction: column; gap: 20px; margin-top: 20px; }
+
+.section-card {
+  background: var(--surf);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  overflow: hidden;
+}
+.section-card .sc-header {
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--border2);
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+}
+.section-card .sc-title-group { flex: 1; }
+.section-card .sc-title { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+.section-card .sc-classification {
+  display: inline-block;
+  font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+  padding: 2px 8px; border-radius: 4px;
+}
+.cls-required_by_law      { background: var(--red-50); color: var(--red-600); }
+.cls-required_by_city     { background: var(--amber-50); color: var(--amber-600); }
+.cls-best_practice        { background: var(--purple-50); color: var(--purple-800); }
+.cls-community_choice     { background: var(--teal-50); color: var(--teal-700); }
+
+.section-card .sc-body { padding: 16px 20px; }
+.section-card .sc-field { margin-bottom: 14px; }
+.section-card .sc-label {
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+  color: var(--text3); margin-bottom: 4px;
+}
+.section-card .sc-text { font-size: 14px; line-height: 1.6; color: var(--text2); }
+
+.section-card .sc-impact {
+  background: var(--amber-50);
+  border-left: 3px solid var(--amber-600);
+  padding: 10px 14px;
+  border-radius: 0 var(--r) var(--r) 0;
+  margin-top: 10px;
+}
+.sc-impact .sc-label { color: var(--amber-600); }
+
+/* ── Vote controls ── */
+.vote-controls {
+  padding: 14px 20px;
+  background: var(--surf2);
+  border-top: 1px solid var(--border2);
+}
+.vote-buttons {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;
+}
+.vote-btn {
+  padding: 7px 16px; border-radius: var(--r);
+  border: 2px solid var(--border);
+  background: var(--surf);
+  font-family: var(--sans); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .13s;
+  color: var(--text2);
+}
+.vote-btn:hover { border-color: var(--purple-600); color: var(--purple-800); }
+.vote-btn.selected { color: #fff; border-color: transparent; }
+.vote-btn.selected.approve   { background: var(--green-600); }
+.vote-btn.selected.disapprove { background: var(--red-600); }
+.vote-btn.selected.discuss   { background: var(--amber-600); }
+
+.vote-notes {
+  width: 100%; min-height: 60px; padding: 10px 12px;
+  border: 1px solid var(--border); border-radius: var(--r);
+  font-family: var(--sans); font-size: 13.5px; line-height: 1.5;
+  resize: vertical; background: var(--surf);
+}
+.vote-notes:focus { outline: none; border-color: var(--purple-600); }
+.vote-notes::placeholder { color: var(--gray-400); }
+
+.save-indicator {
+  font-size: 11px; color: var(--text3); margin-top: 6px;
+  min-height: 16px;
+}
+.save-indicator.saving { color: var(--purple-600); }
+.save-indicator.saved { color: var(--green-600); }
+.save-indicator.error { color: var(--red-600); }
+
+/* ── Submit ballot ── */
+.submit-bar {
+  position: sticky; bottom: 0;
+  background: var(--surf);
+  border-top: 2px solid var(--purple-600);
+  padding: 14px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 -4px 12px rgba(0,0,0,.08);
+  border-radius: var(--r2) var(--r2) 0 0;
+  margin-top: 24px;
+}
+.submit-bar .sb-progress { font-size: 13.5px; color: var(--text2); }
+.submit-bar .sb-progress strong { color: var(--text); }
+
+.btn-submit {
+  padding: 10px 24px; border: none; border-radius: var(--r);
+  background: var(--purple-800); color: #fff;
+  font-family: var(--sans); font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: background .13s;
+}
+.btn-submit:hover { background: var(--purple-600); }
+.btn-submit:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ── Aggregate results ── */
+.agg-section {
+  display: flex; align-items: center; gap: 16px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border2);
+}
+.agg-section:last-child { border-bottom: none; }
+.agg-title { flex: 1; font-size: 14px; font-weight: 600; }
+.agg-votes { display: flex; gap: 6px; }
+.agg-badge {
+  font-size: 12px; font-weight: 700; padding: 3px 10px;
+  border-radius: 20px; min-width: 32px; text-align: center;
+}
+.agg-badge.approve   { background: var(--green-50); color: var(--green-600); }
+.agg-badge.disapprove { background: var(--red-50); color: var(--red-600); }
+.agg-badge.discuss   { background: var(--amber-50); color: var(--amber-600); }
+
+.agg-notes-list {
+  margin-top: 8px; padding: 0; list-style: none;
+}
+.agg-notes-list li {
+  font-size: 13px; color: var(--text2); padding: 4px 0;
+  border-top: 1px solid var(--border2);
+}
+.agg-notes-list li:first-child { border-top: none; }
+
+/* ── Summary (admin) — decision buttons ── */
+.summary-btns { display: flex; gap: 6px; flex-shrink: 0; }
+.summary-btn {
+  padding: 5px 12px; border-radius: var(--r);
+  border: 2px solid var(--border);
+  background: var(--surf);
+  font-family: var(--sans); font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all .13s; color: var(--text2);
+}
+.summary-btn:hover { border-color: var(--purple-600); }
+.summary-btn.selected.approve   { background: var(--green-600); color: #fff; border-color: transparent; }
+.summary-btn.selected.disapprove { background: var(--red-600); color: #fff; border-color: transparent; }
+.summary-btn.selected.remove    { background: var(--gray-600); color: #fff; border-color: transparent; }
+
+/* ── Admin forms ── */
+.admin-form {
+  background: var(--surf);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  padding: 20px;
+  margin-top: 16px;
+}
+.admin-form .form-row { margin-bottom: 14px; }
+.admin-form label {
+  display: block; font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .5px;
+  color: var(--text3); margin-bottom: 4px;
+}
+.admin-form input, .admin-form select, .admin-form textarea {
+  width: 100%; padding: 9px 12px;
+  border: 1px solid var(--border); border-radius: var(--r);
+  font-family: var(--sans); font-size: 14px;
+}
+.admin-form input:focus, .admin-form select:focus, .admin-form textarea:focus {
+  outline: none; border-color: var(--purple-600);
+}
+.btn-primary {
+  padding: 10px 22px; border: none; border-radius: var(--r);
+  background: var(--purple-800); color: #fff;
+  font-family: var(--sans); font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: background .13s;
+}
+.btn-primary:hover { background: var(--purple-600); }
+.btn-secondary {
+  padding: 10px 22px; border: 2px solid var(--border); border-radius: var(--r);
+  background: var(--surf); color: var(--text2);
+  font-family: var(--sans); font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all .13s;
+}
+.btn-secondary:hover { border-color: var(--purple-600); color: var(--purple-800); }
+
+/* ── Tabs (admin page) ── */
+.tab-bar {
+  display: flex; gap: 0; border-bottom: 2px solid var(--border);
+  margin-top: 16px;
+}
+.tab-btn {
+  padding: 10px 20px;
+  background: none; border: none; border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  font-family: var(--sans); font-size: 14px; font-weight: 600;
+  color: var(--text3); cursor: pointer; transition: all .13s;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--purple-800); border-bottom-color: var(--purple-800); }
+.tab-panel { display: none; padding-top: 16px; }
+.tab-panel.active { display: block; }
+
+/* ── Empty state ── */
+.empty-state {
+  text-align: center; padding: 48px 20px;
+  color: var(--text3);
+}
+.empty-state .es-icon { font-size: 36px; margin-bottom: 12px; }
+.empty-state .es-text { font-size: 15px; }
+
+/* ── Alert banners ── */
+.alert {
+  padding: 12px 16px; border-radius: var(--r);
+  margin-bottom: 16px; font-size: 13.5px;
+}
+.alert-info  { background: var(--purple-50); color: var(--purple-800); }
+.alert-success { background: var(--green-50); color: var(--green-600); }
+.alert-error { background: var(--red-50); color: var(--red-600); }
+.alert-warning { background: var(--amber-50); color: var(--amber-600); }
+
+/* ── Article header (voting page) ── */
+.article-header {
+  margin-bottom: 8px;
+}
+.article-header h2 { font-family: var(--serif); font-size: 22px; font-weight: 700; }
+.article-header .ah-nav {
+  display: flex; gap: 8px; margin-top: 8px;
+}
+.article-header .ah-nav a {
+  font-size: 13px; color: var(--purple-800); text-decoration: none;
+}
+.article-header .ah-nav a:hover { text-decoration: underline; }
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .review-wrap { padding: 14px 12px 60px; }
+  .vote-buttons { gap: 6px; }
+  .vote-btn { padding: 6px 12px; font-size: 12px; }
+  .submit-bar { flex-direction: column; gap: 10px; text-align: center; }
+  .agg-section { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .summary-btns { flex-wrap: wrap; }
+}

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Articles — Document Review</title>
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/review.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="inner">
+    <a href="/" class="site-logo">
+      <div class="logo-mark">🏡</div>
+      <div class="logo-text">
+        <div class="logo-name" data-hoa-name>MMPOAII HOA</div>
+        <div class="logo-sub">Document Review</div>
+      </div>
+    </a>
+    <nav class="site-nav">
+      <a href="/review/index.html">← Back to Cycles</a>
+      <div class="nav-user">
+        <div class="avatar" id="nav-avatar">?</div>
+        <div>
+          <div class="uname" data-user-name>Loading…</div>
+          <div class="urole" data-user-role></div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="HoaGuard.logout()">Sign Out</button>
+    </nav>
+  </div>
+</header>
+
+<div id="page-content">
+<div class="review-wrap">
+
+  <div id="cycle-header" class="welcome-banner" style="background:var(--purple-800);color:#fff;padding:20px 24px;border-radius:var(--r2);margin-bottom:20px;">
+    <h2 id="cycle-title" style="font-family:var(--serif);margin-bottom:4px;">Loading…</h2>
+    <p id="cycle-meta" style="opacity:.8;font-size:14px;"></p>
+  </div>
+
+  <div id="overall-progress" style="display:none;margin-bottom:16px;">
+    <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text2);margin-bottom:4px;">
+      <span>Overall Progress</span>
+      <span id="progress-text">0 / 0 sections voted</span>
+    </div>
+    <div class="progress-bar"><div class="fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+
+  <div id="submit-section" style="display:none;margin-bottom:20px;">
+    <div class="alert alert-info" id="submit-info"></div>
+    <button class="btn-submit" id="submit-btn" onclick="doSubmit()" disabled>Submit Ballot</button>
+  </div>
+
+  <div id="ballot-submitted" style="display:none;" class="alert alert-success">
+    Your ballot has been submitted. <a href="#" id="aggregate-link">View aggregate results →</a>
+  </div>
+
+  <div id="articles-container">
+    <div class="empty-state">
+      <div class="es-icon">⏳</div>
+      <div class="es-text">Loading articles…</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<footer class="site-footer">
+  <div data-hoa-name>MMPOAII HOA</div>
+  <div>Document Review System — Confidential</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6/dist/amazon-cognito-identity.min.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/guard.js"></script>
+<script src="/js/review-api.js"></script>
+<script>
+HoaGuard.protect('reviewers');
+
+var params = new URLSearchParams(window.location.search);
+var cycleId = params.get('cycleId');
+
+if (!cycleId) {
+  window.location.href = '/review/index.html';
+}
+
+var totalSections = 0;
+var totalVoted = 0;
+var ballotSubmitted = false;
+
+async function loadArticles() {
+  try {
+    var data = await ReviewApi.listArticles(cycleId);
+
+    document.getElementById('cycle-title').textContent = 'Review: ' + cycleId;
+    document.getElementById('cycle-meta').textContent = data.articles.length + ' articles';
+
+    totalSections = 0;
+    totalVoted = 0;
+    var articles = data.articles || [];
+
+    var html = '<div class="article-list">';
+    for (var i = 0; i < articles.length; i++) {
+      var a = articles[i];
+      totalSections += a.totalSections;
+      totalVoted += a.votedSections;
+      var complete = a.votedSections === a.totalSections;
+      var pct = a.totalSections > 0 ? Math.round((a.votedSections / a.totalSections) * 100) : 0;
+
+      html +=
+        '<a class="article-card' + (complete ? ' complete' : '') + '" href="/review/article.html?cycleId=' + encodeURIComponent(cycleId) + '&articleId=' + a.articleNumber + '">' +
+          '<div class="ac-num">' + (complete ? '✓' : a.articleNumber) + '</div>' +
+          '<div class="ac-body">' +
+            '<div class="ac-title">Article ' + a.articleNumber + ' — ' + escHtml(a.articleTitle) + '</div>' +
+            '<div class="ac-progress">' + a.votedSections + ' of ' + a.totalSections + ' sections voted</div>' +
+            '<div class="progress-bar"><div class="fill" style="width:' + pct + '%"></div></div>' +
+          '</div>' +
+        '</a>';
+    }
+    html += '</div>';
+    document.getElementById('articles-container').innerHTML = html;
+
+    // Update overall progress
+    var overallPct = totalSections > 0 ? Math.round((totalVoted / totalSections) * 100) : 0;
+    document.getElementById('progress-text').textContent = totalVoted + ' / ' + totalSections + ' sections voted';
+    document.getElementById('progress-fill').style.width = overallPct + '%';
+    document.getElementById('overall-progress').style.display = 'block';
+
+    // Show submit section
+    var submitSection = document.getElementById('submit-section');
+    var submitBtn = document.getElementById('submit-btn');
+    var submitInfo = document.getElementById('submit-info');
+
+    if (totalVoted >= totalSections && totalSections > 0) {
+      submitInfo.textContent = 'All ' + totalSections + ' sections voted. You can now submit your ballot.';
+      submitBtn.disabled = false;
+    } else {
+      submitInfo.textContent = 'Vote on all ' + totalSections + ' sections before submitting (' + (totalSections - totalVoted) + ' remaining).';
+      submitBtn.disabled = true;
+    }
+    submitSection.style.display = 'block';
+
+    // Check if already submitted
+    checkBallotStatus();
+
+  } catch (err) {
+    document.getElementById('articles-container').innerHTML =
+      '<div class="alert alert-error">Failed to load articles: ' + escHtml(err.message) + '</div>';
+  }
+}
+
+async function checkBallotStatus() {
+  try {
+    // Try to access aggregate — if it succeeds, ballot was submitted
+    await ReviewApi.getAggregate(cycleId);
+    showSubmitted();
+  } catch (e) {
+    // 403 means not submitted yet — that's expected
+  }
+}
+
+function showSubmitted() {
+  ballotSubmitted = true;
+  document.getElementById('submit-section').style.display = 'none';
+  var el = document.getElementById('ballot-submitted');
+  el.style.display = 'block';
+  document.getElementById('aggregate-link').href = '/review/aggregate.html?cycleId=' + encodeURIComponent(cycleId);
+}
+
+async function doSubmit() {
+  if (ballotSubmitted) return;
+  var btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+
+  try {
+    await ReviewApi.submitBallot(cycleId);
+    showSubmitted();
+  } catch (err) {
+    document.getElementById('submit-info').className = 'alert alert-error';
+    document.getElementById('submit-info').textContent = 'Submit failed: ' + err.message;
+    btn.disabled = false;
+    btn.textContent = 'Submit Ballot';
+  }
+}
+
+function escHtml(s) {
+  var d = document.createElement('div');
+  d.textContent = s || '';
+  return d.innerHTML;
+}
+
+var guardCheck = setInterval(function () {
+  if (HoaGuard.getUser()) {
+    clearInterval(guardCheck);
+    loadArticles();
+    var uname = document.querySelector('[data-user-name]');
+    if (uname && uname.textContent !== 'Loading…') {
+      document.getElementById('nav-avatar').textContent = uname.textContent.charAt(0).toUpperCase();
+    }
+  }
+}, 100);
+</script>
+</body>
+</html>

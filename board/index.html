@@ -177,6 +177,30 @@
     </div>
   </div>
 
+  <!-- Section: Review Documents (only visible to reviewers/review-admins) -->
+  <div class="section-block" id="review-section" style="display:none;">
+    <div class="section-label">Review Documents</div>
+    <div class="card-grid two-col">
+      <a class="tool-card teal-card" href="/review/index.html" id="review-card" style="display:none;">
+        <div class="tc-icon">📋</div>
+        <div class="tc-body">
+          <div class="tc-title">Document Review</div>
+          <div class="tc-desc">Review and vote on governing document sections (CC&Rs, Bylaws, Rules of Conduct). Vote Approve, Disapprove, or Discuss on each section with autosave.</div>
+          <div class="tc-meta">Reviewer access · Autosave · Per-section voting</div>
+        </div>
+        <div class="tc-arrow">→</div>
+      </a>
+      <a class="tool-card amber-card" href="/review/admin.html" id="review-admin-card" style="display:none;">
+        <div class="tc-icon">⚙</div>
+        <div class="tc-body">
+          <div class="tc-title">Review Admin Console</div>
+          <div class="tc-desc">Create review cycles, seed content, view aggregate results, and record final decisions on the Summary Ballot.</div>
+          <div class="tc-meta">Admin access · Create cycles · Summary ballot</div>
+        </div>
+        <div class="tc-arrow">→</div>
+      </a>
+    </div>
+  </div>
 
 </div><!-- /page-wrap -->
 </div><!-- /page-content -->
@@ -206,11 +230,30 @@ document.addEventListener('DOMContentLoaded', function () {
   document.title = 'Board Portal — ' + (HOA_CONFIG.hoaName || 'MMPOAII HOA');
 });
 
-// Watch for guard to populate username, then set avatar initial
+// Watch for guard to populate username, then set avatar initial + show review cards
 const observer = new MutationObserver(function () {
   const uname = document.querySelector('[data-user-name]');
   if (uname && uname.textContent && uname.textContent !== 'Loading…') {
     document.getElementById('nav-avatar').textContent = uname.textContent.charAt(0).toUpperCase();
+
+    // Show review cards based on Cognito group membership
+    var user = HoaGuard.getUser();
+    if (user) {
+      var groups = user.groups || [];
+      var showSection = false;
+      if (groups.includes(HOA_CONFIG.reviewersGroup || 'reviewers')) {
+        document.getElementById('review-card').style.display = '';
+        showSection = true;
+      }
+      if (groups.includes(HOA_CONFIG.reviewAdminsGroup || 'review-admins')) {
+        document.getElementById('review-admin-card').style.display = '';
+        showSection = true;
+      }
+      if (showSection) {
+        document.getElementById('review-section').style.display = '';
+      }
+    }
+
     observer.disconnect();
   }
 });

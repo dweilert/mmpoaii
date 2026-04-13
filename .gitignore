@@ -16,3 +16,9 @@ __marimo__/
 
 /.claude
 .claude
+
+# Dependencies
+node_modules/
+
+# SAM build artifacts
+.aws-sam/
