@@ -294,6 +294,45 @@ Resources:
             Path: /cycles/{cycleId}/summary/{sectionId}
             Method: PUT
 
+  # POST /cycles/{cycleId}/doctext
+  DocTextSaveFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mmpoa-review-doctext-save
+      Handler: doctext-save.handler
+      CodeUri: lambdas/
+      Timeout: 60
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ReviewTable
+        - S3ReadPolicy:
+            BucketName: !Ref SeedBucketName
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ReviewApi
+            Path: /cycles/{cycleId}/doctext
+            Method: POST
+
+  # GET /cycles/{cycleId}/doctext/{sectionId}
+  DocTextGetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mmpoa-review-doctext-get
+      Handler: doctext-get.handler
+      CodeUri: lambdas/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref ReviewTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ReviewApi
+            Path: /cycles/{cycleId}/doctext/{sectionId}
+            Method: GET
+
 # ---------------------------------------------------------------------------
 # Outputs
 # ---------------------------------------------------------------------------

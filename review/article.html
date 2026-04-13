@@ -43,6 +43,10 @@
     </div>
     <h2 id="article-title">Loading…</h2>
     <p id="article-progress" style="font-size:13px;color:var(--text3);margin-top:4px;"></p>
+    <div id="approve-all-bar" style="display:none;margin-top:12px;">
+      <button class="btn-primary" onclick="approveAllSections()" id="approve-all-btn" style="background:var(--green-600);">Approve All Sections</button>
+      <span id="approve-all-status" style="margin-left:12px;font-size:13px;color:var(--text3);"></span>
+    </div>
   </div>
 
   <div id="sections-container">
@@ -65,6 +69,20 @@
   <div data-hoa-name>MMPOAII HOA</div>
   <div>Document Review System — Confidential</div>
 </footer>
+
+<!-- Document Text Modal -->
+<div id="doctext-modal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.5);overflow-y:auto;" onclick="if(event.target===this)closeDocTextModal()">
+  <div style="max-width:720px;margin:40px auto;background:#fff;border-radius:var(--r2);box-shadow:0 8px 32px rgba(0,0,0,.2);overflow:hidden;">
+    <div style="background:var(--purple-800);color:#fff;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div id="modal-title" style="font-family:var(--serif);font-size:17px;font-weight:700;"></div>
+        <div id="modal-subtitle" style="font-size:13px;opacity:.7;margin-top:2px;"></div>
+      </div>
+      <button onclick="closeDocTextModal()" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer;padding:0 4px;line-height:1;">&times;</button>
+    </div>
+    <div id="modal-body" style="padding:24px;font-size:15px;line-height:1.7;color:var(--text);white-space:pre-wrap;font-family:var(--serif);"></div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6/dist/amazon-cognito-identity.min.js"></script>
 <script src="/js/config.js"></script>
@@ -129,7 +147,7 @@ async function loadArticle() {
       // Header
       html += '<div class="sc-header">';
       html += '<div class="sc-title-group">';
-      html += '<div class="sc-title">Art. ' + artNum + ', §' + s.sectionNumber + ' — ' + escHtml(s.sectionTitle) + '</div>';
+      html += '<div class="sc-title"><a href="#" onclick="showDocText(\'' + secId + '\', ' + artNum + ', \'' + escHtml(s.sectionTitle).replace(/'/g, "\\'") + '\', ' + s.sectionNumber + ');return false;" style="color:inherit;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px;" title="Click to view original document text">Art. ' + artNum + ', §' + s.sectionNumber + ' — ' + escHtml(s.sectionTitle) + '</a></div>';
       html += '<span class="sc-classification cls-' + cls + '">' + escHtml(classLabels[cls] || cls) + '</span>';
       html += '</div></div>';
 
@@ -173,6 +191,7 @@ async function loadArticle() {
     html += '</div>';
     document.getElementById('sections-container').innerHTML = html;
     document.getElementById('nav-bottom').style.display = 'flex';
+    document.getElementById('approve-all-bar').style.display = '';
 
   } catch (err) {
     document.getElementById('sections-container').innerHTML =
@@ -265,6 +284,114 @@ function escHtml(s) {
   var d = document.createElement('div');
   d.textContent = s || '';
   return d.innerHTML;
+}
+
+// ── Document Text Modal ──
+async function showDocText(secId, artNum, sectionTitle, sectionNumber) {
+  var modal = document.getElementById('doctext-modal');
+  document.getElementById('modal-title').textContent = 'Art. ' + artNum + ', §' + sectionNumber + ' — ' + sectionTitle;
+  document.getElementById('modal-subtitle').textContent = 'Original Document Text';
+  document.getElementById('modal-body').textContent = 'Loading…';
+  modal.style.display = '';
+  document.body.style.overflow = 'hidden';
+
+  try {
+    var data = await ReviewApi.getDocText(cycleId, secId);
+    document.getElementById('modal-body').textContent = data.text;
+  } catch (err) {
+    if (err.status === 404) {
+      document.getElementById('modal-body').textContent = 'Document text not available for this section.\n\nAn administrator needs to upload the document text via the Admin Console.';
+    } else {
+      document.getElementById('modal-body').textContent = 'Failed to load: ' + err.message;
+    }
+  }
+}
+
+function closeDocTextModal() {
+  document.getElementById('doctext-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+// Close modal on Escape key
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') closeDocTextModal();
+});
+
+// ── Approve All Sections ──
+async function approveAllSections() {
+  var btn = document.getElementById('approve-all-btn');
+  var status = document.getElementById('approve-all-status');
+  btn.disabled = true;
+  btn.textContent = 'Approving…';
+  status.textContent = '';
+
+  // Find all section cards that don't already have "approve" selected
+  var cards = document.querySelectorAll('.section-card');
+  var toApprove = [];
+  cards.forEach(function (card) {
+    var approveBtn = card.querySelector('.vote-btn.approve');
+    if (approveBtn && !approveBtn.classList.contains('selected')) {
+      toApprove.push({ card: card, btn: approveBtn });
+    }
+  });
+
+  if (toApprove.length === 0) {
+    status.textContent = 'All sections already approved.';
+    btn.disabled = false;
+    btn.textContent = 'Approve All Sections';
+    return;
+  }
+
+  var saved = 0;
+  var failed = 0;
+
+  for (var i = 0; i < toApprove.length; i++) {
+    var item = toApprove[i];
+    // Select the approve button visually
+    var allBtns = item.card.querySelectorAll('.vote-btn');
+    allBtns.forEach(function (b) { b.classList.remove('selected'); });
+    item.btn.classList.add('selected');
+
+    // Get secId from the approve button's onclick
+    var onclickAttr = item.btn.getAttribute('onclick');
+    var match = onclickAttr.match(/onVoteClick\('([^']+)'/);
+    if (!match) { failed++; continue; }
+    var secId = match[1];
+
+    // Get notes if any
+    var notesEl = document.getElementById('notes-' + secId);
+    var notes = notesEl ? notesEl.value : undefined;
+
+    status.textContent = 'Saving ' + (i + 1) + ' of ' + toApprove.length + '…';
+
+    try {
+      await ReviewApi.saveVote(cycleId, secId, 'approve', notes);
+      setStatus(secId, 'saved', 'Saved ✓');
+      saved++;
+    } catch (err) {
+      setStatus(secId, 'error', 'Save failed');
+      failed++;
+    }
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Approve All Sections';
+  if (failed === 0) {
+    status.textContent = 'Approved ' + saved + ' sections ✓';
+  } else {
+    status.textContent = 'Approved ' + saved + ', failed ' + failed;
+  }
+
+  // Update progress text
+  var totalCards = document.querySelectorAll('.section-card').length;
+  var votedCards = document.querySelectorAll('.vote-btn.selected').length;
+  // Each card has 3 vote buttons, count cards with any selected
+  var votedCount = 0;
+  document.querySelectorAll('.section-card').forEach(function (c) {
+    if (c.querySelector('.vote-btn.selected')) votedCount++;
+  });
+  document.getElementById('article-progress').textContent =
+    votedCount + ' of ' + totalCards + ' sections voted in this article';
 }
 
 var guardCheck = setInterval(function () {

@@ -1,0 +1,793 @@
+{
+  "articles": [
+    {
+      "articleNumber": 1,
+      "articleTitle": "DEFINITIONS",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "Association",
+          "text": "\"Association\" means Meadow Mountain Property Owners Association No. II-A, Inc., a Texas nonprofit corporation, and its successors and assigns. The Association exists to administer, manage, maintain, and enforce the covenants and restrictions in this Declaration, and to collect and disburse assessments for the common benefit of all Owners of Lots within the Properties."
+        },
+        {
+          "sectionNumber": 2,
+          "sectionTitle": "Owner",
+          "text": "\"Owner\" means any person or entity that holds title to a Lot within the Properties, including contract sellers. It does not include a person whose interest in the Lot exists only as security for an obligation. A person may hold title by deed, judicial order, or other lawful conveyance. The Association is not an Owner of Lots it holds for the purpose of administering the Properties or Common Area."
+        },
+        {
+          "sectionNumber": 3,
+          "sectionTitle": "Properties",
+          "text": "\"Properties\" means the real property located in the City of Austin, County of Travis, State of Texas, known as Meadow Mountain Planned Unit Development No. II-A, as shown on the plat recorded in Volume 81, Pages 320-321, of the Plat Records of Travis County, Texas. It also includes any additions later brought within the jurisdiction of the Association under this Declaration and applicable law."
+        },
+        {
+          "sectionNumber": 4,
+          "sectionTitle": "Common Area",
+          "text": "\"Common Area\" means all real property and improvements owned by the Association for the common use and enjoyment of the Owners. The Common Area includes, but is not limited to, greenbelts, walks, park areas, trails, common roadways, drives, and retaining walls, as shown on the plat recorded in Volume 81, Pages 320-321, of the Travis County Plat Records. It does not include individual building Lots. The Association must maintain all Common Area in a manner consistent with the community standards established by this Declaration and the rules and regulations adopted by the Board of Directors."
+        },
+        {
+          "sectionNumber": 5,
+          "sectionTitle": "Lot",
+          "text": "\"Lot\" means any plot of land, including community building lots, shown on any recorded planned unit development map of the Properties, except the Common Area. Each Lot is a separate parcel of real property subject to this Declaration, the Bylaws, and such rules and regulations as the Board of Directors may adopt from time to time."
+        },
+        {
+          "sectionNumber": 6,
+          "sectionTitle": "Member",
+          "text": "\"Member\" means any person or entity that holds membership in the Association because of being an Owner of a Lot within the Properties, as set forth in Article III of this Declaration. Membership is attached to and inseparable from each Lot."
+        },
+        {
+          "sectionNumber": 7,
+          "sectionTitle": "Board of Directors",
+          "text": "\"Board of Directors\" or \"Board\" means the governing body of the Association, consisting of those individuals elected by the Members in accordance with the Association's Bylaws."
+        },
+        {
+          "sectionNumber": 8,
+          "sectionTitle": "Bylaws",
+          "text": "\"Bylaws\" means the Bylaws of Meadow Mountain Property Owners Association No. II-A, Inc., as amended from time to time, which establish the procedural rules for the operation and governance of the Association."
+        },
+        {
+          "sectionNumber": 9,
+          "sectionTitle": "Architecture Review Committee",
+          "text": "\"Architecture Review Committee\" or \"ARC\" means the committee appointed by the Board of Directors to review and approve or deny applications for improvements or alterations to Lots, consistent with the covenants and restrictions in this Declaration and the rules established in the Rules of Conduct."
+        },
+        {
+          "sectionNumber": 10,
+          "sectionTitle": "Declaration",
+          "text": "\"Declaration\" means this Amended and Restated Declaration of Covenants, Conditions and Restrictions, as amended from time to time."
+        },
+        {
+          "sectionNumber": 11,
+          "sectionTitle": "Improvement and Alteration",
+          "text": "\"Improvement\" and \"Alteration\" have the meanings set forth in Article VI, Section 3."
+        },
+        {
+          "sectionNumber": 12,
+          "sectionTitle": "Annual Assessment and Special Assessment",
+          "text": "\"Annual Assessment\" means the charge levied annually by the Board against each Owner to pay for the costs of operating and maintaining the Association and its Common Area. \"Special Assessment\" means a charge assessed against Owners to defray the costs of unexpected major repairs or improvements to the Common Area as authorized in Article IV."
+        },
+        {
+          "sectionNumber": 13,
+          "sectionTitle": "Canyonside Trail",
+          "text": "\"Canyonside Trail\" means the trail system located in the common area, as identified on the recorded plat of Meadow Mountain Planned Unit Development No. II-A."
+        },
+        {
+          "sectionNumber": 14,
+          "sectionTitle": "MMPOA I",
+          "text": "\"MMPOA I\" refers to Meadow Mountain Property Owners Association No. I, a separate homeowners association that owns and maintains certain common property adjacent to or nearby the Properties."
+        },
+        {
+          "sectionNumber": 15,
+          "sectionTitle": "Conservation Easement Lot 11",
+          "text": "\"Conservation Easement Lot 11\" means the lot subject to a perpetual conservation easement held by the City of Austin or an authorized conservation organization, restricting use and development of that parcel."
+        },
+        {
+          "sectionNumber": 16,
+          "sectionTitle": "Common Property",
+          "text": "\"Common Property\" means property that is owned and maintained by the Association for the common use and benefit of all Members, including but not limited to greenbelts, parks, trails, common roadways, and similar areas."
+        },
+        {
+          "sectionNumber": 17,
+          "sectionTitle": "Tenant",
+          "text": "\"Tenant\" means a person or entity who leases or rents a Lot from an Owner, or who otherwise occupies a Lot with the Owner's permission for a period of time."
+        },
+        {
+          "sectionNumber": 18,
+          "sectionTitle": "Manager",
+          "text": "\"Manager\" means a professional property management company engaged by the Board to assist in the day-to-day administration and management of the Association, subject to the oversight and control of the Board."
+        },
+        {
+          "sectionNumber": 19,
+          "sectionTitle": "Firewise Committee",
+          "text": "\"Firewise Committee\" means a committee established by the Association to coordinate with the community on fire safety, emergency preparedness, compliance with the City of Austin 2024 International Wildland-Urban Interface Code (IWUIC) and local amendments, Firewise USA program standards, and defensible space requirements. The Firewise Committee shall work in coordination with the City of Austin Fire Department, the Texas A&M Forest Service, and applicable federal and state wildfire management agencies."
+        },
+        {
+          "sectionNumber": "19A",
+          "sectionTitle": "Wildland-Urban Interface (WUI) Area",
+          "text": "\"Wildland-Urban Interface (WUI) Area\" means an area designated by the City of Austin as a Wildland-Urban Interface area under the 2024 International Wildland-Urban Interface Code (IWUIC) and local amendments, as amended from time to time. As of the effective date of this amendment, fourteen (14) of the sixteen (16) Lots within the Properties are located in a designated WUI area classified as Proximity Zone A (within 50 feet of 40 or more acres of wildland), which is the highest risk classification. All Lots within the Properties, regardless of individual WUI zone designation, shall comply with the Proximity Zone A requirements of the IWUIC as adopted by the City of Austin, to ensure uniform fire safety standards throughout the community."
+        },
+        {
+          "sectionNumber": 20,
+          "sectionTitle": "Fine Schedule",
+          "text": "\"Fine Schedule\" means the written schedule of monetary penalties established by the Board and published to Members, which sets forth the specific dollar amounts assessable for violations of this Declaration, the Bylaws, and the Rules of Conduct."
+        },
+        {
+          "sectionNumber": 21,
+          "sectionTitle": "Plat",
+          "text": "\"Plat\" means the recorded subdivision plat for Meadow Mountain Planned Unit Development No. II-A, filed in Volume 81, Pages 320-321, of the Plat Records of Travis County, Texas. All references throughout this Declaration, the Bylaws, and any rules and regulations adopted by the Board to the \"Plat\" refer to this recorded map and any amendments thereto."
+        },
+        {
+          "sectionNumber": 22,
+          "sectionTitle": "Document Hierarchy and Precedence",
+          "text": "The governing documents of the Association rank in the following order of precedence: (1) applicable federal and Texas law; (2) this Declaration, as amended from time to time; (3) the Bylaws, as amended from time to time; (4) the Rules of Conduct adopted under Article XIII, Section 5 of this Declaration; (5) design guidelines adopted by the ARC with Board approval; and (6) the Fine Schedule. No lower-ranked document may expand, restrict, or contradict a higher-ranked document. Any conflicting provision in a lower-ranked document is void to the extent of the conflict. The Board shall maintain and post current versions of all governing documents on the Association's website."
+        },
+        {
+          "sectionNumber": 23,
+          "sectionTitle": "Reasonable/Reasonably",
+          "text": "As used throughout these CC&Rs, the Bylaws, and the Rules of Conduct, \"reasonable\" or \"reasonably\" means what an objective, informed person in similar circumstances would consider fair, appropriate, and not arbitrary, taking into account the interests of the community as a whole, the rights of the individual Owner, and the specific facts and circumstances of the situation."
+        }
+      ]
+    },
+    {
+      "articleNumber": 2,
+      "articleTitle": "PROPERTY RIGHTS IN THE COMMON AREAS",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "Owner's Easements of Enjoyment",
+          "text": "Every Owner shall have the right to use and enjoy all Common Area in common with all other Owners, subject to the covenants, conditions, and restrictions of this Declaration and the rules and regulations adopted by the Board of Directors. The Association grants each Owner an easement for the non-exclusive use of all Common Area for purposes of ingress and egress, recreation, and enjoyment, subject to reasonable rules and regulations established by the Board."
+        },
+        {
+          "sectionNumber": 2,
+          "sectionTitle": "Delegation of Use",
+          "text": "The Association may delegate to any Owner or to any third party, including a Tenant, the right to use any portion of the Common Area for any lawful purpose, provided that such delegation shall not interfere with the rights of other Owners or their Tenants."
+        },
+        {
+          "sectionNumber": 3,
+          "sectionTitle": "Owner's Use",
+          "text": "Each Owner agrees to use the Common Area in a responsible manner that does not interfere with the rights of other Owners. No Owner shall make any structural alterations to the Common Area, nor shall any Owner remove, damage, or deface any part of the Common Area without the prior written consent of the Board."
+        }
+      ]
+    },
+    {
+      "articleNumber": 3,
+      "articleTitle": "MEMBERSHIP AND VOTING RIGHTS",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "Mandatory Membership",
+          "text": "Membership in the Association is mandatory and automatic for each Owner. Membership may not be suspended or revoked except in accordance with the Bylaws and applicable Texas law. Each Owner shall become and remain a Member during the period of his, her, or its ownership of a Lot. Membership terminates automatically when an Owner ceases to hold title to a Lot."
+        },
+        {
+          "sectionNumber": 2,
+          "sectionTitle": "Voting Membership",
+          "text": "One (1) vote shall be allocated to each Lot, regardless of how many persons hold title to that Lot. Where a Lot is owned by more than one person, those co-owners shall collectively cast only the single vote allocated to that Lot, and must designate among themselves which person shall exercise the vote. If co-owners fail to agree, the vote for that Lot shall not be counted. Membership voting rights attach to the Lot and cannot be separated from Lot ownership. No exception shall be made except where these governing documents expressly provide otherwise."
+        },
+        {
+          "sectionNumber": 3,
+          "sectionTitle": "Non-Owner Residents",
+          "text": "Residents of Lots who are not Owners do not have voting membership rights in the Association. However, such non-owner residents shall comply with this Declaration, the Bylaws, and all rules and regulations adopted by the Association."
+        },
+        {
+          "sectionNumber": 4,
+          "sectionTitle": "Board Member Conflicts of Interest",
+          "text": "Each member of the Board of Directors has a fiduciary duty to the Association and all its Members. Board members and officers shall comply with the conflict of interest policy established in the Bylaws. The Board shall adopt a written Conflicts of Interest Policy, consistent with the requirements of the Texas Business Organizations Code, and shall make the policy available to all Members upon request."
+        },
+        {
+          "sectionNumber": 5,
+          "sectionTitle": "Management Company Authority and Oversight",
+          "text": "With approval of sixty-seven percent (67%) of all Members entitled to vote, the Board may engage a professional property management company (\"Manager\") to assist in the administration and management of the Association and its Common Area. The Manager shall act solely as the agent of the Association and under the direction and supervision of the Board. The specific terms, scope, and oversight procedures governing any management engagement shall be established in the Bylaws. The retention of a Manager does not relieve the Board of its fiduciary duties to the Members or of ultimate responsibility for the management of the Association."
+        },
+        {
+          "sectionNumber": 6,
+          "sectionTitle": "Electronic Meetings and Voting",
+          "text": "Consistent with Texas Property Code \\&#x00A7; 209.0051 and applicable Texas Nonprofit Corporation Law, the Board and the Members may conduct meetings and votes by electronic means. Meetings and voting may be conducted electronically as provided in the Bylaws. Electronic votes shall be subject to the same quorum, notice, and approval requirements as votes cast in person."
+        }
+      ]
+    },
+    {
+      "articleNumber": 4,
+      "articleTitle": "COVENANT FOR MAINTENANCE ASSESSMENTS",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "Creation of the Lien and Personal Obligation of Assessments",
+          "text": "The Association is empowered to assess all Owners for the costs and expenses of administration, operation, and maintenance of the Association and its Common Area. Each assessment shall constitute a lien against the assessed property and shall also be a personal obligation of the Owner. The lien shall arise by operation of law and need not be recorded to be effective. The Association may pursue all remedies available at law or in equity to enforce collection of assessments."
+        },
+        {
+          "sectionNumber": 2,
+          "sectionTitle": "Purpose of Assessments",
+          "text": "Assessments shall be used to pay for the costs of operating, maintaining, repairing, and improving the Common Area; administering the Association; insuring the Common Area; and all other costs incidental to the governance and management of the Association as authorized by this Declaration and the Bylaws."
+        },
+        {
+          "sectionNumber": 3,
+          "sectionTitle": "Maximum Annual Assessment",
+          "text": "The maximum Annual Assessment shall be established by the Board, provided that no such maximum may be increased by more than ten percent (10%) in any year, unless the Members approve a greater increase by a supermajority vote (two-thirds) of all Members entitled to vote, with written notice of the proposed increase provided at least thirty (30) days in advance.\n\nNotwithstanding the foregoing limitation, the Board may levy an Emergency Special Assessment exceeding the annual cap upon the affirmative vote of two-thirds (2/3) of the Members present at a special meeting called for that purpose, provided that: (a) the assessment is necessitated by an unforeseen emergency involving imminent threat to health, safety, or structural integrity of Common Area improvements; (b) the notice of special meeting describes the emergency and the estimated assessment amount; and (c) no Emergency Special Assessment shall exceed fifty percent (50%) of the then-current Annual Assessment without approval of a majority of the total voting membership."
+        },
+        {
+          "sectionNumber": 4,
+          "sectionTitle": "Special Assessments for Capital Improvements",
+          "text": "The Board may levy special assessments against the Owners for extraordinary capital improvements to the Common Area. Special assessments must be approved by a supermajority vote (two-thirds) of all Members entitled to vote, with written notice provided at least thirty (30) days in advance."
+        },
+        {
+          "sectionNumber": 5,
+          "sectionTitle": "Notice and Quorum for Any Action Authorized Under Sections 3 and 4",
+          "text": "Written notice of any Member meeting at which a vote is to be taken on an increase in Annual Assessment or levy of a Special Assessment shall be provided at least thirty (30) days in advance. The notice shall include the amount of the proposed assessment increase or special assessment and the purposes for which it will be used. A quorum shall consist of those Members present in person or by proxy at a properly called meeting."
+        },
+        {
+          "sectionNumber": 6,
+          "sectionTitle": "Uniform Rate of Assessment",
+          "text": "All assessments shall be made on a uniform basis in favor of all Owners, except that the Board may establish different assessment rates for different classes or categories of Lots if supported by different costs of maintenance and operation."
+        },
+        {
+          "sectionNumber": 7,
+          "sectionTitle": "Date of Commencement of Annual Assessments; Due Dates",
+          "text": "The first Annual Assessment shall commence on the date specified by the Board or as set forth in the Bylaws. Thereafter, Annual Assessments shall commence on January 1 of each calendar year. Unless otherwise established by the Board, all assessments shall be due and payable in full by December 31 of each year, or in such installments as the Board may establish."
+        },
+        {
+          "sectionNumber": 8,
+          "sectionTitle": "Effect of Nonpayment of Assessments; Remedies of the Association",
+          "text": "The Board shall adopt and maintain a written assessment collection policy describing specific late fee amounts, interest rates, and collection timelines, which may be amended by Board resolution with thirty (30) days' written notice to all Members.\n\nIf any assessment remains unpaid thirty (30) days after the due date, the Association may assess a late fee and interest at the rate specified in the collection policy. If any assessment remains unpaid, the Association may pursue the following remedies, singly or in combination:\n\n\\- File a lien against the Lot as provided by Texas Property Code \\&#x00A7; 209.006;\n\n\\- File suit in district court to recover the unpaid amount plus costs and reasonable attorney's fees;\n\n\\- Foreclose on the lien as provided by Texas Property Code \\&#x00A7; 209.006(e), subject to limitations and requirements in that statute and subject to the additional foreclosure restrictions of Texas Property Code \\&#x00A7; 209.0091.\n\nBefore filing a lien for non-payment of assessments, the Association shall provide written notice to the Owner as required by Texas Property Code \\&#x00A7; 209.006(a). The notice shall include the amount due, the date it became due, late fees and interest accrued, and the consequences of failure to pay. Before filing an assessment lien, the Association must also comply with the three-notice procedure required by Texas Property Code \\&#x00A7; 209.0094, including: (1) a first notice sent by first-class mail or email; (2) a second notice sent by certified mail, return receipt requested, at least thirty (30) days after the first notice; and (3) a third notice (the notice of assessment lien) sent no earlier than ninety (90) days after the second notice.\n\nFor the avoidance of doubt, the Association shall not file an assessment lien against any Lot until the three-notice procedure required by Section 209.0094 has been fully completed, including expiration of all applicable cure and response periods.\n\nThe Association shall not commence foreclosure proceedings against a Lot unless the amount owing equals or exceeds the sum of (1) the unpaid assessments and interest accrued for at least six months, (2) all late fees assessed, and (3) reasonable costs incurred in collection efforts as permitted by law."
+        },
+        {
+          "sectionNumber": 9,
+          "sectionTitle": "Subordination of the Lien to Mortgages",
+          "text": "Liens for assessments may be subordinate to mortgages recorded prior to the lien, at the discretion of the Board."
+        },
+        {
+          "sectionNumber": 10,
+          "sectionTitle": "Exempt Property",
+          "text": "The Common Area shall be exempt from assessment for maintenance costs, as these costs are funded by Member assessments. No assessment shall be levied against property held by the Association."
+        },
+        {
+          "sectionNumber": 11,
+          "sectionTitle": "All Assessments Pro Rata",
+          "text": "All assessments, whether Annual or Special, shall be levied on a pro rata basis with respect to all Lots, unless the Board determines that a different basis is appropriate for different classes or categories of Lots based on differing costs of maintenance."
+        },
+        {
+          "sectionNumber": 12,
+          "sectionTitle": "No Diminution or Abatement",
+          "text": "No Owner may demand a reduction, abatement, or refund of any assessment by reason of the untenanted condition of his or her Lot or the loss of use or enjoyment of the Common Area. The right to vote and the obligation to pay assessments shall be personal to each Owner."
+        },
+        {
+          "sectionNumber": 13,
+          "sectionTitle": "Reserve Fund and Reserve Analysis",
+          "text": "The Board shall establish and maintain a Reserve Fund for the purpose of funding major repairs and replacements of Common Area components. The Board shall conduct a Reserve Analysis at intervals and using methodology as established in the Bylaws. The Reserve Fund balance and year-to-date contributions shall be disclosed in the Association's annual financial report provided to all Members. Monies in the Reserve Fund may not be borrowed or transferred to the operating account except by a two-thirds (2/3) vote of the Board, with written notice to all Members within thirty (30) days of such transfer."
+        },
+        {
+          "sectionNumber": 14,
+          "sectionTitle": "Assessment Payment Plans",
+          "text": "Consistent with Texas Property Code \\&#x00A7; 209.0093, the Association shall offer a delinquent Owner a reasonable payment plan before filing an assessment lien. The specific terms and conditions of payment plans shall be established by the Board and may be amended by Board resolution. The Board may adopt supplemental payment plan policies consistent with applicable Texas law."
+        }
+      ]
+    },
+    {
+      "articleNumber": 5,
+      "articleTitle": "MAINTENANCE BY AND SERVICES OF THE ASSOCIATION",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "Common Area",
+          "text": "The Association shall maintain all Common Area in a safe, clean, and attractive condition, consistent with the standards established by this Declaration and the rules and regulations adopted by the Board. The Association shall be responsible for all structural repairs and maintenance of the Common Area, including but not limited to trails, parks, greenbelts, roadways, retaining walls, and all improvements located thereon."
+        },
+        {
+          "sectionNumber": 2,
+          "sectionTitle": "Willful or Negligent Acts",
+          "text": "The Association shall not be liable for any loss, injury, or damage to any Lot or to the person or property of any Owner, Tenant, or other person, resulting from willful or negligent acts committed by any individual. The Board may, however, authorize the purchase of liability insurance to protect the Association against claims."
+        },
+        {
+          "sectionNumber": 3,
+          "sectionTitle": "Maintenance of Canyonside Trail",
+          "text": "The Association shall be responsible for the maintenance and repair of the Canyonside Trail system, consistent with the trail maintenance standards established by this Declaration and the Rules of Conduct. The Association may designate the specific maintenance procedures, schedules, and standards in the Bylaws or Rules of Conduct."
+        }
+      ]
+    },
+    {
+      "articleNumber": 6,
+      "articleTitle": "ARCHITECTURAL AND ENVIRONMENTAL MANAGEMENT",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "Architecture Review Committee",
+          "text": "The Board shall establish an Architecture Review Committee consisting of not fewer than three Members appointed by the Board. The ARC may include Members of the Association, other community residents, or individuals with expertise in architecture, landscaping, or environmental matters. The Board shall establish the procedures for appointment, term limits, removal, and compensation (if any) of ARC members.\n\nThe Architecture Review Committee has the authority to review and approve or deny applications for improvements or alterations to Lots, consistent with the covenants and restrictions set forth in this Declaration. The ARC shall apply the written architectural guidelines established in the Rules of Conduct. If the ARC fails to act within the timeline specified in Section 1 below, approval shall be deemed granted unless the Owner has received a specific request for additional information."
+        },
+        {
+          "sectionNumber": 2,
+          "sectionTitle": "Extent of Architecture Review Committee's Authority",
+          "text": "The Architecture Review Committee shall have authority to control and regulate the construction, alteration, destruction, and removal of all buildings and structures on the Lots, including landscaping, exterior colors, materials, and designs, to ensure that they are consistent with the character and maintenance standards of the Properties and do not unreasonably interfere with the peaceful enjoyment of neighboring Lots."
+        },
+        {
+          "sectionNumber": 3,
+          "sectionTitle": "Association Approval of Improvements and Alterations",
+          "text": "No improvement or alteration to the exterior of a Lot or to the surface of the land shall be made without the prior written approval of the Architecture Review Committee. The terms \"improvements\" and \"alterations\" include any structure, addition, modification, installation, or change to the exterior of a Lot or to the surface of the land. A detailed list of improvements and alterations requiring ARC approval is maintained in the Rules of Conduct and may be updated by the Board. No improvement or alteration may be located or placed, and no holes or penetrations may be made, on Common Area or property owned, maintained, or controlled by the Association without the Association's advance written consent.\n\nThe Architecture Review Committee shall issue a written decision on any complete application within forty-five (45) days of acknowledged receipt. If the ARC fails to issue a decision within this period and the Owner delivers written reminder notice to the Board, the improvement shall be deemed approved as submitted.\n\nAn Owner whose application is disapproved may appeal to the Board of Directors by delivering written notice of appeal within thirty (30) days of the ARC's decision. The Board shall review the appeal at its next regular meeting occurring at least fourteen (14) days after receipt of the notice of appeal. The Board may affirm, reverse, or modify the ARC's decision by majority vote, and shall issue a written decision within fourteen (14) days of the meeting.\n\nAll exterior modifications, additions, renovations, and new construction on any Lot shall comply with the City of Austin 2024 International Wildland-Urban Interface Code (IWUIC) Proximity Zone A requirements, including but not limited to: (a) Class A fire-rated roof assemblies; wood shake, wood shingles, and fire-retardant-treated wood roofing materials are prohibited; (b) exterior walls constructed of one-hour fire-resistance-rated materials, noncombustible materials, heavy timber, fire-retardant-treated wood labeled for exterior use, or ignition-resistant materials; (c) exterior windows of tempered glass, multilayered glazed panels, glass block, or 20-minute fire-protection-rated assemblies; (d) decks constructed of one-hour fire-resistance-rated, heavy timber, or ignition-resistant materials with board gaps not exceeding 1/8 inch; (e) fences within 10 feet of any structure constructed of ignition-resistant materials; (f) noncombustible gutters with approved debris prevention devices; (g) eaves and soffits protected with ignition-resistant materials, with no soffit vents permitted; and (h) ventilation openings fitted with noncombustible mesh with maximum 1/8-inch openings. The Architecture Review Committee shall verify IWUIC compliance as part of all application reviews and shall not approve any application that fails to meet these requirements. Building permit applications submitted to the City of Austin must demonstrate IWUIC compliance before the Association grants ARC approval.\n\nEach Owner shall maintain an Ember Ignition Zone (EIZ) as required by IWUIC Section 603.2.1, consisting of a noncombustible area immediately surrounding all structures on the Lot. Permitted EIZ materials include gravel, concrete, pavers, and noncombustible outdoor furnishings. Each Owner shall maintain defensible space of not less than 30 feet from all structures, or to the property line, whichever is less, in accordance with IWUIC Section 603. For zero-lot-line townhome Lots where 30-foot defensible space is not achievable on all sides, Owners shall maintain defensible space to the property line and coordinate vegetation and combustible material management with adjacent Lot Owners. Failure to maintain the Ember Ignition Zone or required defensible space is a violation of this Declaration subject to enforcement under Article XII.\n\nThe Association shall maintain the community gate and entrance in compliance with the City of Austin Fire Code requirements for fire apparatus access, including a minimum unobstructed road width of 25 feet and 14 feet of vertical clearance. The gate shall be equipped with an automatic opening device accessible to emergency vehicles, such as a Knox Box or equivalent system approved by the City of Austin Fire Department. The Board shall develop and maintain a written wildfire evacuation plan and distribute it to all Owners annually. The evacuation plan shall address: (a) assembly points and evacuation routes; (b) communication procedures during emergencies; (c) coordination with the City of Austin Fire Department; (d) pet and livestock evacuation protocols; and (e) coordination with adjacent associations, including MMPOA I, for shared road evacuation. The Board shall ensure that all permanent address markers comply with IWUIC Section 403.6, displaying the address at the driveway entrance in characters visible from both directions of travel."
+        },
+        {
+          "sectionNumber": 4,
+          "sectionTitle": "Grading, Excavation and Runoff Control Plans",
+          "text": "All grading, excavation, and site drainage plans for any Lot shall be submitted to and approved by the Architecture Review Committee. The ARC shall ensure that such plans comply with all applicable City of Austin Watershed Protection and Development Review Requirements, including stormwater management standards, and do not adversely affect neighboring Lots or the Common Area.\n\nThe Owner's obligation to maintain effective erosion control, runoff management, and site drainage is continuous and shall not cease upon completion of construction. During all phases of construction, the Owner shall implement and maintain temporary erosion and sediment control measures sufficient to prevent soil, debris, or stormwater discharge onto neighboring Lots, the Common Area, or any public right-of-way. Upon completion of construction, all permanent drainage improvements shown on the approved plans shall be maintained in good working order by the Owner in perpetuity. Failure to maintain drainage and runoff controls---whether during or after construction---shall constitute a continuing violation subject to enforcement under Article XII, and the Association may, after notice and an opportunity to cure, enter the Lot and perform necessary corrective work at the Owner's expense as a Special Assessment."
+        },
+        {
+          "sectionNumber": 5,
+          "sectionTitle": "Landscaping Plan",
+          "text": "Every Lot shall be landscaped in a professional manner consistent with the landscaping standards set forth in this Declaration and the Rules of Conduct. All landscaping plans shall be submitted to the Architecture Review Committee for approval before implementation. Landscaping shall include appropriate plantings sufficient to ensure adequate screening from neighboring Lots and roadways."
+        },
+        {
+          "sectionNumber": 6,
+          "sectionTitle": "Building Encroachment Easements",
+          "text": "Any portion of a structure, including eaves, gutters, chimneys, or other projections, that encroaches beyond the set-back lines onto neighboring property or Common Area shall be subject to an easement granted by the affected property owners. No encroachment shall be permitted without the prior written approval of the ARC and the affected property owners."
+        },
+        {
+          "sectionNumber": 7,
+          "sectionTitle": "Minimum Floor Area and Exterior Walls",
+          "text": "The minimum floor area for any residence constructed on a Lot shall be established by the Board and set forth in the Rules of Conduct. All exterior walls shall be of permanent, high-quality construction materials approved by the Architecture Review Committee."
+        },
+        {
+          "sectionNumber": 8,
+          "sectionTitle": "Setbacks",
+          "text": "All buildings and structures shall comply with the setback requirements established by this Declaration and the Rules of Conduct, which shall not be less restrictive than those required by the City of Austin."
+        },
+        {
+          "sectionNumber": 9,
+          "sectionTitle": "Easements",
+          "text": "The Association grants and reserves to itself all easements necessary for the administration, operation, and maintenance of the Common Area, including easements for roads, drainage, utilities, and other purposes. These easements run with the land and are binding on all Owners."
+        },
+        {
+          "sectionNumber": 10,
+          "sectionTitle": "Construction Completion",
+          "text": "All construction on any Lot shall be completed within eighteen (18) months of the date of approval by the Architecture Review Committee, unless extended by written approval of the ARC. Construction shall be conducted in a professional manner, and all construction debris shall be promptly removed from the Lot."
+        },
+        {
+          "sectionNumber": 11,
+          "sectionTitle": "General Maintenance",
+          "text": "Every Owner shall maintain all portions of his or her Lot, including structures, landscaping, and grounds, in a neat, clean, attractive, and well-kept condition, consistent with the standards established by this Declaration and the Rules of Conduct. The Owner shall maintain all landscaping, clear all weeds and dead vegetation, and keep all grounds mowed and attractive. Notwithstanding the foregoing, the Association shall suspend enforcement of any restriction requiring an Owner to maintain green vegetation or turf during any period that the property is subject to a residential watering restriction imposed by a governmental entity, and for sixty (60) days after such restriction is lifted, consistent with Texas Property Code § 202.007(d).\n\nSpecific landscaping standards, including standards for artificial turf, mowing schedules, and tree preservation requirements, are set forth in the Rules of Conduct. The Board shall have the authority to adopt, amend, and enforce rules governing landscaping and exterior maintenance standards through the Rules of Conduct, consistent with this Declaration.\n\nRegardless of the foregoing general maintenance obligation, no Owner may cut, remove, injure, or destroy any tree on any Lot that has a trunk diameter of ten (10) inches or greater when measured four (4) feet above existing ground level, without the prior written approval of the Architecture Review Committee. Any such approval shall be conditioned upon compliance with applicable City of Austin heritage tree and tree preservation ordinances.\n\nCompliance with defensible space standards established by the Firewise Committee and approved by the Board is a condition of property maintenance under this Section. Failure to maintain adequate defensible space as specified in the Rules of Conduct, Article X, after notice and a reasonable cure period, shall be subject to enforcement under Article XII, including fines. In the event an Owner fails to maintain defensible space within thirty (30) days of a Notice of Violation, the Association may enter the Lot and perform the necessary work, with the cost charged to the Owner as a Special Assessment."
+        }
+      ]
+    },
+    {
+      "articleNumber": 7,
+      "articleTitle": "PRIVACY WALLS AND FENCES",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "General Rules",
+          "text": "Any wall or fence erected or maintained along the boundary between two Lots shall be constructed and maintained according to the standards set forth in this Declaration and the Rules of Conduct. All walls and fences must be approved by the Architecture Review Committee before construction and shall be maintained in good condition at all times."
+        },
+        {
+          "sectionNumber": 2,
+          "sectionTitle": "Destructive Acts",
+          "text": "No Owner shall, without the consent of the adjacent Owner, cut, remove, or damage any portion of a shared wall or fence on the boundary between Lots. Any damage to a shared wall or fence caused by an Owner's act shall be repaired by that Owner at the Owner's expense."
+        },
+        {
+          "sectionNumber": 3,
+          "sectionTitle": "Damage or Injury Not Caused by Either Owner",
+          "text": "If a shared wall or fence is damaged or deteriorated due to circumstances beyond the control of either Owner, including but not limited to natural disasters, deterioration due to age, or inherent defects, the cost of repair or reconstruction shall be shared equally by the affected Owners, unless otherwise agreed upon in writing."
+        },
+        {
+          "sectionNumber": 4,
+          "sectionTitle": "Sharing of Repair and Maintenance",
+          "text": "Owners of adjacent Lots share the responsibility for maintaining walls and fences located on the boundary between their Lots. The specific procedures for cost-sharing and dispute resolution are set forth in the Rules of Conduct."
+        },
+        {
+          "sectionNumber": 5,
+          "sectionTitle": "Application",
+          "text": "The provisions of this Article VII apply only to walls and fences located on the boundary between two Lots. Walls and fences constructed on a Lot that does not run along a boundary are governed by the general maintenance obligations in Article VI, Section 11."
+        },
+        {
+          "sectionNumber": 6,
+          "sectionTitle": "Dispute Resolution",
+          "text": "If Owners of adjacent Lots dispute responsibility for the repair or maintenance of a shared wall or fence, either Owner may request mediation or binding arbitration as provided in the Bylaws or Rules of Conduct."
+        }
+      ]
+    },
+    {
+      "articleNumber": 8,
+      "articleTitle": "PERMITTED USES AND RESTRICTIONS",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "General Restrictions",
+          "text": "Each Lot shall be used solely as a residential property or for purposes incidental to residential use. No Lot shall be used for any commercial, business, industrial, or manufacturing purpose, or for transient or hotel-type occupancy, except as specifically permitted by this Declaration or the Rules of Conduct. No commercial signage, equipment, or vehicles shall be displayed on any Lot.\n\nNotwithstanding the foregoing, the following uses are permitted:\n\n\\- Reasonable home-based business conducted entirely within a residence and not involving retail customer visits or commercial traffic;\n\n\\- Rental of a Lot as a residence, subject to the restrictions in Article IX;\n\n\\- Professional services (consulting, counseling, etc.) conducted within a residence, provided no signage or customer visits are visible from the street;\n\n\\- Leasing of a portion of a Lot (such as a guest house) to a Tenant, subject to compliance with Article IX.\n\nNothing in this Section shall be construed to prohibit reasonable accommodations for persons with disabilities as required by the Fair Housing Act (42 U.S.C. \\&#x00A7; 3601 et seq.), the Americans with Disabilities Act, the Texas Fair Housing Act (Tex. Prop. Code Chapter 301), or applicable law. Owners and residents with disabilities may request reasonable accommodations of Association rules and reasonable structural modifications to their dwellings by submitting a written request to the Board.\n\nIn-home health care services, in-home childcare services, and visits by personal care attendants are permitted uses incidental to residential use and shall not be deemed violations of this Section or of the single-family residential use restriction.\n\nAny home-based business must be approved in advance by the Board and must comply with all applicable zoning and building codes of the City of Austin.\n\nHome-based businesses shall comply with the following standards: (a) no more than two (2) client or customer visits per day; (b) no exterior signage, advertising, or displays indicating a business is conducted on the premises; (c) no on-site employees other than persons residing in the dwelling; (d) no commercial vehicles, equipment, or inventory visible from neighboring properties or the street; (e) the business shall not generate noise, odor, traffic, or parking demand materially greater than typical residential use; and (f) the business shall comply with all applicable City of Austin zoning and licensing requirements. The Board may require cessation of any home-based business that, in its reasonable judgment, materially disrupts the residential character of the community."
+        },
+        {
+          "sectionNumber": 2,
+          "sectionTitle": "Noxious Uses",
+          "text": "No noxious, offensive, or hazardous activities shall be conducted on any Lot or in the Common Area. This includes but is not limited to the operation of a dump, yard, junkyard, or waste disposal facility of any kind. No hazardous materials, explosives, or flammable substances shall be stored in violation of applicable law."
+        },
+        {
+          "sectionNumber": 3,
+          "sectionTitle": "Use of Common Area",
+          "text": "Every Owner and Tenant shall have the right to use the Common Area in accordance with the purposes for which it is intended and the rules and regulations established by the Board. The Board may restrict the use of portions of the Common Area and may close facilities for maintenance or other legitimate purposes."
+        },
+        {
+          "sectionNumber": 4,
+          "sectionTitle": "Animals",
+          "text": "Household pets are permitted on any Lot, provided that they are kept under control and do not create a nuisance. The Association recognizes the exemptions provided for service animals under the Americans with Disabilities Act and applicable Texas law.\n\nThe Board shall have the authority to establish and amend rules governing the type, number, and control of animals within the Properties through the Rules of Conduct. Specific standards for pet limits, leash requirements, noise, waste cleanup, and animal structures are set forth in the Rules of Conduct."
+        },
+        {
+          "sectionNumber": 5,
+          "sectionTitle": "Antennas and Signals",
+          "text": "No aerial, antenna, or satellite dish may be erected or maintained on any Lot without the prior written approval of the Architecture Review Committee, except as required by federal law, including the FCC Over-the-Air Reception Devices Rule (47 C.F.R. \\&#x00A7; 1.4000). All antennas must be designed and located to minimize visibility from neighboring Lots and roadways."
+        },
+        {
+          "sectionNumber": 6,
+          "sectionTitle": "Temporary Occupancy",
+          "text": "An Owner may allow temporary occupancy of a Lot by guests, family members, or workers engaged to perform services on the Lot, provided such occupancy does not exceed thirty (30) consecutive days or sixty (60) days in any calendar year without Board approval.\n\nThe limitations of this Section shall not apply to: (a) members of the Owner's immediate family (defined as spouse, parent, grandparent, child, grandchild, or sibling) residing in the dwelling for any duration; (b) licensed home health aides, caregivers, or medical professionals providing care to a resident of the Lot; or (c) house sitters caring for the property during the Owner's documented absence, for a period not to exceed ninety (90) days per calendar year. Owners shall notify the Board in writing of any occupant residing under this exception for more than thirty (30) consecutive days."
+        },
+        {
+          "sectionNumber": 7,
+          "sectionTitle": "Trailers, Boats and Motor Vehicles",
+          "text": "No recreational vehicles, motor homes, trailers, boats, jet skis, or non-standard motor vehicles may be parked, stored, or maintained on any Lot or in the Common Area except as parked within an enclosed garage or in designated parking areas. The Board shall have the authority to establish and amend rules governing vehicle storage, designated parking areas, and related standards through the Rules of Conduct."
+        },
+        {
+          "sectionNumber": 8,
+          "sectionTitle": "Nuisances",
+          "text": "No rubbish, yard waste, debris, junk, or abandoned materials shall be kept or stored on any Lot or in the Common Area. All trash must be stored in closed containers that are kept out of view from neighboring Lots and roadways except on collection day.\n\nNo exterior speakers, horns, whistles, bells, or other sound devices may be located, used, or placed on any Lot or in the Common Area in a manner that projects sound to neighboring Lots or to the Common Area, except security devices used exclusively for security purposes. Specific quiet hours, construction hours, and noise standards are set forth in the Rules of Conduct."
+        },
+        {
+          "sectionNumber": 9,
+          "sectionTitle": "Repair of Buildings",
+          "text": "Any building requiring substantial repair shall be restored to good condition within a reasonable time, not to exceed six months from the date of damage, unless extended by the Board for good cause shown."
+        },
+        {
+          "sectionNumber": 10,
+          "sectionTitle": "Trash Containers and Collection",
+          "text": "Every Lot shall be provided with a suitable closed container for trash, refuse, and yard waste. Trash containers shall be kept in a location not visible from neighboring Lots or roadways, except during trash collection days. Specific standards for container storage, collection day procedures, prohibited materials, and yard waste management are set forth in the Rules of Conduct."
+        },
+        {
+          "sectionNumber": 11,
+          "sectionTitle": "Clothes Drying Facilities",
+          "text": "No clothesline, clothes rack, or similar clothes-drying facility shall be maintained on any Lot in a location visible from any neighboring Lot or from any common roadway, except as otherwise permitted by Texas Property Code \\&#x00A7; 202.023 or other applicable Texas law."
+        },
+        {
+          "sectionNumber": 12,
+          "sectionTitle": "Sidewalk Encroachment",
+          "text": "No structure, object, or plant material shall encroach upon or overhang any sidewalk, roadway, or common pathway maintained by the Association, in a manner that creates a hazard or obstructs passage by pedestrians or vehicles."
+        },
+        {
+          "sectionNumber": 13,
+          "sectionTitle": "Right of Entry for Inspection",
+          "text": "The Association and the Architecture Review Committee, through their duly authorized agents and employees, shall have the right to enter any Lot at reasonable times and upon reasonable notice to the Owner for the purpose of inspecting the condition of the Lot and its compliance with this Declaration and the Rules of Conduct."
+        },
+        {
+          "sectionNumber": 14,
+          "sectionTitle": "Mineral Exploration",
+          "text": "No mining, mineral exploration, or extraction of natural resources shall be conducted on any Lot or in the Common Area without the express written consent of the Board and in compliance with all applicable federal, state, and local laws and regulations."
+        },
+        {
+          "sectionNumber": 15,
+          "sectionTitle": "Machinery and Equipment",
+          "text": "No heavy machinery, construction equipment, or industrial equipment shall be stored or operated on any Lot except as necessary for approved construction or maintenance activities on that Lot."
+        },
+        {
+          "sectionNumber": 16,
+          "sectionTitle": "Diseases and Insects",
+          "text": "Each Owner shall be responsible for controlling diseases and harmful insects on their Lot. If any infestation or disease threatens neighboring Lots or the Common Area, the Owner shall take reasonable action to eliminate the problem within a reasonable timeframe."
+        },
+        {
+          "sectionNumber": 17,
+          "sectionTitle": "Restriction on Further Subdivision",
+          "text": "No Lot may be subdivided or further divided without the prior written approval of the Board and in compliance with all applicable laws and the architectural guidelines in this Declaration."
+        },
+        {
+          "sectionNumber": 18,
+          "sectionTitle": "Signs",
+          "text": "No signs of any kind may be erected or maintained on any Lot, except the following:\n\n\\- One residential address sign not exceeding three square feet;\n\n\\- \"For Sale\" or \"For Rent\" signs not exceeding six square feet and removed within seven days of sale or rental;\n\n\\- Security system signs identifying the security company;\n\n\\- One flagpole as permitted in Section 26 below;\n\n\\- Other signs as specifically approved by the Board."
+        },
+        {
+          "sectionNumber": 19,
+          "sectionTitle": "Tanks, Windmills, and Elevated Storage",
+          "text": "No water tanks, storage tanks, or similar structures shall be erected or maintained on any Lot except as approved by the Architecture Review Committee. All such structures shall be screened from view of neighboring Lots and roadways."
+        },
+        {
+          "sectionNumber": 20,
+          "sectionTitle": "Rainwater Harvesting Systems",
+          "text": "Rainwater harvesting systems and rain barrels may be installed on any Lot subject to approval by the Architecture Review Committee and in compliance with all applicable City of Austin rainwater ordinances and standards, consistent with Texas Property Code \\&#x00A7; 202.007. All tanks and collection systems shall be screened from public view."
+        },
+        {
+          "sectionNumber": 21,
+          "sectionTitle": "Solar Energy Devices",
+          "text": "Solar energy collection devices may be installed on any Lot subject to the approval by the Architecture Review Committee and in compliance with the guidelines set forth in this Declaration and the Rules of Conduct. The ARC shall apply the reasonable standards set forth in Texas Property Code \\&#x00A7; 202.010 to any application for solar device installation."
+        },
+        {
+          "sectionNumber": 22,
+          "sectionTitle": "Solar Roofing Materials",
+          "text": "Solar roofing materials may be installed on any residence as a substitute for conventional roofing materials, subject to compliance with all applicable building codes and approval by the Architecture Review Committee."
+        },
+        {
+          "sectionNumber": 23,
+          "sectionTitle": "Cameras",
+          "text": "An Owner may install security cameras on their Lot for security purposes, including video recording equipment, subject to the requirements of Texas Property Code \\&#x00A7; 202.022 and the privacy protections set forth in Article VIII, Section 33 below. All security cameras shall be positioned to monitor only the Owner's Lot or other property to which the Owner has a legal right, and shall not be positioned to monitor neighboring Lots or Common Area beyond the Owner's property boundaries. Each Owner shall comply with all applicable laws regarding recording and notice of surveillance."
+        },
+        {
+          "sectionNumber": 24,
+          "sectionTitle": "Religious Displays",
+          "text": "An Owner may display religious symbols and religious holiday decorations on their Lot, provided that such displays comply with the applicable provisions of this Declaration and Texas Property Code \\&#x00A7; 202.020."
+        },
+        {
+          "sectionNumber": 25,
+          "sectionTitle": "Political Signs",
+          "text": "An Owner may display political signs on their Lot relating to candidates, ballot measures, or political positions, consistent with Texas Property Code \\&#x00A7; 202.019 and local ordinances. The Association shall not impose restrictions on the timing, location, or duration of political signs that are more restrictive than those applicable to non-political signs."
+        },
+        {
+          "sectionNumber": 26,
+          "sectionTitle": "Flags and Flagpoles",
+          "text": "An Owner may erect and maintain a flagpole and display one flag thereon, subject to the approval by the Architecture Review Committee. The flagpole and flag must comply with the placement and design standards set forth in the Rules of Conduct, consistent with Texas Property Code \\&#x00A7; 202.009. Flags shall be of reasonable size and securely fastened."
+        },
+        {
+          "sectionNumber": 27,
+          "sectionTitle": "Basketball Goals",
+          "text": "Permanent basketball goals installed on a Lot must be approved by the Architecture Review Committee, consistent with Texas Property Code \\&#x00A7; 202.023. Portable basketball goals may be placed on a Lot without prior approval, provided that they are removed and stored out of public view when not in use. Specific placement and storage requirements for basketball goals are set forth in the Rules of Conduct."
+        },
+        {
+          "sectionNumber": 28,
+          "sectionTitle": "Waste",
+          "text": "No hazardous waste, hazardous materials, or dangerous substances shall be accumulated or stored on any Lot. All waste shall be disposed of in compliance with applicable federal, state, and local environmental laws and regulations."
+        },
+        {
+          "sectionNumber": 29,
+          "sectionTitle": "Lighting",
+          "text": "No lighting that creates a nuisance glare affecting neighboring Lots shall be installed or maintained on any Lot. Exterior lighting should be installed and directed to minimize impacts on neighboring properties. Specific lighting standards are set forth in the Rules of Conduct."
+        },
+        {
+          "sectionNumber": 30,
+          "sectionTitle": "Accessory Dwelling Units",
+          "text": "No Owner shall construct, place, or maintain an accessory dwelling unit (ADU) on any Lot within the Properties, regardless of whether such construction is permitted by the City of Austin or other governmental authority. This prohibition applies to all forms of accessory dwelling units, including detached structures, garage conversions, and additions intended for use as separate dwelling units. Any existing ADU constructed prior to the effective date of this amendment shall be deemed a nonconforming use and may not be rented, leased, or occupied as a separate dwelling unit. This restriction is a deed restriction that applies to all Lots and supersedes any municipal ordinance permitting ADU construction, consistent with the exemption for property owners' association rules provided in Texas Senate Bill 673 (89th Legislature)."
+        },
+        {
+          "sectionNumber": 31,
+          "sectionTitle": "Electric Vehicle Charging Equipment",
+          "text": "An Owner has the right to install electric vehicle charging equipment on their Lot, subject to the approval of the Architecture Review Committee. Specific installation requirements, screening standards, and design guidelines for EV charging equipment are set forth in the Rules of Conduct. The Board may adopt design guidelines governing the placement, screening, and aesthetics of EV charging equipment consistent with this Section."
+        },
+        {
+          "sectionNumber": 32,
+          "sectionTitle": "Generators and Standby Power Systems",
+          "text": "An Owner may install a generator or standby power system on their Lot for backup power, subject to the prior approval of the Architecture Review Committee. Specific installation requirements, screening, fuel storage, testing hours, and noise standards for generators are set forth in the Rules of Conduct."
+        },
+        {
+          "sectionNumber": 33,
+          "sectionTitle": "Community Surveillance and Privacy",
+          "text": "The Association may install security cameras or surveillance equipment in the Common Area for security and safety purposes. All surveillance shall comply with the privacy protections set forth in Texas Property Code \\&#x00A7; 202.022 and applicable privacy laws. Notice of surveillance shall be provided to Members as required by law."
+        },
+        {
+          "sectionNumber": 34,
+          "sectionTitle": "Unmanned Aerial Vehicles (Drones)",
+          "text": "No Owner, Tenant, or guest shall operate an unmanned aerial vehicle (\"drone\") over any other Owner's Lot, Common Area, or Canyonside Trail without prior written authorization from the Board, except: (a) licensed commercial operators who have obtained written consent from the affected Lot Owner and Board approval; and (b) governmental agencies or their contractors performing official duties. Violations of this Section shall be subject to the Fine Schedule and may be reported to the Federal Aviation Administration if applicable federal regulations are violated."
+        },
+        {
+          "sectionNumber": 35,
+          "sectionTitle": "Swimming Pools, Spas, and Water Features",
+          "text": "All swimming pools, spas, hot tubs, and permanent water features require prior ARC approval. Installations shall comply with all applicable City of Austin and Travis County building codes, including barrier and fencing requirements. Chemical storage shall be in a secure, enclosed area not visible from neighboring properties. Pool and spa equipment shall be screened from neighboring properties and located to minimize noise impact. Draining of pool or spa water shall comply with City of Austin stormwater regulations and shall not discharge onto neighboring Lots or Common Area. Hours of use for outdoor pools and spas shall be subject to the Quiet Hours established in the Rules of Conduct."
+        }
+      ]
+    },
+    {
+      "articleNumber": 9,
+      "articleTitle": "RENTAL RESTRICTIONS AND REQUIREMENTS",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "Prohibited Uses and General Rental Restrictions",
+          "text": "Residential rental of a Lot is permitted subject to the requirements of this Article IX and the Rules of Conduct. The following uses are prohibited:\n\n\\- Short-term rentals of less than one hundred eighty (180) days, except as provided in Section 2;\n\n\\- Commercial or business use of a Lot;\n\n\\- Transient occupancy or hotel-type use;\n\n\\- Any use that creates a nuisance or is otherwise prohibited by this Declaration."
+        },
+        {
+          "sectionNumber": 2,
+          "sectionTitle": "Permitted Rentals; Minimum Term",
+          "text": "An Owner may lease a Lot to a Tenant for a minimum term of one hundred eighty (180) consecutive days, renewable at the end of the term. Each lease must comply with all provisions of this Declaration and the Rules of Conduct."
+        },
+        {
+          "sectionNumber": 3,
+          "sectionTitle": "Lease Compliance Requirements",
+          "text": "Every lease must include a clause prohibiting the Tenant from violating any provision of this Declaration, the Bylaws, or the Rules of Conduct. The lease clause shall state that violations are grounds for lease termination. Additional lease compliance requirements, including lease production obligations and evidence-of-violation standards, are set forth in the Rules of Conduct."
+        },
+        {
+          "sectionNumber": 4,
+          "sectionTitle": "Enforcement and Fines",
+          "text": "The Association shall have the authority to enforce the rental restrictions in this Article IX against Tenants and Owners through the complaint and fine procedures set forth in Article XII. Any Tenant who violates this Declaration or the Rules of Conduct shall be subject to fines assessed against the Owner."
+        },
+        {
+          "sectionNumber": 5,
+          "sectionTitle": "Rental Registration",
+          "text": "Consistent with Texas Property Code \\&#x00A7; 209.016, an Owner who leases a Lot shall provide written notice to the Association of the lease within fourteen (14) days after the commencement of the lease term. The specific registration process, required information, and timelines are set forth in the Rules of Conduct. The failure of an Owner to register a tenancy is a violation of this Declaration subject to enforcement under Article XII."
+        },
+        {
+          "sectionNumber": 6,
+          "sectionTitle": "Rental Property Cap",
+          "text": "\\(a\\) Maximum Number of Rental Properties. No more than one (1) of the sixteen (16) Lots within the Properties may be leased or rented at any given time. If one (1) Lot is currently leased in compliance with this Article IX, no additional Lot may be leased until the existing lease terminates or the Lot is no longer rented. The Board shall maintain a rental registry to track the number of Lots currently leased within the Properties.\n\n\\(b\\) Waitlist. An Owner who wishes to lease a Lot when the maximum number of rental properties has been reached may submit a written request to the Board to be placed on a waitlist. When a rental vacancy occurs, the Board shall notify the next Owner on the waitlist in order of the date the request was received. The Owner shall have thirty (30) days from notification to execute a lease that complies with this Article IX, or the Owner's position on the waitlist shall be forfeited.\n\n\\(c\\) Grandfathering. Any Lot that is leased as of the effective date of this amendment and is in compliance with this Article IX shall be grandfathered and may continue to be leased for the duration of the current lease term and any renewal thereof. Upon termination of the grandfathered lease, the Lot shall be subject to the rental cap established in subsection (a).\n\n\\(d\\) Enforcement. Any lease executed in violation of this Section shall be a violation of this Declaration. The Association may pursue all remedies available under Article XII, including fines and injunctive relief. The rental cap and waitlist status shall be disclosed in all resale certificates issued pursuant to Article XIII."
+        }
+      ]
+    },
+    {
+      "articleNumber": 10,
+      "articleTitle": "DEVIATIONS",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "Deviation Process",
+          "text": "An Owner may request a deviation or variance from any provision of this Declaration by submitting a written request to the Board. The request shall include a detailed description of the requested deviation and the reasons justifying it. The Board shall consider the request and may approve, conditionally approve, or deny the request within thirty (30) days. The Board may impose conditions on approval to ensure that the deviation does not adversely affect neighboring Lots or the Common Area. Decisions of the Board regarding deviation requests may be appealed to the membership as provided in the Bylaws."
+        }
+      ]
+    },
+    {
+      "articleNumber": 11,
+      "articleTitle": "EASEMENTS AND RIGHTS",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "General Easement",
+          "text": "The Association and all utility companies authorized to serve the Properties shall have perpetual easement rights across all Lots for the installation, maintenance, repair, and replacement of underground utilities, including water, sewer, gas, electric, telecommunications, and storm drainage systems."
+        },
+        {
+          "sectionNumber": 2,
+          "sectionTitle": "Crossover Easement",
+          "text": "Each Owner grants to the Association and all other Owners the right to use their Lot for purposes of ingress and egress to other Lots and to the Common Area, provided that such use shall be limited to emergency situations and shall not interfere with the Owner's peaceful enjoyment of their Lot."
+        },
+        {
+          "sectionNumber": 3,
+          "sectionTitle": "Alteration Easement",
+          "text": "The Association shall have the perpetual right to enter upon any Lot for the purpose of making alterations, improvements, or repairs to the Common Area, including drainage systems, roadways, and other common facilities, provided that the Association shall minimize damage and shall restore the Lot to its original condition."
+        },
+        {
+          "sectionNumber": 4,
+          "sectionTitle": "Encroachment Easement",
+          "text": "An Owner may grant an easement to a neighboring Owner for the purpose of allowing a structure or improvement to encroach upon the Owner's Lot, provided that such easement is recorded with the Travis County Clerk and a copy is provided to the Association."
+        },
+        {
+          "sectionNumber": 5,
+          "sectionTitle": "Drainage Easement",
+          "text": "The Association shall have perpetual easement rights across all Lots for the installation, maintenance, and repair of drainage systems, including culverts, swales, detention ponds, and related infrastructure necessary for proper stormwater management and runoff control on the Properties."
+        },
+        {
+          "sectionNumber": 6,
+          "sectionTitle": "Easement for Accoutrements",
+          "text": "The Association shall have the perpetual right to install and maintain utility lines, poles, transformers, and other utility accoutrements on or across any Lot as necessary to serve the Common Area and other Lots, provided that such installation shall be conducted in a professional manner and shall minimize damage to the Lot."
+        },
+        {
+          "sectionNumber": 7,
+          "sectionTitle": "Utility Easement",
+          "text": "All utility companies authorized by law to provide services to the Properties shall have the perpetual right to use portions of the Properties for the installation, maintenance, and repair of utility infrastructure, including pipes, lines, cables, and related equipment, consistent with applicable easement agreements and utility franchises."
+        },
+        {
+          "sectionNumber": 8,
+          "sectionTitle": "Construction Easement",
+          "text": "The Association shall have the right to enter upon any Lot with equipment and materials for the purpose of constructing, installing, and maintaining the Common Area and common utilities, provided that such access shall be limited to reasonable times and shall not unnecessarily interfere with the Owner's use and enjoyment of the Lot."
+        },
+        {
+          "sectionNumber": 9,
+          "sectionTitle": "Blanket Easement",
+          "text": "In addition to the specific easements set forth above, each Owner grants to the Association a blanket easement across their Lot for all purposes reasonably necessary for the administration, management, maintenance, and improvement of the Properties and the Common Area."
+        }
+      ]
+    },
+    {
+      "articleNumber": 12,
+      "articleTitle": "COMPLAINTS AND ENFORCEMENT",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "Complaints by Owner",
+          "text": "Any Owner may file a written complaint with the Board alleging that another Owner or a Tenant has violated any provision of this Declaration, the Bylaws, or the Rules of Conduct. The complaint shall be filed with the Association in accordance with the procedures established in the Rules of Conduct and shall include specific details of the alleged violation, the date and time of the violation, and the names of witnesses."
+        },
+        {
+          "sectionNumber": "1A",
+          "sectionTitle": "Proportionality in Enforcement",
+          "text": "The Board shall apply enforcement actions in a manner proportionate to the nature, severity, and frequency of the violation. Minor aesthetic violations shall not be subject to the same enforcement measures as violations that threaten health, safety, or structural integrity. The Board shall consider the Owner's good-faith efforts to cure and any extenuating circumstances before imposing fines or pursuing further remedies."
+        },
+        {
+          "sectionNumber": 2,
+          "sectionTitle": "Complaints by the Association",
+          "text": "The Board or its designated agent shall have the authority to initiate enforcement proceedings against any Owner or Tenant alleged to be in violation of this Declaration, the Bylaws, or the Rules of Conduct."
+        },
+        {
+          "sectionNumber": 3,
+          "sectionTitle": "Remedy of Violations",
+          "text": "Before assessing any fine, the Board shall provide written notice to the Owner specifying the alleged violation and providing the Owner an opportunity to cure the violation within a reasonable time period, not to exceed thirty (30) days, unless a longer cure period is established in the Rules of Conduct. The notice shall include the following information:\n\n\\- A detailed description of the alleged violation;\n\n\\- The specific provision of this Declaration, the Bylaws, or the Rules of Conduct allegedly violated;\n\n\\- The date and time of the alleged violation;\n\n\\- The identity of any witnesses;\n\n\\- A statement that the Owner has a right to a hearing before the Board;\n\n\\- A copy of the relevant provision and any Rules of Conduct;\n\n\\- The deadline for curing the violation;\n\n\\- The consequences of failure to cure, including potential fines.\n\nIf an Owner fails to cure a violation within the specified time period, the Board may assess a fine as provided in Section 4 below or may pursue other remedies.\n\nBefore any dispute between Owners, or between an Owner and the Association, may be submitted to arbitration or litigation, the parties shall first attempt to resolve the dispute through mediation as provided in the Bylaws. The specific mediation procedures, including mediator selection, process, cost allocation, and time limits, are established in the Bylaws.\n\nMediation shall be conducted by a qualified mediator agreed upon by the parties, or if the parties cannot agree within fifteen (15) days, appointed by the Board from a list of mediators maintained by the Travis County Dispute Resolution Center. Mediation shall be completed within sixty (60) days of the mediator's appointment. The costs of mediation shall be shared equally by the parties; each party shall bear its own attorney's fees. No party may file a lawsuit or demand arbitration regarding any dispute subject to this Section until mediation has been attempted and has concluded without resolution."
+        },
+        {
+          "sectionNumber": 4,
+          "sectionTitle": "Fines and Penalty Schedule",
+          "text": "The Board shall adopt and maintain a written Fine Schedule that establishes the specific dollar amounts applicable to violations of this Declaration, the Bylaws, and any rules and regulations of the Association. The Fine Schedule must be published and made available to all Members before any fines are assessed. The Board may amend the Fine Schedule by Board resolution at any time, with written notice to all Members of the revised schedule at least thirty (30) days before revised amounts take effect. This delegation allows the Board to adjust fine amounts over time without a formal Declaration amendment. The current Fine Schedule, including default amounts, repeat violation escalations, daily fine limits, and violation categories, is set forth in the Rules of Conduct. Consistent with Texas Property Code \\&#x00A7; 202.004(b), the Association may not assess a fine for a violation of any provision not contained in a dedicatory instrument or governing document of the Association that has been adopted and published to Members.\n\nFor purposes of determining whether a violation is a first, second, or subsequent offense under the Fine Schedule, the violation count for any particular provision shall reset to zero after twelve (12) consecutive months during which no Notice of Violation for that same provision has been issued to the Owner."
+        }
+      ]
+    },
+    {
+      "articleNumber": 13,
+      "articleTitle": "GENERAL PROVISIONS",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "Enforcement",
+          "text": "The Association, through its Board of Directors, is empowered and shall have the authority to enforce all covenants, conditions, and restrictions contained in this Declaration. The Board may pursue enforcement through any means available under Texas law, including but not limited to:\n\n\\- Issuing notice and opportunity to cure;\n\n\\- Assessing fines as provided in Article XII, Section 4;\n\n\\- Filing suit for injunctive relief to prevent or remedy violations;\n\n\\- Pursuing liens and foreclosure for unpaid assessments as provided in Article IV.\n\nThe Association may also seek attorney's fees and costs from violators as permitted by Texas law."
+        },
+        {
+          "sectionNumber": 2,
+          "sectionTitle": "Severability",
+          "text": "If any provision of this Declaration is held to be invalid or unenforceable by a court of competent jurisdiction, such provision shall be severable, and all other provisions shall remain in full force and effect. The remaining provisions shall be enforced to the maximum extent permitted by law."
+        },
+        {
+          "sectionNumber": 3,
+          "sectionTitle": "Duration and Amendment",
+          "text": "This Declaration shall run with the land in perpetuity unless and until modified or terminated in accordance with the procedures set forth herein and in applicable Texas law.\n\nThis Declaration may be amended or restated only by the vote or written consent of the Members as required by the amendment procedures in the Bylaws and Article XIV below, or as required by Texas Property Code Chapter 209."
+        },
+        {
+          "sectionNumber": 4,
+          "sectionTitle": "Notices",
+          "text": "All notices required by this Declaration shall be in writing and shall be delivered by personal delivery, certified mail return receipt requested, or via email with read receipt requested to the Member at the address listed in the Association's records. Notice shall be deemed received upon personal delivery or email delivery with receipt."
+        },
+        {
+          "sectionNumber": 5,
+          "sectionTitle": "Rules of Conduct",
+          "text": "The Board shall establish and maintain Rules of Conduct implementing and supplementing the provisions of this Declaration. The Rules of Conduct shall include detailed procedures and standards regarding:\n\n\\- Architectural and landscaping standards;\n\n\\- Permitted and prohibited uses;\n\n\\- Pet and animal standards;\n\n\\- Noise, nuisance, and disturbance standards;\n\n\\- Trash and waste management;\n\n\\- Complaint and enforcement procedures;\n\n\\- Fines and penalties;\n\n\\- Assessment collection procedures.\n\nThe Rules of Conduct shall be adopted by Board resolution and provided to all Members."
+        },
+        {
+          "sectionNumber": 6,
+          "sectionTitle": "Compliance with Texas Property Code Chapter 209",
+          "text": "This Declaration is adopted in compliance with Texas Property Code Chapter 209 and all applicable provisions thereof. In the event of any conflict between this Declaration and the requirements of Texas Property Code Chapter 209, the requirements of the Texas Property Code shall prevail."
+        },
+        {
+          "sectionNumber": 7,
+          "sectionTitle": "Owner Requests for Records",
+          "text": "Every Owner has the right to inspect and receive copies of Association records under Texas Property Code \\&#x00A7; 209.007. The specific procedures for requesting and obtaining copies of Association records, including timelines, fees, and format options, are set forth in the Bylaws. The Association's duty to provide records applies only to existing books and records. The Association is not obligated to create a new document, prepare a summary of information, or compile and report data.\n\nRecords exempt from disclosure include the following:\n\n\\- Information relating to violations of rules and regulations not yet publicly disclosed;\n\n\\- Information regarding the Association's legal, investigative, or settlement strategies;\n\n\\- Attorney-client communications and work product;\n\n\\- Information relating to pending litigation;\n\n\\- Financial records relating to Owners, Tenants, or other individuals;\n\n\\- Information that would compromise the security of the Properties or individuals;\n\n\\- Private information of Members and non-member residents."
+        },
+        {
+          "sectionNumber": 8,
+          "sectionTitle": "Record Retention",
+          "text": "The Association shall retain its records according to the schedule established in the Bylaws. At minimum, the Declaration, Bylaws, Articles of Incorporation, and all amendments shall be retained permanently. The Board shall adopt a comprehensive record retention policy in the Bylaws specifying retention periods for all categories of Association records."
+        },
+        {
+          "sectionNumber": 9,
+          "sectionTitle": "Governing Law",
+          "text": "This Declaration shall be governed by and construed in accordance with the laws of the State of Texas, without regard to conflict of law principles."
+        },
+        {
+          "sectionNumber": 10,
+          "sectionTitle": "No Discrimination",
+          "text": "The Association shall not discriminate against any Owner or Tenant on the basis of race, color, religion, sex, national origin, disability, familial status, or any other basis prohibited by federal, state, or local law. All provisions of this Declaration and the Rules of Conduct shall be applied uniformly and without discrimination."
+        },
+        {
+          "sectionNumber": 11,
+          "sectionTitle": "Online Document Availability",
+          "text": "The Association shall make available to all Members, upon request, electronic copies of this Declaration, the Bylaws, the Rules of Conduct, and other governing documents in a format that is accessible and downloadable."
+        },
+        {
+          "sectionNumber": 12,
+          "sectionTitle": "Homeowner Insurance Requirements",
+          "text": "Each Owner shall be required to maintain homeowners insurance on any residential structure located on their Lot in an amount not less than the insurable value of the structure. The Association may establish higher insurance requirements if necessary to protect the Common Area and the interests of all Members.\n\nThe Association shall maintain, at a minimum: (a) commercial general liability insurance covering the Common Area and Association operations, with limits of not less than one million dollars (\\$1,000,000) per occurrence and two million dollars (\\$2,000,000) aggregate; (b) directors and officers liability insurance with limits of not less than one million dollars (\\$1,000,000); and (c) fidelity bond or crime insurance covering all persons who control or disburse Association funds, in an amount not less than the estimated maximum funds in the custody of the Association or its management agent at any given time. The Board shall review insurance coverage annually and may obtain additional coverage as it deems prudent. Insurance premiums are a Common Expense included in the Annual Assessment."
+        },
+        {
+          "sectionNumber": 13,
+          "sectionTitle": "Force Majeure - Association Obligations",
+          "text": "In the event that the Association is prevented or delayed in the performance of any obligation under this Declaration by reason of acts of God, war, terrorism, pandemic, epidemic, natural disasters, or other causes beyond the reasonable control of the Association, the Association shall not be liable for failure or delay in performance of such obligation during the period of such prevention or delay."
+        },
+        {
+          "sectionNumber": 14,
+          "sectionTitle": "Resale Certificates",
+          "text": "The Association shall provide resale certificates to Owners as required by Texas Property Code \\&#x00A7; 209.010. A resale certificate shall include current information regarding the financial condition of the Association, outstanding violations, pending litigation, and other information required by law."
+        }
+      ]
+    },
+    {
+      "articleNumber": 14,
+      "articleTitle": "RATIFICATION AND EXECUTION",
+      "sections": [
+        {
+          "sectionNumber": 1,
+          "sectionTitle": "Ratification by All Owners",
+          "text": "This Amended and Restated Declaration has been approved and ratified by the vote or written consent of the Members as required by the amendment procedures in the Bylaws. All Owners, by virtue of their purchase or ownership of a Lot within the Properties after the date of this Declaration, shall be deemed to have ratified and accepted this Declaration and all covenants, conditions, and restrictions set forth herein."
+        },
+        {
+          "sectionNumber": 2,
+          "sectionTitle": "Supersession of Original Declaration",
+          "text": "This Amended and Restated Declaration completely restates and amends the original Declaration of Covenants, Conditions and Restrictions of Meadow Mountain Property Owners Association No. II-A filed with the Travis County Clerk on November 16, 1981. Except as specifically preserved by this Declaration, all provisions of the original Declaration are hereby superseded, amended, or restated. To the extent of any conflict between this Declaration and the original Declaration, this Declaration shall control."
+        },
+        {
+          "sectionNumber": 3,
+          "sectionTitle": "Existing Approvals and Variances",
+          "text": "All approvals, variances, and deviations granted by the Board prior to the date of this Declaration shall remain in full force and effect unless specifically revoked by the Board in writing. Any conditions imposed on such approvals or variances shall continue to apply."
+        },
+        {
+          "sectionNumber": 4,
+          "sectionTitle": "Recordation",
+          "text": "This Amended and Restated Declaration shall be recorded with the Travis County Clerk as authorized by Article XIII, Section 3 and shall be effective as of the date of recordation.\n\nIN WITNESS WHEREOF, the Meadow Mountain Property Owners Association No. II-A, Inc., acting by and through its duly authorized Board of Directors, has executed this Declaration as of the date last signed below.\n\nMEADOW MOUNTAIN PROPERTY OWNERS ASSOCIATION NO. II-A, INC.\n\nBy: \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\n\nName (Print): \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\n\nTitle: \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\n\nDate: \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_"
+        }
+      ]
+    }
+  ]
+}

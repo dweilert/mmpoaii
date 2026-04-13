@@ -44,6 +44,7 @@
   <div class="tab-bar">
     <button class="tab-btn active" onclick="showTab('tab-create')">Create Cycle</button>
     <button class="tab-btn" onclick="showTab('tab-seed')">Seed Content</button>
+    <button class="tab-btn" onclick="showTab('tab-doctext')">Document Text</button>
     <button class="tab-btn" onclick="showTab('tab-summary')">Summary Ballot</button>
   </div>
 
@@ -102,7 +103,36 @@
     </div>
   </div>
 
-  <!-- ── Tab 3: Summary Ballot ── -->
+  <!-- ── Tab 3: Document Text ── -->
+  <div class="tab-panel" id="tab-doctext">
+    <div class="admin-form">
+      <p style="font-size:14px;color:var(--text2);margin-bottom:12px;">Upload the actual governing document text so reviewers can view each section in a popup. Generate the JSON with:<br>
+      <code style="background:var(--surf);padding:2px 6px;border-radius:4px;font-size:12px;">node backend/scripts/parse-governing-doc.js "CCRs.docx" output.json --upload</code></p>
+      <div class="form-row">
+        <label for="doctext-cycle">Cycle ID</label>
+        <input type="text" id="doctext-cycle" placeholder="e.g. Cycle-01">
+      </div>
+      <div class="form-row">
+        <label for="doctext-source">Source</label>
+        <select id="doctext-source" onchange="toggleDocTextSource()">
+          <option value="s3">S3 file key</option>
+          <option value="json">Paste JSON</option>
+        </select>
+      </div>
+      <div class="form-row" id="doctext-s3-row">
+        <label for="doctext-s3key">S3 Key</label>
+        <input type="text" id="doctext-s3key" placeholder="e.g. ccrs-text.json">
+      </div>
+      <div class="form-row" id="doctext-json-row" style="display:none;">
+        <label for="doctext-json">Document Text JSON</label>
+        <textarea id="doctext-json" rows="10" placeholder='Paste the JSON here…' style="font-family:monospace;font-size:12px;"></textarea>
+      </div>
+      <div id="doctext-msg" style="margin-bottom:12px;"></div>
+      <button class="btn-primary" onclick="doUploadDocText()">Upload Document Text</button>
+    </div>
+  </div>
+
+  <!-- ── Tab 4: Summary Ballot ── -->
   <div class="tab-panel" id="tab-summary">
     <div class="admin-form" style="margin-bottom:16px;">
       <div class="form-row" style="margin-bottom:0;display:flex;gap:8px;align-items:flex-end;">
@@ -148,6 +178,55 @@ function toggleSeedSource() {
   var val = document.getElementById('seed-source').value;
   document.getElementById('seed-s3-row').style.display = val === 's3' ? '' : 'none';
   document.getElementById('seed-json-row').style.display = val === 'json' ? '' : 'none';
+}
+
+function toggleDocTextSource() {
+  var val = document.getElementById('doctext-source').value;
+  document.getElementById('doctext-s3-row').style.display = val === 's3' ? '' : 'none';
+  document.getElementById('doctext-json-row').style.display = val === 'json' ? '' : 'none';
+}
+
+// ── Upload Document Text ──
+async function doUploadDocText() {
+  var cycleId = document.getElementById('doctext-cycle').value.trim();
+  var source = document.getElementById('doctext-source').value;
+  var msgEl = document.getElementById('doctext-msg');
+
+  if (!cycleId) {
+    msgEl.innerHTML = '<div class="alert alert-error">Cycle ID is required.</div>';
+    return;
+  }
+
+  var payload;
+  if (source === 's3') {
+    var s3Key = document.getElementById('doctext-s3key').value.trim();
+    if (!s3Key) {
+      msgEl.innerHTML = '<div class="alert alert-error">S3 key is required.</div>';
+      return;
+    }
+    payload = { s3Key: s3Key };
+  } else {
+    var jsonText = document.getElementById('doctext-json').value.trim();
+    if (!jsonText) {
+      msgEl.innerHTML = '<div class="alert alert-error">Paste the JSON.</div>';
+      return;
+    }
+    try {
+      payload = JSON.parse(jsonText);
+    } catch (e) {
+      msgEl.innerHTML = '<div class="alert alert-error">Invalid JSON: ' + escHtml(e.message) + '</div>';
+      return;
+    }
+  }
+
+  msgEl.innerHTML = '<div class="alert alert-info">Uploading document text…</div>';
+
+  try {
+    var result = await ReviewApi.uploadDocText(cycleId, payload);
+    msgEl.innerHTML = '<div class="alert alert-success">Loaded ' + result.sectionsLoaded + ' sections of document text into cycle "' + escHtml(cycleId) + '".</div>';
+  } catch (err) {
+    msgEl.innerHTML = '<div class="alert alert-error">Failed: ' + escHtml(err.message) + '</div>';
+  }
 }
 
 // ── Create Cycle ──

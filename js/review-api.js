@@ -106,6 +106,16 @@ const ReviewApi = (function () {
     return apiFetch('PUT', '/cycles/' + encodeURIComponent(cycleId) + '/summary/' + encodeURIComponent(sectionId), { finalVote });
   }
 
+  /** POST /cycles/{cycleId}/doctext — upload document text */
+  function uploadDocText(cycleId, payload) {
+    return apiFetch('POST', '/cycles/' + encodeURIComponent(cycleId) + '/doctext', payload);
+  }
+
+  /** GET /cycles/{cycleId}/doctext/{sectionId} — get section text */
+  function getDocText(cycleId, sectionId) {
+    return apiFetch('GET', '/cycles/' + encodeURIComponent(cycleId) + '/doctext/' + encodeURIComponent(sectionId));
+  }
+
   return {
     listCycles,
     createCycle,
@@ -117,6 +127,8 @@ const ReviewApi = (function () {
     getAggregate,
     getSummary,
     saveSummaryDecision,
+    uploadDocText,
+    getDocText,
   };
 
 })();
