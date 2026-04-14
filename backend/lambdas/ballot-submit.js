@@ -3,6 +3,7 @@
 const { PutCommand, QueryCommand, GetCommand } = require('@aws-sdk/lib-dynamodb');
 const { ddb, TABLE_NAME } = require('./shared/dynamo');
 const { requireGroup, getUserSub, ok, forbidden, badRequest, serverError } = require('./shared/auth');
+const { logAudit } = require('./shared/audit');
 
 /**
  * POST /cycles/{cycleId}/submit
@@ -84,6 +85,7 @@ exports.handler = async (event) => {
     }));
 
     console.log(`[ballot-submit] user=${userSub} cycle=${cycleId} sections=${votedSections}`);
+    await logAudit('BALLOT_SUBMIT', userSub, { cycleId, sectionsVoted: votedSections });
     return ok({ submitted: true, cycleId, sectionsVoted: votedSections, submittedAt: now });
   } catch (err) {
     console.error('[ballot-submit] error:', err);

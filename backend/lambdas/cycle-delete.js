@@ -21,6 +21,7 @@ async function batchWriteWithRetry(ddb, tableName, items) {
   }
 }
 const { requireGroup, getUserSub, ok, forbidden, badRequest, notFound, serverError } = require('./shared/auth');
+const { logAudit } = require('./shared/audit');
 
 /**
  * DELETE /cycles/{cycleId}
@@ -70,6 +71,7 @@ exports.handler = async (event) => {
     }
 
     console.log(`[cycle-delete] user=${userSub} cycleId=${cycleId} deleted=${items.length} items`);
+    await logAudit('CYCLE_DELETE', userSub, { cycleId, itemsDeleted: items.length });
     return ok({ cycleId, deleted: items.length });
 
   } catch (err) {

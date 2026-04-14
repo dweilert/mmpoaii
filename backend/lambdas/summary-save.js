@@ -3,6 +3,7 @@
 const { PutCommand } = require('@aws-sdk/lib-dynamodb');
 const { ddb, TABLE_NAME } = require('./shared/dynamo');
 const { requireGroup, getUserSub, ok, forbidden, badRequest, serverError } = require('./shared/auth');
+const { logAudit } = require('./shared/audit');
 
 const VALID_DECISIONS = ['approve', 'disapprove', 'remove'];
 const SECTION_ID_RE = /^ART-\d{1,3}#SEC-\d{1,3}$/;
@@ -55,6 +56,7 @@ exports.handler = async (event) => {
     }));
 
     console.log(`[summary-save] user=${userSub} cycle=${cycleId} section=${sectionId} decision=${finalVote}`);
+    await logAudit('SUMMARY_DECISION', userSub, { cycleId, sectionId, finalVote });
     return ok({ saved: true, sectionId, finalVote, decidedAt: now });
   } catch (err) {
     console.error('[summary-save] error:', err);

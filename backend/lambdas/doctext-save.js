@@ -25,6 +25,7 @@ async function batchWriteWithRetry(ddb, tableName, items) {
 const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
 const { ddb, TABLE_NAME } = require('./shared/dynamo');
 const { requireGroup, getUserSub, ok, forbidden, badRequest, serverError } = require('./shared/auth');
+const { logAudit } = require('./shared/audit');
 
 const s3 = new S3Client({});
 const SEED_BUCKET = process.env.SEED_BUCKET || 'mmpoa-review-seeds';
@@ -123,6 +124,7 @@ exports.handler = async (event) => {
     }
 
     console.log(`[doctext-save] user=${userSub} cycle=${cycleId} saved ${written} sections truncated=${truncatedCount}`);
+    await logAudit('DOCTEXT_UPLOAD', userSub, { cycleId, sectionsLoaded: written, truncated: truncatedCount });
     return ok({ cycleId, sectionsLoaded: written, truncated: truncatedCount, documentSetId: docData.documentSetId || null });
   } catch (err) {
     console.error('[doctext-save] error writing:', err);

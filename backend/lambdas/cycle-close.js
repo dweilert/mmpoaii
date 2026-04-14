@@ -3,6 +3,7 @@
 const { UpdateCommand, GetCommand } = require('@aws-sdk/lib-dynamodb');
 const { ddb, TABLE_NAME } = require('./shared/dynamo');
 const { requireGroup, getUserSub, ok, forbidden, badRequest, notFound, serverError } = require('./shared/auth');
+const { logAudit } = require('./shared/audit');
 
 /**
  * PUT /cycles/{cycleId}/status
@@ -56,6 +57,7 @@ exports.handler = async (event) => {
     }));
 
     console.log(`[cycle-close] user=${userSub} cycle=${cycleId} status=${status}`);
+    await logAudit('CYCLE_STATUS_CHANGE', userSub, { cycleId, status });
     return ok({ cycleId, status });
   } catch (err) {
     console.error('[cycle-close] error:', err);

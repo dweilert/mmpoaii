@@ -84,7 +84,7 @@ exports.handler = async (event) => {
       }
       const secKey = `ART-${artNum}#SEC-${String(item.sectionNumber).padStart(2, '0')}`;
       const votes = sectionVotes[secKey] || { approve: 0, disapprove: 0, discuss: 0, notes: [] };
-      articleMap[artNum].sections.push({
+      const section = {
         sectionNumber: item.sectionNumber,
         sectionTitle: item.sectionTitle,
         classification: item.classification,
@@ -93,8 +93,12 @@ exports.handler = async (event) => {
           disapprove: votes.disapprove,
           discuss: votes.discuss,
         },
-        notes: votes.notes,
-      });
+      };
+      // Only admins see reviewer notes — protects reviewer anonymity
+      if (isAdmin) {
+        section.notes = votes.notes;
+      }
+      articleMap[artNum].sections.push(section);
     }
 
     // Sort articles and sections

@@ -3,6 +3,7 @@
 const { UpdateCommand } = require('@aws-sdk/lib-dynamodb');
 const { ddb, TABLE_NAME } = require('./shared/dynamo');
 const { requireGroup, getUserSub, ok, forbidden, badRequest, notFound, serverError } = require('./shared/auth');
+const { logAudit } = require('./shared/audit');
 
 /**
  * PUT /cycles/{cycleId}/threshold
@@ -41,7 +42,9 @@ exports.handler = async (event) => {
       ConditionExpression: 'attribute_exists(PK)',
     }));
 
-    console.log(`[cycle-threshold] user=${getUserSub(event)} cycleId=${cycleId} threshold=${threshold}`);
+    const userSub = getUserSub(event);
+    console.log(`[cycle-threshold] user=${userSub} cycleId=${cycleId} threshold=${threshold}`);
+    await logAudit('THRESHOLD_SET', userSub, { cycleId, threshold });
     return ok({ cycleId, threshold });
 
   } catch (err) {

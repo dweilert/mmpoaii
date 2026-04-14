@@ -4,6 +4,7 @@ const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
 const { BatchWriteCommand } = require('@aws-sdk/lib-dynamodb');
 const { ddb, TABLE_NAME } = require('./shared/dynamo');
 const { requireGroup, getUserSub, ok, forbidden, badRequest, notFound, serverError } = require('./shared/auth');
+const { logAudit } = require('./shared/audit');
 
 const s3 = new S3Client({});
 const SEED_BUCKET = process.env.SEED_BUCKET || 'mmpoa-review-seeds';
@@ -117,6 +118,7 @@ exports.handler = async (event) => {
     }
 
     console.log(`[cycle-seed] user=${userSub} cycle=${cycleId} seeded ${written} sections`);
+    await logAudit('CYCLE_SEED', userSub, { cycleId, sectionsSeeded: written, s3Key: body.s3Key || null });
     return ok({ cycleId, sectionsSeeded: written, documentSetId: seedData.documentSetId || null });
   } catch (err) {
     console.error('[cycle-seed] error writing:', err);

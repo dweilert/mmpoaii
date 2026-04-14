@@ -21,6 +21,7 @@ async function batchWriteWithRetry(ddb, tableName, items) {
   }
 }
 const { requireGroup, getUserSub, created, forbidden, badRequest, serverError } = require('./shared/auth');
+const { logAudit } = require('./shared/audit');
 
 /**
  * POST /cycles
@@ -127,6 +128,7 @@ exports.handler = async (event) => {
     }
 
     console.log(`[cycle-create] user=${userSub} created cycle=${cycleId} doc=${document} carried=${carriedForward}`);
+    await logAudit('CYCLE_CREATE', userSub, { cycleId, document, title, fromCycleId: fromCycleId || null, carriedForward });
     return created({ cycleId, document, title, carriedForward });
   } catch (err) {
     if (err.name === 'ConditionalCheckFailedException') {
