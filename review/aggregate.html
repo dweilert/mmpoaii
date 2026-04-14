@@ -237,12 +237,13 @@ function badge(totalVotes, threshold, approveCount) {
 
 async function loadAggregate() {
   try {
-    var results = await Promise.all([
+    var results = await Promise.allSettled([
       ReviewApi.getAggregate(cycleId),
       ReviewApi.listCycles(),
     ]);
-    var data   = results[0];
-    var cycles = results[1].cycles || [];
+    if (results[0].status === 'rejected') throw results[0].reason;
+    var data   = results[0].value;
+    var cycles = results[1].status === 'fulfilled' ? (results[1].value.cycles || []) : [];
 
     var cycleInfo = cycles.find(function (c) { return c.cycleId === cycleId; });
     var threshold = cycleInfo && cycleInfo.threshold ? parseInt(cycleInfo.threshold, 10) : null;

@@ -223,7 +223,7 @@ async function loadArticle() {
 function voteButton(secId, value, label, currentVote) {
   var selected = currentVote === value ? ' selected' : '';
   return '<button class="vote-btn ' + value + selected + '" ' +
-    'data-sec-id="' + secId + '" ' +
+    'data-sec-id="' + secId + '" data-vote="' + value + '" ' +
     'onclick="onVoteClick(\'' + secId + '\', \'' + value + '\', this)">' +
     label + '</button>';
 }
@@ -286,12 +286,13 @@ function onNotesInput(secId) {
 
   noteTimers[secId] = setTimeout(async function () {
     var notesEl = document.getElementById('notes-' + secId);
-    var notes = notesEl ? notesEl.value : '';
+    if (!notesEl) return;
+    var notes = notesEl.value;
 
-    // Find current vote
+    // Find current vote from data attribute
     var container = notesEl.closest('.vote-controls');
-    var selectedBtn = container.querySelector('.vote-btn.selected');
-    var vote = selectedBtn ? selectedBtn.textContent.trim().toLowerCase() : undefined;
+    var selectedBtn = container ? container.querySelector('.vote-btn.selected') : null;
+    var vote = selectedBtn ? selectedBtn.dataset.vote : undefined;
 
     setStatus(secId, 'saving', 'Saving notes…');
     try {

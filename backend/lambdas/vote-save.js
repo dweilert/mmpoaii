@@ -5,6 +5,7 @@ const { ddb, TABLE_NAME } = require('./shared/dynamo');
 const { requireGroup, getUserSub, ok, forbidden, badRequest, serverError } = require('./shared/auth');
 
 const VALID_VOTES = ['approve', 'disapprove', 'discuss'];
+const SECTION_ID_RE = /^ART-\d{1,3}#SEC-\d{1,3}$/;
 
 /**
  * PUT /cycles/{cycleId}/votes/{sectionId}
@@ -24,6 +25,7 @@ exports.handler = async (event) => {
   const cycleId = event.pathParameters?.cycleId;
   const sectionId = decodeURIComponent(event.pathParameters?.sectionId || '');
   if (!cycleId || !sectionId) return badRequest('cycleId and sectionId are required');
+  if (!SECTION_ID_RE.test(sectionId)) return badRequest('Invalid sectionId format');
 
   let body;
   try {

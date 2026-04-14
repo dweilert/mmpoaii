@@ -24,6 +24,7 @@ exports.handler = async (event) => {
 
   // Frontend sends ART-01--SEC-01 (double dash) to avoid # in URL path
   const sectionId = rawSectionId.replace('--', '#');
+  if (!/^ART-\d{1,3}#SEC-\d{1,3}$/.test(sectionId)) return badRequest('Invalid sectionId format');
 
   try {
     const { GetCommand } = require('@aws-sdk/lib-dynamodb');

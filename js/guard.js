@@ -99,9 +99,15 @@ const HoaGuard = (function () {
     var fullName  = HOA_CONFIG.hoaName || '';
     var shortName = HOA_CONFIG.hoaShortName || fullName;
     document.querySelectorAll('[data-hoa-name]').forEach(function (el) {
-      el.innerHTML =
-        '<span class="hoa-name-full">'  + fullName  + '</span>' +
-        '<span class="hoa-name-short">' + shortName + '</span>';
+      el.textContent = '';
+      var fullSpan = document.createElement('span');
+      fullSpan.className = 'hoa-name-full';
+      fullSpan.textContent = fullName;
+      var shortSpan = document.createElement('span');
+      shortSpan.className = 'hoa-name-short';
+      shortSpan.textContent = shortName;
+      el.appendChild(fullSpan);
+      el.appendChild(shortSpan);
     });
   }
 

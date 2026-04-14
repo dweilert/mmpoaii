@@ -29,7 +29,7 @@ exports.handler = async (event) => {
   }
 
   const threshold = parseInt(body.threshold, 10);
-  if (!threshold || threshold < 1) return badRequest('threshold must be a positive integer');
+  if (!threshold || threshold < 1 || threshold > 999) return badRequest('threshold must be between 1 and 999');
 
   try {
     await ddb.send(new UpdateCommand({

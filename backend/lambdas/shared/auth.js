@@ -5,8 +5,11 @@
  * The Cognito authorizer puts decoded claims into event.requestContext.authorizer.claims.
  */
 
-// Restrict responses to the known frontend origin; falls back to '*' if not configured.
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '*';
+// Restrict responses to the known frontend origin. Fails closed if not configured.
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN;
+if (!ALLOWED_ORIGIN) {
+  console.error('[auth] ALLOWED_ORIGIN environment variable is not set');
+}
 
 function getClaims(event) {
   const claims = event.requestContext?.authorizer?.claims;

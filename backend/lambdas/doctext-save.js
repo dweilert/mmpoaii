@@ -65,6 +65,9 @@ exports.handler = async (event) => {
         Bucket: SEED_BUCKET,
         Key: body.s3Key,
       }));
+      if (response.ContentLength > 5 * 1024 * 1024) {
+        return badRequest('Document text file exceeds 5MB limit');
+      }
       const text = await response.Body.transformToString();
       docData = JSON.parse(text);
     } else if (body.articles) {
