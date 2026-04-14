@@ -59,8 +59,13 @@ const ReviewApi = (function () {
   }
 
   /** POST /cycles — create a new cycle */
-  function createCycle(document, cycleId, title, fromCycleId) {
-    return apiFetch('POST', '/cycles', { document, cycleId, title, fromCycleId });
+  function createCycle(document, cycleId, title, fromCycleId, threshold) {
+    return apiFetch('POST', '/cycles', { document, cycleId, title, fromCycleId, threshold });
+  }
+
+  /** PUT /cycles/{cycleId}/threshold — set approval threshold */
+  function setThreshold(cycleId, threshold) {
+    return apiFetch('PUT', '/cycles/' + encodeURIComponent(cycleId) + '/threshold', { threshold });
   }
 
   /** POST /cycles/{cycleId}/seed — seed content from S3 or inline */
@@ -143,6 +148,7 @@ const ReviewApi = (function () {
     getDocText,
     listSeeds,
     deleteCycle,
+    setThreshold,
   };
 
 })();

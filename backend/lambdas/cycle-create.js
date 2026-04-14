@@ -26,7 +26,7 @@ exports.handler = async (event) => {
     return badRequest('Invalid JSON body');
   }
 
-  const { document, cycleId, title, fromCycleId } = body;
+  const { document, cycleId, title, fromCycleId, threshold } = body;
   if (!document || !cycleId || !title) {
     return badRequest('document, cycleId, and title are required');
   }
@@ -46,6 +46,7 @@ exports.handler = async (event) => {
         status: 'open',
         createdAt: now,
         createdBy: userSub,
+        ...(threshold && threshold > 0 ? { threshold: parseInt(threshold, 10) } : {}),
       },
       ConditionExpression: 'attribute_not_exists(PK)',
     }));

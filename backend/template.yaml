@@ -165,6 +165,24 @@ Resources:
             Path: /cycles/{cycleId}
             Method: DELETE
 
+  # PUT /cycles/{cycleId}/threshold
+  CycleThresholdFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mmpoa-review-cycle-threshold
+      Handler: cycle-threshold.handler
+      CodeUri: lambdas/
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ReviewTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ReviewApi
+            Path: /cycles/{cycleId}/threshold
+            Method: PUT
+
   # POST /cycles/{cycleId}/seed
   CycleSeedFunction:
     Type: AWS::Serverless::Function

@@ -40,13 +40,7 @@
     <p style="opacity:.8;font-size:14px;">Create cycles, seed content, and record final decisions.</p>
   </div>
 
-  <!-- Tabs -->
-  <div class="tab-bar">
-    <button class="tab-btn active" onclick="showTab('tab-create')">Create &amp; Load Cycle</button>
-    <button class="tab-btn" onclick="showTab('tab-summary')">Summary Ballot</button>
-  </div>
-
-  <!-- ── Existing Cycles Panel (shown on all tabs) ── -->
+  <!-- ── Existing Cycles Panel ── -->
   <div id="existing-cycles" style="margin-bottom:20px;background:var(--surf);border:1px solid var(--border);border-radius:var(--r2);padding:16px 20px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
       <label style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin:0;">Existing Cycles</label>
@@ -55,8 +49,8 @@
     <div id="cycles-list" style="font-size:13px;color:var(--text2);">Loading…</div>
   </div>
 
-  <!-- ── Tab 1: Create & Load Cycle ── -->
-  <div class="tab-panel active" id="tab-create">
+  <!-- ── Create & Load Cycle ── -->
+  <div id="tab-create">
     <div class="admin-form">
 
       <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:8px;">Document Files</h3>
@@ -109,26 +103,17 @@
         </select>
       </div>
 
+      <div class="form-row" style="max-width:260px;">
+        <label for="create-threshold">Minimum approvals to pass (threshold)</label>
+        <input type="number" id="create-threshold" min="1" max="99" placeholder="e.g. 3">
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Used on the Aggregate Results page to show PASSED / FAILED per section.</div>
+      </div>
+
       <div id="create-msg" style="margin-bottom:12px;"></div>
       <button class="btn-primary" onclick="doCreateAndLoad()" style="padding:12px 28px;font-size:15px;">Create Cycle &amp; Load Data</button>
     </div>
   </div>
 
-  <!-- ── Tab 2: Summary Ballot ── -->
-  <div class="tab-panel" id="tab-summary">
-    <div class="admin-form" style="margin-bottom:16px;">
-      <div class="form-row" style="margin-bottom:0;display:flex;gap:8px;align-items:flex-end;">
-        <div style="flex:1;">
-          <label for="summary-cycle">Cycle ID</label>
-          <select id="summary-cycle" style="width:100%;">
-            <option value="">— Select a cycle —</option>
-          </select>
-        </div>
-        <button class="btn-primary" onclick="loadSummary()">Load Summary</button>
-      </div>
-    </div>
-    <div id="summary-container"></div>
-  </div>
 
 </div>
 </div>
@@ -161,16 +146,6 @@
 <script src="/js/review-api.js"></script>
 <script>
 HoaGuard.protect('review-admins');
-
-// ── Tabs ──────────────────────────────────────────────────────────────────────
-function showTab(tabId) {
-  document.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.remove('active'); });
-  document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
-  document.getElementById(tabId).classList.add('active');
-  document.querySelectorAll('.tab-btn').forEach(function (b) {
-    if (b.getAttribute('onclick').indexOf(tabId) >= 0) b.classList.add('active');
-  });
-}
 
 // ── Parse state ───────────────────────────────────────────────────────────────
 var parsedFieldGuide   = null;
@@ -540,7 +515,8 @@ async function doCreateAndLoad() {
   msgEl.innerHTML = '<div class="alert alert-info">Step 1/3: Creating cycle…</div>';
 
   try {
-    var createResult = await ReviewApi.createCycle(doc, id, title, from);
+    var threshold = parseInt(document.getElementById('create-threshold').value, 10) || null;
+  var createResult = await ReviewApi.createCycle(doc, id, title, from, threshold);
     var msg = 'Cycle "' + escHtml(id) + '" created.';
     if (createResult.carriedForward > 0) msg += ' Carried forward ' + createResult.carriedForward + ' sections.';
 
@@ -563,90 +539,30 @@ async function doCreateAndLoad() {
   }
 }
 
-// ── Summary Ballot ────────────────────────────────────────────────────────────
-async function loadSummary() {
-  var cycleId = document.getElementById('summary-cycle').value.trim();
-  var container = document.getElementById('summary-container');
-
-  if (!cycleId) {
-    container.innerHTML = '<div class="alert alert-error">Select a cycle.</div>';
-    return;
-  }
-
-  container.innerHTML = '<div class="empty-state"><div class="es-icon">⏳</div><div class="es-text">Loading summary…</div></div>';
-
-  try {
-    var data = await ReviewApi.getSummary(cycleId);
-    var articles = data.articles || [];
-
-    if (articles.length === 0) {
-      container.innerHTML = '<div class="empty-state"><div class="es-icon">📋</div><div class="es-text">No content found for this cycle.</div></div>';
-      return;
-    }
-
-    var html = '';
-    for (var i = 0; i < articles.length; i++) {
-      var art = articles[i];
-      html += '<div style="margin-bottom:24px;">';
-      html += '<h3 style="font-family:var(--serif);font-size:17px;margin-bottom:8px;">Article ' +
-              art.articleNumber + ' — ' + escHtml(art.articleTitle) + '</h3>';
-      html += '<div style="background:var(--surf);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;">';
-
-      for (var j = 0; j < art.sections.length; j++) {
-        var s = art.sections[j];
-        var v = s.votes || {};
-        var secId = 'ART-' + pad(art.articleNumber) + '#SEC-' + pad(s.sectionNumber);
-        var currentDecision = s.summary ? s.summary.finalVote : '';
-
-        html += '<div class="agg-section" style="flex-wrap:wrap;">';
-        html += '<div class="agg-title" style="min-width:200px;">§' + s.sectionNumber + ' — ' + escHtml(s.sectionTitle) + '</div>';
-
-        html += '<div class="agg-votes">';
-        if (v.approve    > 0) html += '<span class="agg-badge approve">✓ '  + v.approve    + '</span>';
-        if (v.disapprove > 0) html += '<span class="agg-badge disapprove">✗ ' + v.disapprove + '</span>';
-        if (v.discuss    > 0) html += '<span class="agg-badge discuss">? '  + v.discuss    + '</span>';
-        html += '</div>';
-
-        html += '<div class="summary-btns">';
-        html += summaryBtn(cycleId, secId, 'approve',    'Approve',    currentDecision);
-        html += summaryBtn(cycleId, secId, 'disapprove', 'Disapprove', currentDecision);
-        html += summaryBtn(cycleId, secId, 'remove',     'Remove',     currentDecision);
-        html += '</div>';
-
-        html += '<div class="save-indicator" id="summary-status-' + secId + '" style="width:100%;"></div>';
-        html += '</div>';
-
-        if (s.notes && s.notes.length > 0) {
-          html += '<div style="padding:0 18px 12px;"><ul class="agg-notes-list">';
-          for (var k = 0; k < s.notes.length; k++) html += '<li>' + escHtml(s.notes[k]) + '</li>';
-          html += '</ul></div>';
-        }
-      }
-      html += '</div></div>';
-    }
-    container.innerHTML = html;
-  } catch (err) {
-    container.innerHTML = '<div class="alert alert-error">Failed: ' + escHtml(err.message) + '</div>';
-  }
+// ── Threshold inline edit ─────────────────────────────────────────────────────
+function editThreshold(idx) {
+  document.getElementById('thr-val-' + idx).style.display = 'none';
+  document.getElementById('thr-btn-' + idx).style.display = 'none';
+  document.getElementById('thr-form-' + idx).style.display = '';
+  document.getElementById('thr-inp-' + idx).focus();
 }
 
-function summaryBtn(cycleId, secId, value, label, currentDecision) {
-  var selected = currentDecision === value ? ' selected' : '';
-  return '<button class="summary-btn ' + value + selected + '" ' +
-    'onclick="onSummaryClick(\'' + cycleId + '\',\'' + secId + '\',\'' + value + '\',this)">' +
-    label + '</button>';
+function cancelThreshold(idx) {
+  document.getElementById('thr-val-' + idx).style.display = '';
+  document.getElementById('thr-btn-' + idx).style.display = '';
+  document.getElementById('thr-form-' + idx).style.display = 'none';
 }
 
-async function onSummaryClick(cycleId, secId, finalVote, btn) {
-  btn.parentElement.querySelectorAll('.summary-btn').forEach(function (b) { b.classList.remove('selected'); });
-  btn.classList.add('selected');
-  var statusEl = document.getElementById('summary-status-' + secId);
-  if (statusEl) { statusEl.className = 'save-indicator saving'; statusEl.textContent = 'Saving…'; }
+async function saveThreshold(idx) {
+  var val = parseInt(document.getElementById('thr-inp-' + idx).value, 10);
+  if (!val || val < 1) { alert('Enter a valid threshold (1 or more).'); return; }
+  var cycleId = cachedCycles[idx].cycleId;
   try {
-    await ReviewApi.saveSummaryDecision(cycleId, secId, finalVote);
-    if (statusEl) { statusEl.className = 'save-indicator saved'; statusEl.textContent = 'Saved ✓'; }
+    await ReviewApi.setThreshold(cycleId, val);
+    cancelThreshold(idx);
+    loadExistingCycles();
   } catch (err) {
-    if (statusEl) { statusEl.className = 'save-indicator error'; statusEl.textContent = 'Failed: ' + err.message; }
+    alert('Failed to set threshold: ' + (err.message || 'Unknown error'));
   }
 }
 
@@ -709,7 +625,7 @@ async function loadExistingCycles() {
     } else {
       var html = '<table style="width:100%;border-collapse:collapse;">';
       html += '<tr style="border-bottom:1px solid var(--border);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);">';
-      html += '<td style="padding:4px 8px;">Cycle ID</td><td style="padding:4px 8px;">Document</td><td style="padding:4px 8px;">Title</td><td style="padding:4px 8px;">Status</td><td style="padding:4px 8px;">Created</td><td style="padding:4px 8px;">Actions</td></tr>';
+      html += '<td style="padding:4px 8px;">Cycle ID</td><td style="padding:4px 8px;">Document</td><td style="padding:4px 8px;">Title</td><td style="padding:4px 8px;">Status</td><td style="padding:4px 8px;">Threshold</td><td style="padding:4px 8px;">Created</td><td style="padding:4px 8px;">Actions</td></tr>';
       for (var i = 0; i < cachedCycles.length; i++) {
         var c = cachedCycles[i];
         var statusColor = c.status === 'open' ? 'var(--green-600)' : 'var(--gray-600)';
@@ -718,6 +634,15 @@ async function loadExistingCycles() {
         html += '<td style="padding:6px 8px;">' + escHtml(c.document || '') + '</td>';
         html += '<td style="padding:6px 8px;">' + escHtml(c.title || '') + '</td>';
         html += '<td style="padding:6px 8px;"><span style="color:' + statusColor + ';font-weight:700;font-size:12px;text-transform:uppercase;">' + escHtml(c.status || 'open') + '</span></td>';
+        html += '<td style="padding:6px 8px;white-space:nowrap;">';
+        html += '<span id="thr-val-' + i + '" style="font-weight:600;">' + (c.threshold || '—') + '</span> ';
+        html += '<button id="thr-btn-' + i + '" onclick="editThreshold(' + i + ')" title="Set threshold" style="background:none;border:none;color:var(--purple-700);cursor:pointer;font-size:13px;padding:0 2px;">✎</button>';
+        html += '<span id="thr-form-' + i + '" style="display:none;white-space:nowrap;">';
+        html += '<input type="number" id="thr-inp-' + i + '" min="1" max="99" value="' + (c.threshold || '') + '" style="width:52px;padding:2px 4px;border:1px solid var(--border);border-radius:var(--r);">';
+        html += ' <button onclick="saveThreshold(' + i + ')" style="background:var(--purple-700);color:#fff;border:none;padding:2px 8px;border-radius:var(--r);font-size:12px;cursor:pointer;">Set</button>';
+        html += ' <button onclick="cancelThreshold(' + i + ')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;line-height:1;padding:0 3px;">✕</button>';
+        html += '</span>';
+        html += '</td>';
         html += '<td style="padding:6px 8px;font-size:12px;color:var(--text3);">' + escHtml((c.createdAt || '').substring(0, 10)) + '</td>';
         html += '<td style="padding:6px 8px;"><button onclick="showDeleteModal(\'' + escHtml(c.cycleId) + '\',\'' + escHtml(c.title || c.cycleId) + '\')" style="background:none;border:1px solid #f5aaaa;color:#b71c1c;padding:3px 10px;border-radius:var(--r1);font-size:12px;font-weight:600;cursor:pointer;">Delete</button></td>';
         html += '</tr>';
@@ -732,20 +657,6 @@ async function loadExistingCycles() {
 }
 
 function populateCycleDropdowns() {
-  // Summary cycle dropdown
-  var summarySel = document.getElementById('summary-cycle');
-  if (summarySel) {
-    var summaryVal = summarySel.value;
-    summarySel.innerHTML = '<option value="">— Select a cycle —</option>';
-    cachedCycles.forEach(function (c) {
-      var opt = document.createElement('option');
-      opt.value = c.cycleId;
-      opt.textContent = c.cycleId + ' — ' + (c.title || c.document || '');
-      summarySel.appendChild(opt);
-    });
-    if (summaryVal) summarySel.value = summaryVal;
-  }
-
   // Copy-from dropdown
   var fromSel = document.getElementById('create-from');
   var fromVal = fromSel.value;

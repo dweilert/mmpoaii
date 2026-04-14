@@ -34,6 +34,7 @@ exports.handler = async (event) => {
       document: item.document,
       title: item.title,
       status: item.status,
+      threshold: item.threshold || null,
       createdAt: item.createdAt,
       createdBy: item.createdBy,
     }));

@@ -6,6 +6,27 @@
 <title>Aggregate Results — Document Review</title>
 <link rel="stylesheet" href="/css/site.css">
 <link rel="stylesheet" href="/css/review.css">
+<style>
+  .pass-badge {
+    display:inline-block;font-size:11px;font-weight:700;letter-spacing:.4px;
+    text-transform:uppercase;padding:2px 8px;border-radius:10px;
+    background:#e6f4ea;color:#1e7e34;border:1px solid #a8d5b8;margin-right:6px;
+  }
+  .fail-badge {
+    display:inline-block;font-size:11px;font-weight:700;letter-spacing:.4px;
+    text-transform:uppercase;padding:2px 8px;border-radius:10px;
+    background:#fde8e8;color:#b71c1c;border:1px solid #f5aaaa;margin-right:6px;
+  }
+  @media print {
+    .site-header, .site-footer, #print-btn, .logout-btn,
+    #back-link, .nav-user { display:none !important; }
+    body { background:#fff !important; }
+    .review-wrap { max-width:100% !important; padding:0 !important; }
+    .welcome-banner { background:#4a4a7a !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .agg-section { break-inside:avoid; }
+    #agg-container > div { break-inside:avoid; page-break-inside:avoid; }
+  }
+</style>
 </head>
 <body>
 
@@ -35,9 +56,15 @@
 <div id="page-content">
 <div class="review-wrap">
 
-  <div class="welcome-banner" style="background:var(--purple-800);color:#fff;padding:20px 24px;border-radius:var(--r2);margin-bottom:20px;">
-    <h2 style="font-family:var(--serif);margin-bottom:4px;">Aggregate Results</h2>
-    <p id="agg-subtitle" style="opacity:.8;font-size:14px;">Combined votes from all reviewers</p>
+  <div class="welcome-banner" style="background:var(--purple-800);color:#fff;padding:20px 24px;border-radius:var(--r2);margin-bottom:20px;display:flex;justify-content:space-between;align-items:flex-start;">
+    <div>
+      <h2 style="font-family:var(--serif);margin-bottom:4px;">Aggregate Results</h2>
+      <p id="agg-subtitle" style="opacity:.8;font-size:14px;">Combined votes from all reviewers</p>
+      <p id="agg-threshold-note" style="opacity:.7;font-size:13px;margin:0;"></p>
+    </div>
+    <button id="print-btn" onclick="window.print()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4);padding:8px 18px;border-radius:var(--r1);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;margin-top:4px;">
+      Print / Save PDF
+    </button>
   </div>
 
   <div id="agg-container">
@@ -74,8 +101,25 @@ document.getElementById('back-link').href = '/review/articles.html?cycleId=' + e
 
 async function loadAggregate() {
   try {
-    var data = await ReviewApi.getAggregate(cycleId);
-    document.getElementById('agg-subtitle').textContent = 'Cycle: ' + cycleId + ' — Combined votes from all reviewers';
+    // Fetch aggregate and cycle list in parallel
+    var results = await Promise.all([
+      ReviewApi.getAggregate(cycleId),
+      ReviewApi.listCycles(),
+    ]);
+    var data     = results[0];
+    var cycles   = results[1].cycles || [];
+
+    // Find threshold for this cycle
+    var cycleInfo = cycles.find(function (c) { return c.cycleId === cycleId; });
+    var threshold = cycleInfo && cycleInfo.threshold ? parseInt(cycleInfo.threshold, 10) : null;
+
+    document.getElementById('agg-subtitle').textContent =
+      'Cycle: ' + cycleId + ' — Combined votes from all reviewers';
+
+    if (threshold) {
+      document.getElementById('agg-threshold-note').textContent =
+        'Threshold: ' + threshold + ' approvals required to pass';
+    }
 
     var articles = data.articles || [];
     if (articles.length === 0) {
@@ -95,11 +139,22 @@ async function loadAggregate() {
       for (var j = 0; j < art.sections.length; j++) {
         var s = art.sections[j];
         var v = s.votes || {};
-        var totalVotes = v.approve + v.disapprove + v.discuss;
+        var totalVotes = (v.approve || 0) + (v.disapprove || 0) + (v.discuss || 0);
         var unanimous = (v.approve === totalVotes && totalVotes > 0);
 
         html += '<div class="agg-section">';
         html += '<div class="agg-title">';
+
+        // PASSED / FAILED badge
+        if (threshold) {
+          var approveCount = v.approve || 0;
+          if (approveCount >= threshold) {
+            html += '<span class="pass-badge">PASSED</span>';
+          } else {
+            html += '<span class="fail-badge">FAILED</span>';
+          }
+        }
+
         html += '§' + s.sectionNumber + ' — ' + escHtml(s.sectionTitle);
         if (unanimous) html += ' <span style="color:var(--green-600);font-size:12px;">✓ Unanimous</span>';
         html += '</div>';
