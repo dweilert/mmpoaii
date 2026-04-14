@@ -2,6 +2,24 @@
 
 const { QueryCommand, BatchWriteCommand } = require('@aws-sdk/lib-dynamodb');
 const { ddb, TABLE_NAME } = require('./shared/dynamo');
+
+async function batchWriteWithRetry(ddb, tableName, items) {
+  let unprocessed = items;
+  let attempts = 0;
+  while (unprocessed.length > 0 && attempts < 5) {
+    const result = await ddb.send(new BatchWriteCommand({
+      RequestItems: { [tableName]: unprocessed },
+    }));
+    unprocessed = (result.UnprocessedItems && result.UnprocessedItems[tableName]) || [];
+    if (unprocessed.length > 0) {
+      attempts++;
+      await new Promise(r => setTimeout(r, Math.min(100 * Math.pow(2, attempts), 2000)));
+    }
+  }
+  if (unprocessed.length > 0) {
+    throw new Error(`Failed to delete ${unprocessed.length} items after retries`);
+  }
+}
 const { requireGroup, getUserSub, ok, forbidden, badRequest, notFound, serverError } = require('./shared/auth');
 
 /**
@@ -43,12 +61,12 @@ exports.handler = async (event) => {
       return notFound(`Cycle "${cycleId}" not found`);
     }
 
-    // Batch delete — DynamoDB allows up to 25 per request
+    // Batch delete — DynamoDB allows up to 25 per request, with UnprocessedItems retry
     for (let i = 0; i < items.length; i += 25) {
       const batch = items.slice(i, i + 25).map(item => ({
         DeleteRequest: { Key: { PK: item.PK, SK: item.SK } },
       }));
-      await ddb.send(new BatchWriteCommand({ RequestItems: { [TABLE_NAME]: batch } }));
+      await batchWriteWithRetry(ddb, TABLE_NAME, batch);
     }
 
     console.log(`[cycle-delete] user=${userSub} cycleId=${cycleId} deleted=${items.length} items`);

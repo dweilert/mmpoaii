@@ -41,6 +41,7 @@ Globals:
         TABLE_NAME: !Ref ReviewTable
         COGNITO_USER_POOL_ID: !Ref CognitoUserPoolId
         SEED_BUCKET: !Ref SeedBucketName
+        ALLOWED_ORIGIN: 'https://dev.d314yalvvnr26k.amplifyapp.com'
 
 # ---------------------------------------------------------------------------
 # Resources
@@ -53,6 +54,8 @@ Resources:
     Properties:
       TableName: mmpoa-reviews
       BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
       AttributeDefinitions:
         - AttributeName: PK
           AttributeType: S
@@ -368,6 +371,24 @@ Resources:
             RestApiId: !Ref ReviewApi
             Path: /cycles/{cycleId}/doctext/{sectionId}
             Method: GET
+
+  # PUT /cycles/{cycleId}/status
+  CycleCloseFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mmpoa-review-cycle-close
+      Handler: cycle-close.handler
+      CodeUri: lambdas/
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ReviewTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ReviewApi
+            Path: /cycles/{cycleId}/status
+            Method: PUT
 
   # GET /seeds
   SeedsListFunction:

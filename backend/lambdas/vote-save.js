@@ -42,17 +42,27 @@ exports.handler = async (event) => {
 
   const userSub = getUserSub(event);
 
-  // Check that the reviewer hasn't already submitted their ballot
+  // Check cycle status and ballot status
   try {
-    const ballotResult = await ddb.send(new GetCommand({
-      TableName: TABLE_NAME,
-      Key: { PK: `CYCLE#${cycleId}`, SK: `BALLOT#USER#${userSub}` },
-    }));
+    const [cycleResult, ballotResult] = await Promise.all([
+      ddb.send(new GetCommand({
+        TableName: TABLE_NAME,
+        Key: { PK: `CYCLE#${cycleId}`, SK: 'META' },
+      })),
+      ddb.send(new GetCommand({
+        TableName: TABLE_NAME,
+        Key: { PK: `CYCLE#${cycleId}`, SK: `BALLOT#USER#${userSub}` },
+      })),
+    ]);
+    if (!cycleResult.Item) return badRequest(`Cycle "${cycleId}" not found`);
+    if (cycleResult.Item.status === 'closed') {
+      return badRequest('This review cycle is closed — votes are no longer accepted');
+    }
     if (ballotResult.Item?.status === 'submitted') {
       return badRequest('Ballot already submitted — votes are locked');
     }
   } catch (err) {
-    console.error('[vote-save] error checking ballot:', err);
+    console.error('[vote-save] error checking cycle/ballot:', err);
     return serverError();
   }
 

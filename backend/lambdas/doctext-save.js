@@ -1,6 +1,27 @@
 'use strict';
 
 const { BatchWriteCommand } = require('@aws-sdk/lib-dynamodb');
+
+// DynamoDB item size limit is 400KB; stay well below with a 350KB text cap
+const MAX_TEXT_BYTES = 350 * 1024;
+
+async function batchWriteWithRetry(ddb, tableName, items) {
+  let unprocessed = items;
+  let attempts = 0;
+  while (unprocessed.length > 0 && attempts < 5) {
+    const result = await ddb.send(new BatchWriteCommand({
+      RequestItems: { [tableName]: unprocessed },
+    }));
+    unprocessed = (result.UnprocessedItems && result.UnprocessedItems[tableName]) || [];
+    if (unprocessed.length > 0) {
+      attempts++;
+      await new Promise(r => setTimeout(r, Math.min(100 * Math.pow(2, attempts), 2000)));
+    }
+  }
+  if (unprocessed.length > 0) {
+    throw new Error(`Failed to write ${unprocessed.length} items after retries`);
+  }
+}
 const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
 const { ddb, TABLE_NAME } = require('./shared/dynamo');
 const { requireGroup, getUserSub, ok, forbidden, badRequest, serverError } = require('./shared/auth');
@@ -59,10 +80,19 @@ exports.handler = async (event) => {
 
   try {
     const items = [];
+    let truncatedCount = 0;
+    const uploadedAt = new Date().toISOString();
     for (const article of (docData.articles || [])) {
       for (const section of (article.sections || [])) {
         const artNum = String(article.articleNumber).padStart(2, '0');
         const secNum = String(section.sectionNumber).padStart(2, '0');
+        let text = section.text || '';
+        // Truncate oversized text to stay within DynamoDB 400KB item limit
+        if (Buffer.byteLength(text, 'utf8') > MAX_TEXT_BYTES) {
+          text = Buffer.from(text, 'utf8').slice(0, MAX_TEXT_BYTES).toString('utf8');
+          truncatedCount++;
+          console.warn(`[doctext-save] truncated ART-${artNum}#SEC-${secNum} — exceeded ${MAX_TEXT_BYTES} bytes`);
+        }
         items.push({
           PutRequest: {
             Item: {
@@ -72,8 +102,8 @@ exports.handler = async (event) => {
               articleTitle: article.articleTitle,
               sectionNumber: section.sectionNumber,
               sectionTitle: section.sectionTitle,
-              text: section.text,
-              uploadedAt: new Date().toISOString(),
+              text,
+              uploadedAt,
               uploadedBy: userSub,
             },
           },
@@ -81,18 +111,16 @@ exports.handler = async (event) => {
       }
     }
 
-    // Batch write (25 items per batch)
+    // Batch write (25 items per batch) with UnprocessedItems retry
     let written = 0;
     for (let i = 0; i < items.length; i += 25) {
       const batch = items.slice(i, i + 25);
-      await ddb.send(new BatchWriteCommand({
-        RequestItems: { [TABLE_NAME]: batch },
-      }));
+      await batchWriteWithRetry(ddb, TABLE_NAME, batch);
       written += batch.length;
     }
 
-    console.log(`[doctext-save] user=${userSub} cycle=${cycleId} saved ${written} sections`);
-    return ok({ cycleId, sectionsLoaded: written, documentSetId: docData.documentSetId || null });
+    console.log(`[doctext-save] user=${userSub} cycle=${cycleId} saved ${written} sections truncated=${truncatedCount}`);
+    return ok({ cycleId, sectionsLoaded: written, truncated: truncatedCount, documentSetId: docData.documentSetId || null });
   } catch (err) {
     console.error('[doctext-save] error writing:', err);
     return serverError();

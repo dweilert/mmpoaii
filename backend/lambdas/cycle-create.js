@@ -1,7 +1,25 @@
 'use strict';
 
-const { PutCommand, QueryCommand, BatchWriteCommand } = require('@aws-sdk/lib-dynamodb');
+const { PutCommand, DeleteCommand, QueryCommand, BatchWriteCommand } = require('@aws-sdk/lib-dynamodb');
 const { ddb, TABLE_NAME } = require('./shared/dynamo');
+
+async function batchWriteWithRetry(ddb, tableName, items) {
+  let unprocessed = items;
+  let attempts = 0;
+  while (unprocessed.length > 0 && attempts < 5) {
+    const result = await ddb.send(new BatchWriteCommand({
+      RequestItems: { [tableName]: unprocessed },
+    }));
+    unprocessed = (result.UnprocessedItems && result.UnprocessedItems[tableName]) || [];
+    if (unprocessed.length > 0) {
+      attempts++;
+      await new Promise(r => setTimeout(r, Math.min(100 * Math.pow(2, attempts), 2000)));
+    }
+  }
+  if (unprocessed.length > 0) {
+    throw new Error(`Failed to write ${unprocessed.length} items after retries`);
+  }
+}
 const { requireGroup, getUserSub, created, forbidden, badRequest, serverError } = require('./shared/auth');
 
 /**
@@ -86,20 +104,24 @@ exports.handler = async (event) => {
         return decision !== 'approve' && decision !== 'remove';
       });
 
-      // Batch write carried-forward sections into new cycle
-      const batches = [];
-      for (let i = 0; i < toCarry.length; i += 25) {
-        const batch = toCarry.slice(i, i + 25).map(item => ({
-          PutRequest: {
-            Item: { ...item, PK: `CYCLE#${cycleId}` },
-          },
+      // Batch write carried-forward sections into new cycle with retry
+      // If batch fails, compensate by deleting the META item so the cycle doesn't exist half-created
+      try {
+        for (let i = 0; i < toCarry.length; i += 25) {
+          const batch = toCarry.slice(i, i + 25).map(item => ({
+            PutRequest: {
+              Item: { ...item, PK: `CYCLE#${cycleId}` },
+            },
+          }));
+          await batchWriteWithRetry(ddb, TABLE_NAME, batch);
+        }
+      } catch (batchErr) {
+        console.error('[cycle-create] carry-forward failed, deleting META to compensate:', batchErr);
+        await ddb.send(new DeleteCommand({
+          TableName: TABLE_NAME,
+          Key: { PK: `CYCLE#${cycleId}`, SK: 'META' },
         }));
-        batches.push(batch);
-      }
-      for (const batch of batches) {
-        await ddb.send(new BatchWriteCommand({
-          RequestItems: { [TABLE_NAME]: batch },
-        }));
+        throw batchErr;
       }
       carriedForward = toCarry.length;
     }

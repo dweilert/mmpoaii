@@ -8,6 +8,24 @@ const { requireGroup, getUserSub, ok, forbidden, badRequest, notFound, serverErr
 const s3 = new S3Client({});
 const SEED_BUCKET = process.env.SEED_BUCKET || 'mmpoa-review-seeds';
 
+async function batchWriteWithRetry(ddb, tableName, items) {
+  let unprocessed = items;
+  let attempts = 0;
+  while (unprocessed.length > 0 && attempts < 5) {
+    const result = await ddb.send(new BatchWriteCommand({
+      RequestItems: { [tableName]: unprocessed },
+    }));
+    unprocessed = (result.UnprocessedItems && result.UnprocessedItems[tableName]) || [];
+    if (unprocessed.length > 0) {
+      attempts++;
+      await new Promise(r => setTimeout(r, Math.min(100 * Math.pow(2, attempts), 2000)));
+    }
+  }
+  if (unprocessed.length > 0) {
+    throw new Error(`Failed to write ${unprocessed.length} items after retries`);
+  }
+}
+
 /**
  * POST /cycles/{cycleId}/seed
  * Load section content from a JSON seed file in S3 (or from the request body).
@@ -87,13 +105,11 @@ exports.handler = async (event) => {
       }
     }
 
-    // Batch write (25 items per batch — DynamoDB limit)
+    // Batch write (25 items per batch — DynamoDB limit) with UnprocessedItems retry
     let written = 0;
     for (let i = 0; i < items.length; i += 25) {
       const batch = items.slice(i, i + 25);
-      await ddb.send(new BatchWriteCommand({
-        RequestItems: { [TABLE_NAME]: batch },
-      }));
+      await batchWriteWithRetry(ddb, TABLE_NAME, batch);
       written += batch.length;
     }
 

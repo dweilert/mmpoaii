@@ -223,6 +223,7 @@ async function loadArticle() {
 function voteButton(secId, value, label, currentVote) {
   var selected = currentVote === value ? ' selected' : '';
   return '<button class="vote-btn ' + value + selected + '" ' +
+    'data-sec-id="' + secId + '" ' +
     'onclick="onVoteClick(\'' + secId + '\', \'' + value + '\', this)">' +
     label + '</button>';
 }
@@ -384,11 +385,9 @@ async function approveAllSections() {
     allBtns.forEach(function (b) { b.classList.remove('selected'); });
     item.btn.classList.add('selected');
 
-    // Get secId from the approve button's onclick
-    var onclickAttr = item.btn.getAttribute('onclick');
-    var match = onclickAttr.match(/onVoteClick\('([^']+)'/);
-    if (!match) { failed++; continue; }
-    var secId = match[1];
+    // Get secId from data attribute
+    var secId = item.btn.dataset.secId;
+    if (!secId) { failed++; continue; }
 
     // Get notes if any
     var notesEl = document.getElementById('notes-' + secId);
@@ -438,6 +437,13 @@ var guardCheck = setInterval(function () {
     }
   }
 }, 100);
+
+setTimeout(function () {
+  var container = document.getElementById('sections-container');
+  if (container && container.querySelector('.es-icon')) {
+    container.innerHTML = '<div class="alert alert-error">Loading timed out. Please refresh the page or check your connection.</div>';
+  }
+}, 30000);
 </script>
 </body>
 </html>

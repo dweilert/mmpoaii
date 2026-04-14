@@ -150,6 +150,13 @@ var guardCheck = setInterval(function () {
   }
 }, 100);
 
+setTimeout(function () {
+  var container = document.getElementById('cycles-container');
+  if (container && container.querySelector('.es-icon')) {
+    container.innerHTML = '<div class="alert alert-error">Loading timed out. Please refresh the page or check your connection.</div>';
+  }
+}, 30000);
+
 document.addEventListener('DOMContentLoaded', function () {
   document.title = 'Document Review — ' + (HOA_CONFIG.hoaName || 'MMPOAII HOA');
 });

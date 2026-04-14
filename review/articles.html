@@ -170,22 +170,14 @@ async function loadArticles() {
     }
     submitSection.style.display = 'block';
 
-    // Check if already submitted
-    checkBallotStatus();
+    // Check ballot status from API response
+    if (data.ballotSubmitted) {
+      showSubmitted();
+    }
 
   } catch (err) {
     document.getElementById('articles-container').innerHTML =
       '<div class="alert alert-error">Failed to load articles: ' + escHtml(err.message) + '</div>';
-  }
-}
-
-async function checkBallotStatus() {
-  try {
-    // Try to access aggregate — if it succeeds, ballot was submitted
-    await ReviewApi.getAggregate(cycleId);
-    showSubmitted();
-  } catch (e) {
-    // 403 means not submitted yet — that's expected
   }
 }
 
@@ -230,6 +222,13 @@ var guardCheck = setInterval(function () {
     }
   }
 }, 100);
+
+setTimeout(function () {
+  var container = document.getElementById('articles-container');
+  if (container && container.querySelector('.es-icon')) {
+    container.innerHTML = '<div class="alert alert-error">Loading timed out. Please refresh the page or check your connection.</div>';
+  }
+}, 30000);
 </script>
 </body>
 </html>

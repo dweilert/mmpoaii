@@ -21,7 +21,7 @@ const ReviewApi = (function () {
   }
 
   /**
-   * Make an authenticated API call.
+   * Make an authenticated API call with a 30-second timeout.
    */
   async function apiFetch(method, path, body) {
     const token = await getToken();
@@ -39,7 +39,22 @@ const ReviewApi = (function () {
       opts.body = JSON.stringify(body);
     }
 
-    const resp = await fetch(url, opts);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    opts.signal = controller.signal;
+
+    let resp;
+    try {
+      resp = await fetch(url, opts);
+      clearTimeout(timeoutId);
+    } catch (err) {
+      clearTimeout(timeoutId);
+      if (err.name === 'AbortError') {
+        throw new Error('Request timed out. Please check your connection and try again.');
+      }
+      throw err;
+    }
+
     const data = await resp.json();
 
     if (!resp.ok) {
@@ -133,6 +148,11 @@ const ReviewApi = (function () {
     return apiFetch('DELETE', '/cycles/' + encodeURIComponent(cycleId));
   }
 
+  /** PUT /cycles/{cycleId}/status — open or close a cycle */
+  function closeCycle(cycleId, status) {
+    return apiFetch('PUT', '/cycles/' + encodeURIComponent(cycleId) + '/status', { status });
+  }
+
   return {
     listCycles,
     createCycle,
@@ -149,6 +169,7 @@ const ReviewApi = (function () {
     listSeeds,
     deleteCycle,
     setThreshold,
+    closeCycle,
   };
 
 })();

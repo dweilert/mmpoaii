@@ -1,6 +1,6 @@
 'use strict';
 
-const { QueryCommand } = require('@aws-sdk/lib-dynamodb');
+const { QueryCommand, GetCommand } = require('@aws-sdk/lib-dynamodb');
 const { ddb, TABLE_NAME } = require('./shared/dynamo');
 const { requireGroup, getUserSub, ok, forbidden, badRequest, serverError } = require('./shared/auth');
 
@@ -22,26 +22,30 @@ exports.handler = async (event) => {
   const userSub = getUserSub(event);
 
   try {
-    // Get all content items for this cycle
-    const contentResult = await ddb.send(new QueryCommand({
-      TableName: TABLE_NAME,
-      KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
-      ExpressionAttributeValues: {
-        ':pk': `CYCLE#${cycleId}`,
-        ':sk': 'CONTENT#',
-      },
-    }));
-
-    // Get this user's votes for this cycle via GSI1
-    const voteResult = await ddb.send(new QueryCommand({
-      TableName: TABLE_NAME,
-      IndexName: 'GSI1',
-      KeyConditionExpression: 'GSI1PK = :gsi1pk AND GSI1SK = :gsi1sk',
-      ExpressionAttributeValues: {
-        ':gsi1pk': `USER#${userSub}`,
-        ':gsi1sk': `CYCLE#${cycleId}`,
-      },
-    }));
+    // Get content items, user votes, and ballot status in parallel
+    const [contentResult, voteResult, ballotResult] = await Promise.all([
+      ddb.send(new QueryCommand({
+        TableName: TABLE_NAME,
+        KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
+        ExpressionAttributeValues: {
+          ':pk': `CYCLE#${cycleId}`,
+          ':sk': 'CONTENT#',
+        },
+      })),
+      ddb.send(new QueryCommand({
+        TableName: TABLE_NAME,
+        IndexName: 'GSI1',
+        KeyConditionExpression: 'GSI1PK = :gsi1pk AND GSI1SK = :gsi1sk',
+        ExpressionAttributeValues: {
+          ':gsi1pk': `USER#${userSub}`,
+          ':gsi1sk': `CYCLE#${cycleId}`,
+        },
+      })),
+      ddb.send(new GetCommand({
+        TableName: TABLE_NAME,
+        Key: { PK: `CYCLE#${cycleId}`, SK: `BALLOT#USER#${userSub}` },
+      })),
+    ]);
 
     // Build a map of sections the user has voted on -> vote value
     const votedSections = new Map();
@@ -79,9 +83,10 @@ exports.handler = async (event) => {
 
     // Convert to sorted array
     const articles = Object.values(articleMap).sort((a, b) => a.articleNumber - b.articleNumber);
+    const ballotSubmitted = ballotResult.Item?.status === 'submitted';
 
-    console.log(`[articles-list] user=${userSub} cycle=${cycleId} articles=${articles.length}`);
-    return ok({ cycleId, articles });
+    console.log(`[articles-list] user=${userSub} cycle=${cycleId} articles=${articles.length} ballotSubmitted=${ballotSubmitted}`);
+    return ok({ cycleId, articles, ballotSubmitted });
   } catch (err) {
     console.error('[articles-list] error:', err);
     return serverError();

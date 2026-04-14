@@ -44,6 +44,9 @@ exports.handler = async (event) => {
       Select: 'COUNT',
     }));
     const totalSections = contentResult.Count || 0;
+    if (totalSections === 0) {
+      return badRequest('No sections have been loaded for this cycle — contact an administrator');
+    }
 
     // Count this user's votes via GSI1
     const voteResult = await ddb.send(new QueryCommand({

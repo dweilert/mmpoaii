@@ -5,6 +5,9 @@
  * The Cognito authorizer puts decoded claims into event.requestContext.authorizer.claims.
  */
 
+// Restrict responses to the known frontend origin; falls back to '*' if not configured.
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '*';
+
 function getClaims(event) {
   const claims = event.requestContext?.authorizer?.claims;
   if (!claims) throw new Error('No auth claims found');
@@ -18,7 +21,7 @@ function getUserSub(event) {
 function getUserGroups(event) {
   const raw = getClaims(event)['cognito:groups'];
   if (!raw) return [];
-  // Cognito sends groups as a string like "[reviewers, review-admins]" or "reviewers"
+  // Cognito sends groups as a string like "[reviewers, review-admins]" or as an array
   if (Array.isArray(raw)) return raw;
   return raw.replace(/[\[\]]/g, '').split(',').map(g => g.trim()).filter(Boolean);
 }
@@ -38,9 +41,9 @@ function cors(statusCode, body) {
     statusCode,
     headers: {
       'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
       'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-      'Access-Control-Allow-Methods': 'GET,PUT,POST,OPTIONS',
+      'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,OPTIONS',
     },
     body: JSON.stringify(body),
   };

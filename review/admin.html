@@ -566,6 +566,18 @@ async function saveThreshold(idx) {
   }
 }
 
+// ── Close / Reopen Cycle ──────────────────────────────────────────────────────
+async function setCycleStatus(idx, status) {
+  var c = cachedCycles[idx];
+  if (!c) return;
+  try {
+    await ReviewApi.closeCycle(c.cycleId, status);
+    loadExistingCycles();
+  } catch (err) {
+    alert('Failed to update cycle status: ' + (err.message || 'Unknown error'));
+  }
+}
+
 // ── Delete Cycle ──────────────────────────────────────────────────────────────
 var deleteCycleIdPending = null;
 
@@ -642,7 +654,14 @@ async function loadExistingCycles() {
         html += ' onblur="saveThreshold(' + i + ')">';
         html += '</td>';
         html += '<td style="padding:6px 8px;font-size:12px;color:var(--text3);">' + escHtml((c.createdAt || '').substring(0, 10)) + '</td>';
-        html += '<td style="padding:6px 8px;"><button onclick="showDeleteModal(\'' + escHtml(c.cycleId) + '\',\'' + escHtml(c.title || c.cycleId) + '\')" style="background:none;border:1px solid #f5aaaa;color:#b71c1c;padding:3px 10px;border-radius:var(--r1);font-size:12px;font-weight:600;cursor:pointer;">Delete</button></td>';
+        var isOpen = (c.status || 'open') === 'open';
+        var closeLabel = isOpen ? 'Close' : 'Reopen';
+        var closeBorder = isOpen ? '#ffe082' : '#a8d5b8';
+        var closeColor  = isOpen ? '#7a6100' : '#1e7e34';
+        html += '<td style="padding:6px 8px;display:flex;gap:6px;flex-wrap:wrap;">';
+        html += '<button onclick="setCycleStatus(' + i + ',\'' + (isOpen ? 'closed' : 'open') + '\')" style="background:none;border:1px solid ' + closeBorder + ';color:' + closeColor + ';padding:3px 10px;border-radius:var(--r1);font-size:12px;font-weight:600;cursor:pointer;">' + closeLabel + '</button>';
+        html += '<button onclick="showDeleteModal(\'' + escHtml(c.cycleId) + '\',\'' + escHtml(c.title || c.cycleId) + '\')" style="background:none;border:1px solid #f5aaaa;color:#b71c1c;padding:3px 10px;border-radius:var(--r1);font-size:12px;font-weight:600;cursor:pointer;">Delete</button>';
+        html += '</td>';
         html += '</tr>';
       }
       html += '</table>';
@@ -679,6 +698,13 @@ var guardCheck = setInterval(function () {
     loadExistingCycles();
   }
 }, 100);
+
+setTimeout(function () {
+  var listEl = document.getElementById('cycles-list');
+  if (listEl && listEl.textContent === 'Loading…') {
+    listEl.innerHTML = '<span style="color:var(--red-600);">Loading timed out. Please refresh the page or check your connection.</span>';
+  }
+}, 30000);
 </script>
 </body>
 </html>
