@@ -22,6 +22,11 @@
     text-transform:uppercase;padding:2px 8px;border-radius:10px;
     background:#f0f0f0;color:#888;border:1px solid #ccc;margin-right:6px;
   }
+  .noth-badge {
+    display:inline-block;font-size:11px;font-weight:700;letter-spacing:.4px;
+    padding:2px 8px;border-radius:10px;
+    background:#fde8e8;color:#b71c1c;border:1px solid #f5aaaa;margin-right:6px;
+  }
   @media print {
     .site-header, .site-footer, #print-btn, .logout-btn,
     #back-link, .nav-user { display:none !important; }
@@ -70,6 +75,10 @@
     <button id="print-btn" onclick="window.print()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4);padding:8px 18px;border-radius:var(--r1);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;margin-top:4px;">
       Print / Save PDF
     </button>
+  </div>
+
+  <div id="agg-no-threshold" style="display:none;background:#fde8e8;border:1px solid #f5aaaa;border-radius:var(--r2);padding:14px 20px;margin-bottom:16px;font-size:14px;font-weight:600;color:#b71c1c;">
+    No approval threshold has been set for this cycle. Section results cannot be evaluated as PASS or FAIL. Set a threshold in the Admin Console to enable evaluation.
   </div>
 
   <div id="agg-container">
@@ -124,6 +133,8 @@ async function loadAggregate() {
     if (threshold) {
       document.getElementById('agg-threshold-note').textContent =
         'Threshold: ' + threshold + ' approvals required to pass';
+    } else {
+      document.getElementById('agg-no-threshold').style.display = '';
     }
 
     var articles = data.articles || [];
@@ -149,7 +160,7 @@ async function loadAggregate() {
         html += '<div class="agg-section">';
         html += '<div class="agg-title">';
 
-        // PASS / FAIL / PEND badge
+        // PASS / FAIL / PEND / -??- badge
         if (totalVotes === 0) {
           html += '<span class="pend-badge">PEND</span>';
         } else if (threshold) {
@@ -159,6 +170,8 @@ async function loadAggregate() {
           } else {
             html += '<span class="fail-badge">FAIL</span>';
           }
+        } else {
+          html += '<span class="noth-badge">-??-</span>';
         }
 
         html += '§' + s.sectionNumber + ' — ' + escHtml(s.sectionTitle);
