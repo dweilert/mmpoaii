@@ -539,30 +539,30 @@ async function doCreateAndLoad() {
   }
 }
 
-// ── Threshold inline edit ─────────────────────────────────────────────────────
-function editThreshold(idx) {
-  document.getElementById('thr-val-' + idx).style.display = 'none';
-  document.getElementById('thr-btn-' + idx).style.display = 'none';
-  document.getElementById('thr-form-' + idx).style.display = '';
-  document.getElementById('thr-inp-' + idx).focus();
-}
-
-function cancelThreshold(idx) {
-  document.getElementById('thr-val-' + idx).style.display = '';
-  document.getElementById('thr-btn-' + idx).style.display = '';
-  document.getElementById('thr-form-' + idx).style.display = 'none';
-}
-
+// ── Threshold save (auto-save on blur/Enter) ──────────────────────────────────
 async function saveThreshold(idx) {
-  var val = parseInt(document.getElementById('thr-inp-' + idx).value, 10);
-  if (!val || val < 1) { alert('Enter a valid threshold (1 or more).'); return; }
+  var input = document.getElementById('thr-inp-' + idx);
+  if (!input) return;
+  var val = parseInt(input.value, 10);
+  var original = cachedCycles[idx] ? (cachedCycles[idx].threshold || '') : '';
+  if (!val || val < 1) {
+    input.value = original;
+    input.style.borderColor = '';
+    return;
+  }
+  if (val === original) return; // no change
   var cycleId = cachedCycles[idx].cycleId;
+  input.style.borderColor = 'orange';
   try {
     await ReviewApi.setThreshold(cycleId, val);
-    cancelThreshold(idx);
-    loadExistingCycles();
+    cachedCycles[idx].threshold = val;
+    input.style.borderColor = '#1e7e34';
+    setTimeout(function() { input.style.borderColor = ''; }, 1500);
   } catch (err) {
+    input.value = original;
+    input.style.borderColor = '#b71c1c';
     alert('Failed to set threshold: ' + (err.message || 'Unknown error'));
+    setTimeout(function() { input.style.borderColor = ''; }, 2000);
   }
 }
 
@@ -634,14 +634,12 @@ async function loadExistingCycles() {
         html += '<td style="padding:6px 8px;">' + escHtml(c.document || '') + '</td>';
         html += '<td style="padding:6px 8px;">' + escHtml(c.title || '') + '</td>';
         html += '<td style="padding:6px 8px;"><span style="color:' + statusColor + ';font-weight:700;font-size:12px;text-transform:uppercase;">' + escHtml(c.status || 'open') + '</span></td>';
-        html += '<td style="padding:6px 8px;white-space:nowrap;">';
-        html += '<span id="thr-val-' + i + '" style="font-weight:600;">' + (c.threshold || '—') + '</span> ';
-        html += '<button id="thr-btn-' + i + '" onclick="editThreshold(' + i + ')" title="Set threshold" style="background:none;border:none;color:var(--purple-700);cursor:pointer;font-size:13px;padding:0 2px;">✎</button>';
-        html += '<span id="thr-form-' + i + '" style="display:none;white-space:nowrap;">';
-        html += '<input type="number" id="thr-inp-' + i + '" min="1" max="99" value="' + (c.threshold || '') + '" style="width:52px;padding:2px 4px;border:1px solid var(--border);border-radius:var(--r);">';
-        html += ' <button onclick="saveThreshold(' + i + ')" style="background:var(--purple-700);color:#fff;border:none;padding:2px 8px;border-radius:var(--r);font-size:12px;cursor:pointer;">Set</button>';
-        html += ' <button onclick="cancelThreshold(' + i + ')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;line-height:1;padding:0 3px;">✕</button>';
-        html += '</span>';
+        html += '<td style="padding:6px 8px;">';
+        html += '<input type="number" id="thr-inp-' + i + '" min="1" max="99" value="' + (c.threshold || '') + '" placeholder="—"';
+        html += ' style="width:64px;padding:4px 6px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;text-align:center;"';
+        html += ' title="Enter approvals required to pass; press Enter or click away to save"';
+        html += ' onkeydown="if(event.key===\'Enter\'){this.blur();}"';
+        html += ' onblur="saveThreshold(' + i + ')">';
         html += '</td>';
         html += '<td style="padding:6px 8px;font-size:12px;color:var(--text3);">' + escHtml((c.createdAt || '').substring(0, 10)) + '</td>';
         html += '<td style="padding:6px 8px;"><button onclick="showDeleteModal(\'' + escHtml(c.cycleId) + '\',\'' + escHtml(c.title || c.cycleId) + '\')" style="background:none;border:1px solid #f5aaaa;color:#b71c1c;padding:3px 10px;border-radius:var(--r1);font-size:12px;font-weight:600;cursor:pointer;">Delete</button></td>';
