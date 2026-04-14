@@ -114,9 +114,9 @@ async function loadCycles() {
             '<div class="cc-title">' + escHtml(c.title || c.cycleId) + '</div>' +
             '<div class="cc-meta">Document: ' + escHtml(c.document || '') + ' · Created: ' + formatDate(c.createdAt) + '</div>' +
           '</div>' +
+          (isAdmin ? '<a class="btn-secondary cc-agg-btn" href="/review/aggregate.html?cycleId=' + encodeURIComponent(c.cycleId) + '" onclick="event.stopPropagation()">Aggregate Results</a>' : '') +
           '<div class="cc-status ' + statusClass + '">' + c.status + '</div>' +
         '</a>' +
-        (isAdmin ? '<a class="btn-secondary cycle-agg-link" href="/review/aggregate.html?cycleId=' + encodeURIComponent(c.cycleId) + '">Aggregate Results →</a>' : '') +
         '</div>';
     }
     html += '</div>';

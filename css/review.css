@@ -34,9 +34,19 @@
 .cc-status.open { background: var(--green-50); color: var(--green-600); }
 .cc-status.closed { background: var(--gray-100); color: var(--gray-600); }
 
-/* ── Cycle card row (card + aggregate link) ── */
+/* ── Cycle card row ── */
 .cycle-card-row { display: flex; flex-direction: column; gap: 6px; }
-.cycle-agg-link { font-size: 13px; text-align: right; padding: 4px 8px; }
+
+/* Aggregate Results button inside cycle card */
+.cc-agg-btn {
+  padding: 6px 14px; border-radius: var(--r);
+  border: 2px solid rgba(106,90,205,.35);
+  background: var(--purple-50); color: var(--purple-800);
+  font-size: 12px; font-weight: 700; white-space: nowrap;
+  text-decoration: none; flex-shrink: 0;
+  transition: all .13s;
+}
+.cc-agg-btn:hover { background: var(--purple-800); color: #fff; border-color: var(--purple-800); }
 
 /* ── Progress bar ── */
 .progress-bar {

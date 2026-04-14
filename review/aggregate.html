@@ -186,9 +186,14 @@
       <p id="agg-subtitle" style="opacity:.8;font-size:14px;">Combined votes from all reviewers</p>
       <p id="agg-threshold-note" style="opacity:.7;font-size:13px;margin:0;"></p>
     </div>
-    <button id="print-btn" onclick="window.print()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4);padding:8px 18px;border-radius:var(--r1);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;margin-top:4px;">
-      Print / Save PDF
-    </button>
+    <div style="display:flex;gap:8px;align-items:flex-start;margin-top:4px;">
+      <button id="export-md-btn" style="display:none;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4);padding:8px 18px;border-radius:var(--r1);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;">
+        Export Markdown
+      </button>
+      <button id="print-btn" onclick="window.print()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4);padding:8px 18px;border-radius:var(--r1);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;">
+        Print / Save PDF
+      </button>
+    </div>
   </div>
 
   <div id="agg-no-threshold" style="display:none;background:#fde8e8;border:1px solid #f5aaaa;border-radius:var(--r2);padding:14px 20px;margin-bottom:16px;font-size:14px;font-weight:600;color:#b71c1c;">
@@ -267,6 +272,11 @@ async function loadAggregate() {
       ? 'Threshold: ' + threshold + ' approvals required to pass'
       : 'No threshold set';
     document.getElementById('ph-date').textContent = 'Printed: ' + new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+
+    // Store for markdown export
+    _aggData = data;
+    _aggThreshold = threshold;
+    _aggCycleTitle = cycleTitle;
 
     var articles = data.articles || [];
     if (articles.length === 0) {
@@ -350,9 +360,104 @@ function escHtml(s) {
   return d.innerHTML;
 }
 
+// ── Export Markdown (admin-only) ──
+// Stored after load so export can access the data
+var _aggData = null;
+var _aggThreshold = null;
+var _aggCycleId = cycleId;
+var _aggCycleTitle = '';
+
+function exportMarkdown() {
+  if (!_aggData) return;
+  var articles = _aggData.articles || [];
+  var lines = [];
+  lines.push('# Review Results — ' + _aggCycleId + ' — ' + _aggCycleTitle);
+  lines.push('');
+  lines.push('Exported: ' + new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }));
+  if (_aggThreshold) {
+    lines.push('Threshold: ' + _aggThreshold + ' approvals required to pass');
+  } else {
+    lines.push('Threshold: Not set');
+  }
+  lines.push('');
+  lines.push('> Sections that PASSED have been omitted — they do not require further review.');
+  lines.push('');
+
+  for (var i = 0; i < articles.length; i++) {
+    var art = articles[i];
+    // Collect non-pass sections for this article
+    var kept = [];
+    for (var j = 0; j < art.sections.length; j++) {
+      var s = art.sections[j];
+      var v = s.votes || {};
+      var totalVotes = (v.approve || 0) + (v.disapprove || 0) + (v.discuss || 0);
+      var approveCount = v.approve || 0;
+      var passed = _aggThreshold && totalVotes > 0 && approveCount >= _aggThreshold;
+      if (!passed) kept.push(s);
+    }
+    if (kept.length === 0) continue; // entire article passed
+
+    lines.push('## Article ' + art.articleNumber + ' — ' + (art.articleTitle || ''));
+    lines.push('');
+
+    for (var k = 0; k < kept.length; k++) {
+      var sec = kept[k];
+      var sv = sec.votes || {};
+      var sTotalVotes = (sv.approve || 0) + (sv.disapprove || 0) + (sv.discuss || 0);
+
+      // Status label
+      var status;
+      if (sTotalVotes === 0) {
+        status = 'PENDING';
+      } else if (!_aggThreshold) {
+        status = 'NO THRESHOLD';
+      } else {
+        status = 'FAIL';
+      }
+
+      lines.push('### §' + sec.sectionNumber + ' — ' + (sec.sectionTitle || '') + '  [' + status + ']');
+      lines.push('');
+
+      // Vote tally
+      var parts = [];
+      if (sv.approve > 0)    parts.push('Approve: ' + sv.approve);
+      if (sv.disapprove > 0) parts.push('Disapprove: ' + sv.disapprove);
+      if (sv.discuss > 0)    parts.push('Discuss: ' + sv.discuss);
+      lines.push('- **Votes:** ' + (parts.length ? parts.join(' | ') : 'None'));
+
+      // Notes (admin-only data already filtered server-side)
+      if (sec.notes && sec.notes.length > 0) {
+        lines.push('- **Reviewer Notes:**');
+        for (var n = 0; n < sec.notes.length; n++) {
+          lines.push('  - ' + sec.notes[n]);
+        }
+      }
+      lines.push('');
+    }
+  }
+
+  // Download
+  var blob = new Blob([lines.join('\n')], { type: 'text/markdown' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = _aggCycleId + '-review-results.md';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+document.getElementById('export-md-btn').addEventListener('click', exportMarkdown);
+
 var guardCheck = setInterval(function () {
   if (HoaGuard.getUser()) {
     clearInterval(guardCheck);
+    // Show export button for admins
+    var user = HoaGuard.getUser();
+    if (user && user.groups && user.groups.includes(HOA_CONFIG.reviewAdminsGroup || 'review-admins')) {
+      document.getElementById('export-md-btn').style.display = '';
+    }
     loadAggregate();
     var uname = document.querySelector('[data-user-name]');
     if (uname && uname.textContent !== 'Loading…') {
