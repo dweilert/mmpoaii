@@ -106,17 +106,20 @@ async function loadCycles() {
     for (var i = 0; i < data.cycles.length; i++) {
       var c = data.cycles[i];
       var statusClass = c.status === 'open' ? 'open' : 'closed';
+      var statusLabel = c.status === 'open' ? 'Open' : 'Closed';
       html +=
-        '<div class="cycle-card-row">' +
-        '<a class="cycle-card" href="/review/articles.html?cycleId=' + encodeURIComponent(c.cycleId) + '">' +
-          '<div class="cc-icon">📋</div>' +
-          '<div class="cc-body">' +
-            '<div class="cc-title">' + escHtml(c.title || c.cycleId) + '</div>' +
-            '<div class="cc-meta">Document: ' + escHtml(c.document || '') + ' · Created: ' + formatDate(c.createdAt) + '</div>' +
+        '<div class="cycle-card">' +
+          '<a class="cc-info" href="/review/articles.html?cycleId=' + encodeURIComponent(c.cycleId) + '">' +
+            '<div class="cc-icon">📋</div>' +
+            '<div class="cc-body">' +
+              '<div class="cc-title">' + escHtml(c.title || c.cycleId) + '</div>' +
+              '<div class="cc-meta">Document: ' + escHtml(c.document || '') + ' · Created: ' + formatDate(c.createdAt) + '</div>' +
+            '</div>' +
+          '</a>' +
+          '<div class="cc-actions">' +
+            (isAdmin ? '<a class="btn-secondary cc-agg-btn" href="/review/aggregate.html?cycleId=' + encodeURIComponent(c.cycleId) + '">Aggregate Results</a>' : '') +
+            '<div class="cc-status ' + statusClass + '">' + statusLabel + '</div>' +
           '</div>' +
-          (isAdmin ? '<a class="btn-secondary cc-agg-btn" href="/review/aggregate.html?cycleId=' + encodeURIComponent(c.cycleId) + '" onclick="event.stopPropagation()">Aggregate Results</a>' : '') +
-          '<div class="cc-status ' + statusClass + '">' + c.status + '</div>' +
-        '</a>' +
         '</div>';
     }
     html += '</div>';
