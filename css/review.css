@@ -34,6 +34,10 @@
 .cc-status.open { background: var(--green-50); color: var(--green-600); }
 .cc-status.closed { background: var(--gray-100); color: var(--gray-600); }
 
+/* ── Cycle card row (card + aggregate link) ── */
+.cycle-card-row { display: flex; flex-direction: column; gap: 6px; }
+.cycle-agg-link { font-size: 13px; text-align: right; padding: 4px 8px; }
+
 /* ── Progress bar ── */
 .progress-bar {
   height: 6px; border-radius: 3px; background: var(--gray-100);

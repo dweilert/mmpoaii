@@ -100,11 +100,14 @@ async function loadCycles() {
     }
 
     // For each cycle, get article progress
+    var user = HoaGuard.getUser();
+    var isAdmin = user && user.groups && user.groups.includes(HOA_CONFIG.reviewAdminsGroup || 'review-admins');
     var html = '<div class="cycle-list">';
     for (var i = 0; i < data.cycles.length; i++) {
       var c = data.cycles[i];
       var statusClass = c.status === 'open' ? 'open' : 'closed';
       html +=
+        '<div class="cycle-card-row">' +
         '<a class="cycle-card" href="/review/articles.html?cycleId=' + encodeURIComponent(c.cycleId) + '">' +
           '<div class="cc-icon">📋</div>' +
           '<div class="cc-body">' +
@@ -112,7 +115,9 @@ async function loadCycles() {
             '<div class="cc-meta">Document: ' + escHtml(c.document || '') + ' · Created: ' + formatDate(c.createdAt) + '</div>' +
           '</div>' +
           '<div class="cc-status ' + statusClass + '">' + c.status + '</div>' +
-        '</a>';
+        '</a>' +
+        (isAdmin ? '<a class="btn-secondary cycle-agg-link" href="/review/aggregate.html?cycleId=' + encodeURIComponent(c.cycleId) + '">Aggregate Results →</a>' : '') +
+        '</div>';
     }
     html += '</div>';
     container.innerHTML = html;
