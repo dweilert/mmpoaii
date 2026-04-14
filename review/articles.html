@@ -183,14 +183,19 @@ async function loadArticles() {
 
 function showSubmitted() {
   ballotSubmitted = true;
-  document.getElementById('submit-section').style.display = 'none';
   var el = document.getElementById('ballot-submitted');
   el.style.display = 'block';
   document.getElementById('aggregate-link').href = '/review/aggregate.html?cycleId=' + encodeURIComponent(cycleId);
+  // Keep submit section visible so they can re-submit
+  var btn = document.getElementById('submit-btn');
+  btn.disabled = false;
+  btn.textContent = 'Re-Submit Ballot';
+  var info = document.getElementById('submit-info');
+  info.className = 'alert alert-info';
+  info.textContent = 'Your ballot has been submitted. You may change votes and re-submit at any time while the cycle is open.';
 }
 
 async function doSubmit() {
-  if (ballotSubmitted) return;
   var btn = document.getElementById('submit-btn');
   btn.disabled = true;
   btn.textContent = 'Submitting…';
@@ -202,7 +207,7 @@ async function doSubmit() {
     document.getElementById('submit-info').className = 'alert alert-error';
     document.getElementById('submit-info').textContent = 'Submit failed: ' + err.message;
     btn.disabled = false;
-    btn.textContent = 'Submit Ballot';
+    btn.textContent = ballotSubmitted ? 'Re-Submit Ballot' : 'Submit Ballot';
   }
 }
 

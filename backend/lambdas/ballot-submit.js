@@ -25,13 +25,14 @@ exports.handler = async (event) => {
   const userSub = getUserSub(event);
 
   try {
-    // Check if already submitted
-    const existing = await ddb.send(new GetCommand({
+    // Check cycle is not closed
+    const cycleResult = await ddb.send(new GetCommand({
       TableName: TABLE_NAME,
-      Key: { PK: `CYCLE#${cycleId}`, SK: `BALLOT#USER#${userSub}` },
+      Key: { PK: `CYCLE#${cycleId}`, SK: 'META' },
     }));
-    if (existing.Item?.status === 'submitted') {
-      return badRequest('Ballot already submitted');
+    if (!cycleResult.Item) return badRequest(`Cycle "${cycleId}" not found`);
+    if (cycleResult.Item.status === 'closed') {
+      return badRequest('This review cycle is closed — ballots are no longer accepted');
     }
 
     // Count total sections in the cycle
