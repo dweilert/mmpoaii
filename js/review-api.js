@@ -123,6 +123,11 @@ const ReviewApi = (function () {
     return apiFetch('GET', '/seeds');
   }
 
+  /** DELETE /cycles/{cycleId} — permanently delete a cycle and all its data */
+  function deleteCycle(cycleId) {
+    return apiFetch('DELETE', '/cycles/' + encodeURIComponent(cycleId));
+  }
+
   return {
     listCycles,
     createCycle,
@@ -137,6 +142,7 @@ const ReviewApi = (function () {
     uploadDocText,
     getDocText,
     listSeeds,
+    deleteCycle,
   };
 
 })();

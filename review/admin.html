@@ -133,6 +133,21 @@
 </div>
 </div>
 
+<!-- ── Delete Confirmation Modal ── -->
+<div id="delete-modal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.55);align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:var(--r2);max-width:440px;width:90%;box-shadow:0 8px 40px rgba(0,0,0,.3);padding:28px 32px;">
+    <h3 style="font-family:var(--serif);font-size:19px;margin:0 0 10px;color:var(--text);">Delete Cycle?</h3>
+    <p style="font-size:14px;color:var(--text2);margin:0 0 10px;">This will permanently delete:</p>
+    <div id="delete-cycle-label" style="font-size:15px;font-weight:700;color:#b71c1c;background:#fde8e8;border:1px solid #f5aaaa;border-radius:var(--r);padding:10px 16px;margin-bottom:12px;"></div>
+    <p style="font-size:13px;color:var(--text3);margin:0 0 22px;">All sections, votes, ballots, and decisions will be removed from AWS. <strong>This cannot be undone.</strong></p>
+    <div id="delete-error" style="font-size:13px;color:#b71c1c;min-height:18px;margin-bottom:10px;"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+      <button id="confirm-delete-btn" onclick="confirmDeleteCycle()" style="background:#b71c1c;color:#fff;border:none;padding:10px 22px;border-radius:var(--r1);font-size:14px;font-weight:700;cursor:pointer;">Delete Permanently</button>
+    </div>
+  </div>
+</div>
+
 <footer class="site-footer">
   <div data-hoa-name>MMPOAII HOA</div>
   <div>Review Admin Console — Confidential</div>
@@ -635,6 +650,41 @@ async function onSummaryClick(cycleId, secId, finalVote, btn) {
   }
 }
 
+// ── Delete Cycle ──────────────────────────────────────────────────────────────
+var deleteCycleIdPending = null;
+
+function showDeleteModal(cycleId, cycleTitle) {
+  deleteCycleIdPending = cycleId;
+  document.getElementById('delete-cycle-label').textContent = cycleId + ' — ' + cycleTitle;
+  document.getElementById('delete-error').textContent = '';
+  var btn = document.getElementById('confirm-delete-btn');
+  btn.disabled = false;
+  btn.textContent = 'Delete Permanently';
+  document.getElementById('delete-modal').style.display = 'flex';
+}
+
+function closeDeleteModal() {
+  deleteCycleIdPending = null;
+  document.getElementById('delete-modal').style.display = 'none';
+}
+
+async function confirmDeleteCycle() {
+  if (!deleteCycleIdPending) return;
+  var btn = document.getElementById('confirm-delete-btn');
+  btn.disabled = true;
+  btn.textContent = 'Deleting…';
+  document.getElementById('delete-error').textContent = '';
+  try {
+    var result = await ReviewApi.deleteCycle(deleteCycleIdPending);
+    closeDeleteModal();
+    loadExistingCycles();
+  } catch (err) {
+    document.getElementById('delete-error').textContent = 'Failed: ' + (err.message || 'Unknown error');
+    btn.disabled = false;
+    btn.textContent = 'Delete Permanently';
+  }
+}
+
 // ── Utilities ─────────────────────────────────────────────────────────────────
 function pad(n) { return String(n).padStart(2, '0'); }
 
@@ -659,7 +709,7 @@ async function loadExistingCycles() {
     } else {
       var html = '<table style="width:100%;border-collapse:collapse;">';
       html += '<tr style="border-bottom:1px solid var(--border);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);">';
-      html += '<td style="padding:4px 8px;">Cycle ID</td><td style="padding:4px 8px;">Document</td><td style="padding:4px 8px;">Title</td><td style="padding:4px 8px;">Status</td><td style="padding:4px 8px;">Created</td></tr>';
+      html += '<td style="padding:4px 8px;">Cycle ID</td><td style="padding:4px 8px;">Document</td><td style="padding:4px 8px;">Title</td><td style="padding:4px 8px;">Status</td><td style="padding:4px 8px;">Created</td><td style="padding:4px 8px;">Actions</td></tr>';
       for (var i = 0; i < cachedCycles.length; i++) {
         var c = cachedCycles[i];
         var statusColor = c.status === 'open' ? 'var(--green-600)' : 'var(--gray-600)';
@@ -669,6 +719,7 @@ async function loadExistingCycles() {
         html += '<td style="padding:6px 8px;">' + escHtml(c.title || '') + '</td>';
         html += '<td style="padding:6px 8px;"><span style="color:' + statusColor + ';font-weight:700;font-size:12px;text-transform:uppercase;">' + escHtml(c.status || 'open') + '</span></td>';
         html += '<td style="padding:6px 8px;font-size:12px;color:var(--text3);">' + escHtml((c.createdAt || '').substring(0, 10)) + '</td>';
+        html += '<td style="padding:6px 8px;"><button onclick="showDeleteModal(\'' + escHtml(c.cycleId) + '\',\'' + escHtml(c.title || c.cycleId) + '\')" style="background:none;border:1px solid #f5aaaa;color:#b71c1c;padding:3px 10px;border-radius:var(--r1);font-size:12px;font-weight:600;cursor:pointer;">Delete</button></td>';
         html += '</tr>';
       }
       html += '</table>';

@@ -99,7 +99,7 @@ Resources:
       Name: mmpoa-review-api
       StageName: !Ref StageName
       Cors:
-        AllowMethods: "'GET,PUT,POST,OPTIONS'"
+        AllowMethods: "'GET,PUT,POST,DELETE,OPTIONS'"
         AllowHeaders: "'Content-Type,Authorization'"
         AllowOrigin: "'*'"
       Auth:
@@ -146,6 +146,24 @@ Resources:
             RestApiId: !Ref ReviewApi
             Path: /cycles
             Method: POST
+
+  # DELETE /cycles/{cycleId}
+  CycleDeleteFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mmpoa-review-cycle-delete
+      Handler: cycle-delete.handler
+      CodeUri: lambdas/
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ReviewTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ReviewApi
+            Path: /cycles/{cycleId}
+            Method: DELETE
 
   # POST /cycles/{cycleId}/seed
   CycleSeedFunction:
