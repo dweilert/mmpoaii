@@ -27,14 +27,116 @@
     padding:2px 8px;border-radius:10px;
     background:#fde8e8;color:#b71c1c;border:1px solid #f5aaaa;margin-right:6px;
   }
+
+  /* ── Print-only report header ── */
+  #print-header {
+    display:none;
+  }
+
   @media print {
+    /* Hide all web chrome */
     .site-header, .site-footer, #print-btn, .logout-btn,
-    #back-link, .nav-user { display:none !important; }
-    body { background:#fff !important; }
-    .review-wrap { max-width:100% !important; padding:0 !important; }
-    .welcome-banner { background:#4a4a7a !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-    .agg-section { break-inside:avoid; }
-    #agg-container > div { break-inside:avoid; page-break-inside:avoid; }
+    #back-link, .nav-user, .welcome-banner { display:none !important; }
+
+    body { background:#fff !important; font-size:11pt; color:#000; margin:0; }
+    #page-content { padding:0 !important; }
+    .review-wrap { max-width:100% !important; padding:0 !important; margin:0 !important; }
+
+    /* Show the print header */
+    #print-header {
+      display:block !important;
+      border-bottom:2px solid #4a3878;
+      padding-bottom:10px;
+      margin-bottom:14px;
+    }
+    #print-header .ph-org {
+      font-size:9pt;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.6px;
+      color:#4a3878;
+      margin-bottom:2px;
+    }
+    #print-header .ph-title {
+      font-size:17pt;
+      font-weight:700;
+      color:#000;
+      margin-bottom:3px;
+    }
+    #print-header .ph-cycle {
+      font-size:11pt;
+      font-weight:600;
+      color:#222;
+      margin-bottom:2px;
+    }
+    #print-header .ph-meta {
+      font-size:9pt;
+      color:#555;
+      display:flex;
+      justify-content:space-between;
+    }
+
+    /* Article headings */
+    .print-article-heading {
+      font-size:12pt;
+      font-weight:700;
+      background:#f0ecf8 !important;
+      -webkit-print-color-adjust:exact;
+      print-color-adjust:exact;
+      padding:5px 8px;
+      margin:14px 0 0;
+      border-left:4px solid #4a3878;
+    }
+
+    /* Section rows as clean table */
+    .print-section-row {
+      display:flex;
+      align-items:baseline;
+      padding:4px 8px;
+      border-bottom:1px solid #ddd;
+      break-inside:avoid;
+      page-break-inside:avoid;
+    }
+    .print-section-row:nth-child(even) {
+      background:#fafafa !important;
+      -webkit-print-color-adjust:exact;
+      print-color-adjust:exact;
+    }
+    .print-badge-col { flex:0 0 52px; }
+    .print-section-col { flex:1; font-size:10pt; }
+    .print-votes-col { flex:0 0 130px; text-align:right; font-size:9pt; color:#333; white-space:nowrap; }
+
+    /* Notes under sections */
+    .print-notes {
+      padding:2px 8px 4px 60px;
+      font-size:9pt;
+      color:#444;
+      font-style:italic;
+      border-bottom:1px solid #eee;
+    }
+
+    /* Badge sizing in print */
+    .pass-badge, .fail-badge, .pend-badge, .noth-badge {
+      font-size:8pt;
+      padding:1px 5px;
+    }
+
+    /* Screen-only agg-section — hide, we render print rows separately */
+    .agg-section { display:none !important; }
+    /* But show our print rows */
+    .print-section-row, .print-article-heading, .print-notes { display:flex !important; }
+    .print-article-heading { display:block !important; }
+    .print-notes { display:block !important; }
+
+    /* No threshold banner */
+    #agg-no-threshold {
+      -webkit-print-color-adjust:exact;
+      print-color-adjust:exact;
+      font-size:9pt;
+    }
+
+    /* Keep article groups together where possible */
+    #agg-container > div { page-break-inside:avoid; }
   }
 </style>
 </head>
@@ -66,6 +168,18 @@
 <div id="page-content">
 <div class="review-wrap">
 
+  <!-- Print-only report header — hidden on screen -->
+  <div id="print-header">
+    <div class="ph-org" id="ph-org"></div>
+    <div class="ph-title">Aggregate Ballot Results</div>
+    <div class="ph-cycle" id="ph-cycle"></div>
+    <div class="ph-meta">
+      <span id="ph-threshold"></span>
+      <span id="ph-date"></span>
+    </div>
+  </div>
+
+  <!-- Screen banner -->
   <div class="welcome-banner" style="background:var(--purple-800);color:#fff;padding:20px 24px;border-radius:var(--r2);margin-bottom:20px;display:flex;justify-content:space-between;align-items:flex-start;">
     <div>
       <h2 style="font-family:var(--serif);margin-bottom:4px;">Aggregate Results</h2>
@@ -113,29 +227,45 @@ if (!cycleId) {
 
 document.getElementById('back-link').href = '/review/articles.html?cycleId=' + encodeURIComponent(cycleId);
 
+function badge(totalVotes, threshold, approveCount) {
+  if (totalVotes === 0) return '<span class="pend-badge">PEND</span>';
+  if (!threshold)       return '<span class="noth-badge">-??-</span>';
+  return approveCount >= threshold
+    ? '<span class="pass-badge">PASS</span>'
+    : '<span class="fail-badge">FAIL</span>';
+}
+
 async function loadAggregate() {
   try {
-    // Fetch aggregate and cycle list in parallel
     var results = await Promise.all([
       ReviewApi.getAggregate(cycleId),
       ReviewApi.listCycles(),
     ]);
-    var data     = results[0];
-    var cycles   = results[1].cycles || [];
+    var data   = results[0];
+    var cycles = results[1].cycles || [];
 
-    // Find threshold for this cycle
     var cycleInfo = cycles.find(function (c) { return c.cycleId === cycleId; });
     var threshold = cycleInfo && cycleInfo.threshold ? parseInt(cycleInfo.threshold, 10) : null;
+    var cycleTitle = cycleInfo ? (cycleInfo.title || cycleId) : cycleId;
 
+    // Populate screen banner
     document.getElementById('agg-subtitle').textContent =
-      'Cycle: ' + cycleId + ' — Combined votes from all reviewers';
-
+      'Cycle: ' + cycleId + ' — ' + cycleTitle;
     if (threshold) {
       document.getElementById('agg-threshold-note').textContent =
         'Threshold: ' + threshold + ' approvals required to pass';
     } else {
       document.getElementById('agg-no-threshold').style.display = '';
     }
+
+    // Populate print header
+    var hoaName = (typeof HOA_CONFIG !== 'undefined' && HOA_CONFIG.hoaName) || 'HOA';
+    document.getElementById('ph-org').textContent = hoaName;
+    document.getElementById('ph-cycle').textContent = cycleId + ' — ' + cycleTitle;
+    document.getElementById('ph-threshold').textContent = threshold
+      ? 'Threshold: ' + threshold + ' approvals required to pass'
+      : 'No threshold set';
+    document.getElementById('ph-date').textContent = 'Printed: ' + new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
 
     var articles = data.articles || [];
     if (articles.length === 0) {
@@ -147,50 +277,53 @@ async function loadAggregate() {
     var html = '';
     for (var i = 0; i < articles.length; i++) {
       var art = articles[i];
+
+      // Article heading (shown in both screen and print)
       html += '<div style="margin-bottom:24px;">';
-      html += '<h3 style="font-family:var(--serif);font-size:17px;margin-bottom:8px;">Article ' +
+      html += '<h3 class="print-article-heading" style="font-family:var(--serif);font-size:17px;margin-bottom:8px;padding:0;">Article ' +
               art.articleNumber + ' — ' + escHtml(art.articleTitle) + '</h3>';
       html += '<div style="background:var(--surf);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;">';
 
       for (var j = 0; j < art.sections.length; j++) {
         var s = art.sections[j];
         var v = s.votes || {};
-        var totalVotes = (v.approve || 0) + (v.disapprove || 0) + (v.discuss || 0);
+        var totalVotes   = (v.approve || 0) + (v.disapprove || 0) + (v.discuss || 0);
+        var approveCount = v.approve || 0;
+        var b = badge(totalVotes, threshold, approveCount);
 
+        // Screen row
         html += '<div class="agg-section">';
-        html += '<div class="agg-title">';
-
-        // PASS / FAIL / PEND / -??- badge
-        if (totalVotes === 0) {
-          html += '<span class="pend-badge">PEND</span>';
-        } else if (threshold) {
-          var approveCount = v.approve || 0;
-          if (approveCount >= threshold) {
-            html += '<span class="pass-badge">PASS</span>';
-          } else {
-            html += '<span class="fail-badge">FAIL</span>';
-          }
-        } else {
-          html += '<span class="noth-badge">-??-</span>';
-        }
-
-        html += '§' + s.sectionNumber + ' — ' + escHtml(s.sectionTitle);
-        html += '</div>';
+        html += '<div class="agg-title">' + b + '§' + s.sectionNumber + ' — ' + escHtml(s.sectionTitle) + '</div>';
         html += '<div class="agg-votes">';
-        if (v.approve > 0) html += '<span class="agg-badge approve">✓ ' + v.approve + '</span>';
+        if (v.approve    > 0) html += '<span class="agg-badge approve">✓ ' + v.approve + '</span>';
         if (v.disapprove > 0) html += '<span class="agg-badge disapprove">✗ ' + v.disapprove + '</span>';
-        if (v.discuss > 0) html += '<span class="agg-badge discuss">? ' + v.discuss + '</span>';
-        html += '</div>';
+        if (v.discuss    > 0) html += '<span class="agg-badge discuss">? ' + v.discuss + '</span>';
+        html += '</div></div>';
+
+        // Print row (hidden on screen via CSS, shown when printing)
+        var voteStr = '';
+        if (v.approve    > 0) voteStr += 'Approve: ' + v.approve + '  ';
+        if (v.disapprove > 0) voteStr += 'Disapprove: ' + v.disapprove + '  ';
+        if (v.discuss    > 0) voteStr += 'Discuss: ' + v.discuss;
+        if (!voteStr) voteStr = 'No votes';
+        html += '<div class="print-section-row">';
+        html += '<div class="print-badge-col">' + b + '</div>';
+        html += '<div class="print-section-col">§' + s.sectionNumber + ' — ' + escHtml(s.sectionTitle) + '</div>';
+        html += '<div class="print-votes-col">' + escHtml(voteStr.trim()) + '</div>';
         html += '</div>';
 
-        // Notes
+        // Notes (print and screen)
         if (s.notes && s.notes.length > 0) {
-          html += '<div style="padding:0 18px 12px;">';
+          html += '<div style="padding:0 18px 12px;" class="screen-notes">';
           html += '<ul class="agg-notes-list">';
           for (var k = 0; k < s.notes.length; k++) {
             html += '<li>' + escHtml(s.notes[k]) + '</li>';
           }
           html += '</ul></div>';
+
+          html += '<div class="print-notes">Notes: ';
+          html += s.notes.map(function(n) { return escHtml(n); }).join(' | ');
+          html += '</div>';
         }
       }
 
