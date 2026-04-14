@@ -55,7 +55,7 @@ exports.handler = async (event) => {
     const votedSections = new Map();
     for (const item of (voteResult.Items || [])) {
       // SK = VOTE#ART-01#SEC-01#USER#<sub>
-      const match = item.SK.match(/VOTE#(ART-\d+#SEC-\d+)#USER#/);
+      const match = item.SK.match(/VOTE#(ART-\d+#SEC-[\dA-Za-z]+)#USER#/);
       if (match) votedSections.set(match[1], item.vote || 'unknown');
     }
 

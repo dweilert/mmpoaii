@@ -61,7 +61,7 @@ exports.handler = async (event) => {
     // Aggregate votes per section
     const sectionVotes = {}; // "ART-01#SEC-01" -> { approve: N, disapprove: N, discuss: N, notes: [] }
     for (const item of (voteResult.Items || [])) {
-      const match = item.SK.match(/VOTE#(ART-\d+#SEC-\d+)#USER#/);
+      const match = item.SK.match(/VOTE#(ART-\d+#SEC-[\dA-Za-z]+)#USER#/);
       if (!match) continue;
       const key = match[1];
       if (!sectionVotes[key]) {
