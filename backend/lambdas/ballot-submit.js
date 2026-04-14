@@ -7,8 +7,9 @@ const { logAudit } = require('./shared/audit');
 
 /**
  * POST /cycles/{cycleId}/submit
- * Finalize the reviewer's ballot. After submission, votes are locked and
- * aggregate results become visible to the reviewer.
+ * Submit (or re-submit) the reviewer's ballot. Reviewers can submit as many
+ * times as they want while the cycle is open. After submission, aggregate
+ * results become visible to the reviewer.
  *
  * Group: reviewers
  */
@@ -35,21 +36,6 @@ exports.handler = async (event) => {
       return badRequest('This review cycle is closed — ballots are no longer accepted');
     }
 
-    // Count total sections in the cycle
-    const contentResult = await ddb.send(new QueryCommand({
-      TableName: TABLE_NAME,
-      KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
-      ExpressionAttributeValues: {
-        ':pk': `CYCLE#${cycleId}`,
-        ':sk': 'CONTENT#',
-      },
-      Select: 'COUNT',
-    }));
-    const totalSections = contentResult.Count || 0;
-    if (totalSections === 0) {
-      return badRequest('No sections have been loaded for this cycle — contact an administrator');
-    }
-
     // Count this user's votes via GSI1
     const voteResult = await ddb.send(new QueryCommand({
       TableName: TABLE_NAME,
@@ -61,14 +47,9 @@ exports.handler = async (event) => {
       },
     }));
 
-    // Only count votes that have a vote value and are VOTE# items (not BALLOT#)
     const votedSections = (voteResult.Items || []).filter(item =>
       item.SK && item.SK.startsWith('VOTE#') && item.vote
     ).length;
-
-    if (votedSections < totalSections) {
-      return badRequest(`You have voted on ${votedSections} of ${totalSections} sections. All sections must be voted on before submitting.`);
-    }
 
     // Mark ballot as submitted
     const now = new Date().toISOString();

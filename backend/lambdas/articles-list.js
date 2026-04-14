@@ -22,8 +22,8 @@ exports.handler = async (event) => {
   const userSub = getUserSub(event);
 
   try {
-    // Get content items, user votes, and ballot status in parallel
-    const [contentResult, voteResult, ballotResult] = await Promise.all([
+    // Get content items, user votes, ballot status, and cycle meta in parallel
+    const [contentResult, voteResult, ballotResult, cycleResult] = await Promise.all([
       ddb.send(new QueryCommand({
         TableName: TABLE_NAME,
         KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
@@ -44,6 +44,10 @@ exports.handler = async (event) => {
       ddb.send(new GetCommand({
         TableName: TABLE_NAME,
         Key: { PK: `CYCLE#${cycleId}`, SK: `BALLOT#USER#${userSub}` },
+      })),
+      ddb.send(new GetCommand({
+        TableName: TABLE_NAME,
+        Key: { PK: `CYCLE#${cycleId}`, SK: 'META' },
       })),
     ]);
 
@@ -84,9 +88,10 @@ exports.handler = async (event) => {
     // Convert to sorted array
     const articles = Object.values(articleMap).sort((a, b) => a.articleNumber - b.articleNumber);
     const ballotSubmitted = ballotResult.Item?.status === 'submitted';
+    const cycleStatus = cycleResult.Item?.status || 'open';
 
-    console.log(`[articles-list] user=${userSub} cycle=${cycleId} articles=${articles.length} ballotSubmitted=${ballotSubmitted}`);
-    return ok({ cycleId, articles, ballotSubmitted });
+    console.log(`[articles-list] user=${userSub} cycle=${cycleId} articles=${articles.length} ballotSubmitted=${ballotSubmitted} cycleStatus=${cycleStatus}`);
+    return ok({ cycleId, articles, ballotSubmitted, cycleStatus });
   } catch (err) {
     console.error('[articles-list] error:', err);
     return serverError();

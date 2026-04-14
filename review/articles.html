@@ -91,6 +91,7 @@ if (!cycleId) {
 var totalSections = 0;
 var totalVoted = 0;
 var ballotSubmitted = false;
+var cycleClosed = false;
 
 async function loadArticles() {
   try {
@@ -161,12 +162,17 @@ async function loadArticles() {
     var submitBtn = document.getElementById('submit-btn');
     var submitInfo = document.getElementById('submit-info');
 
-    if (totalVoted >= totalSections && totalSections > 0) {
-      submitInfo.textContent = 'All ' + totalSections + ' sections voted. You can now submit your ballot.';
+    cycleClosed = data.cycleStatus === 'closed';
+
+    if (cycleClosed) {
+      submitInfo.textContent = 'This review cycle is closed — ballots are no longer accepted.';
+      submitBtn.disabled = true;
+    } else if (totalVoted >= totalSections && totalSections > 0) {
+      submitInfo.textContent = 'All ' + totalSections + ' sections voted. Ready to submit your ballot.';
       submitBtn.disabled = false;
     } else {
-      submitInfo.textContent = 'Vote on all ' + totalSections + ' sections before submitting (' + (totalSections - totalVoted) + ' remaining).';
-      submitBtn.disabled = true;
+      submitInfo.textContent = totalVoted + ' of ' + totalSections + ' sections voted. You can submit at any time.';
+      submitBtn.disabled = false;
     }
     submitSection.style.display = 'block';
 
