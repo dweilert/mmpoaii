@@ -6,7 +6,7 @@ const { requireGroup, getUserSub, ok, forbidden, badRequest, serverError } = req
 const { logAudit } = require('./shared/audit');
 
 const VALID_VOTES = ['approve', 'disapprove', 'discuss'];
-const SECTION_ID_RE = /^ART-\d{1,3}#SEC-\d{1,3}$/;
+const SECTION_ID_RE = /^ART-\d{1,3}#SEC-[\dA-Za-z]{1,4}$/;
 
 /**
  * PUT /cycles/{cycleId}/votes/{sectionId}
