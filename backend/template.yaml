@@ -41,7 +41,7 @@ Globals:
         TABLE_NAME: !Ref ReviewTable
         COGNITO_USER_POOL_ID: !Ref CognitoUserPoolId
         SEED_BUCKET: !Ref SeedBucketName
-        ALLOWED_ORIGIN: 'https://dev.d314yalvvnr26k.amplifyapp.com'
+        ALLOWED_ORIGIN: 'https://mmpoaii.org'
 
 # ---------------------------------------------------------------------------
 # Resources
