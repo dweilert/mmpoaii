@@ -110,7 +110,8 @@
       </div>
 
       <div id="create-msg" style="margin-bottom:12px;"></div>
-      <button class="btn-primary" onclick="doCreateAndLoad()" style="padding:12px 28px;font-size:15px;">Create Cycle &amp; Load Data</button>
+      <button class="btn-primary" id="create-btn" onclick="doCreateAndLoad()" style="padding:12px 28px;font-size:15px;" disabled>Create Cycle &amp; Load Data</button>
+      <div style="font-size:12px;color:var(--text3);margin-top:6px;" id="create-btn-hint">Both documents must be loaded and validated with no errors before creating a cycle.</div>
     </div>
   </div>
 
@@ -366,11 +367,11 @@ function validateAlignment(fg, gd) {
   var matchCount = 0;
   fgSections.forEach(function (fg, key) {
     if (gdSections.has(key)) { matchCount++; }
-    else { warnings.push('Section ' + key + ' (' + fg.sectionTitle + ') in Field Guide but not Governing Doc — View Text unavailable'); }
+    else { errors.push('Section ' + key + ' (' + fg.sectionTitle + ') is in Field Guide but NOT in Governing Document'); }
   });
   gdSections.forEach(function (gd, key) {
     if (!fgSections.has(key)) {
-      warnings.push('Section ' + key + ' (' + gd.sectionTitle + ') in Governing Doc but not Field Guide');
+      errors.push('Section ' + key + ' (' + gd.sectionTitle + ') is in Governing Document but NOT in Field Guide');
     }
   });
 
@@ -402,6 +403,9 @@ async function onDocxFile(input, type) {
   parsedDocumentSetId = null;
   parseErrors = [];
   document.getElementById('parse-results').style.display = 'none';
+  document.getElementById('create-btn').disabled = true;
+  document.getElementById('create-btn-hint').textContent = 'Both documents must be loaded and validated with no errors before creating a cycle.';
+  document.getElementById('create-btn-hint').style.color = 'var(--text3)';
 
   try {
     var arrayBuffer = await file.arrayBuffer();
@@ -475,12 +479,21 @@ async function runValidation() {
   }
 
   // DocumentSetId + status
+  var createBtn = document.getElementById('create-btn');
+  var createHint = document.getElementById('create-btn-hint');
   if (validation.errors.length === 0) {
     html += '<div style="background:#e6f4ea;border:1px solid #a8d5b8;border-radius:var(--r);padding:10px 14px;font-size:13px;color:#1e7e34;">';
     html += validation.warnings.length === 0
       ? '<strong>All sections matched.</strong> '
       : '<strong>Ready to load</strong> (with warnings above). ';
     html += 'Document Set ID: <strong>' + escHtml(parsedDocumentSetId) + '</strong></div>';
+    createBtn.disabled = false;
+    createHint.textContent = 'Validation passed. Ready to create cycle.';
+    createHint.style.color = '#1e7e34';
+  } else {
+    createBtn.disabled = true;
+    createHint.textContent = 'Fix the ' + validation.errors.length + ' error(s) above before creating a cycle. Documents will not be loaded to AWS until all errors are resolved.';
+    createHint.style.color = '#b71c1c';
   }
 
   html += '</div>';
