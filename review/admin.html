@@ -59,17 +59,28 @@
   <div class="tab-panel active" id="tab-create">
     <div class="admin-form">
 
-      <p style="font-size:14px;color:var(--text2);margin-bottom:16px;">
-        Before creating a cycle, run the parse script to prepare the data files:
-      </p>
-      <pre style="background:var(--surf2);padding:10px 14px;border-radius:var(--r);font-size:12px;overflow-x:auto;margin-bottom:16px;border:1px solid var(--border);">node backend/scripts/parse-review-docs.js \
-  --field-guide "FieldGuide.docx" \
-  --governing-doc "CCRs.docx" \
-  --output-dir backend/seeds \
-  --name ccrs-2026-01 \
-  --upload</pre>
+      <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:8px;">Document Files</h3>
 
-      <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:8px;">Cycle Details</h3>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:16px;">
+        Select both Word documents. They are parsed and validated in the browser — no terminal commands needed.
+      </p>
+
+      <div style="display:flex;gap:16px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:220px;" class="form-row">
+          <label for="fg-file">Field Guide (.docx)</label>
+          <input type="file" id="fg-file" accept=".docx" onchange="onDocxFile(this,'fg')">
+          <div id="fg-status" style="font-size:12px;margin-top:4px;min-height:18px;"></div>
+        </div>
+        <div style="flex:1;min-width:220px;" class="form-row">
+          <label for="gd-file">Governing Document (.docx)</label>
+          <input type="file" id="gd-file" accept=".docx" onchange="onDocxFile(this,'gd')">
+          <div id="gd-status" style="font-size:12px;margin-top:4px;min-height:18px;"></div>
+        </div>
+      </div>
+
+      <div id="parse-results" style="display:none;margin-bottom:4px;"></div>
+
+      <h3 style="font-size:14px;font-weight:700;color:var(--text);margin:20px 0 12px;border-bottom:1px solid var(--border);padding-bottom:8px;">Cycle Details</h3>
 
       <div style="display:flex;gap:16px;flex-wrap:wrap;">
         <div style="flex:1;min-width:200px;" class="form-row">
@@ -96,16 +107,6 @@
         <select id="create-from">
           <option value="">— None (new cycle) —</option>
         </select>
-      </div>
-
-      <h3 style="font-size:14px;font-weight:700;color:var(--text);margin:20px 0 12px;border-bottom:1px solid var(--border);padding-bottom:8px;">Document Files to Load</h3>
-
-      <div class="form-row">
-        <label for="create-file-pair">Select the matched file pair from S3</label>
-        <select id="create-file-pair" onchange="onFilePairChange()">
-          <option value="">Loading available files…</option>
-        </select>
-        <div id="file-pair-detail" style="font-size:12px;color:var(--text3);margin-top:4px;"></div>
       </div>
 
       <div id="create-msg" style="margin-bottom:12px;"></div>
@@ -138,6 +139,7 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6/dist/amazon-cognito-identity.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1/mammoth.browser.min.js"></script>
 <script src="/js/config.js"></script>
 <script src="/js/auth.js"></script>
 <script src="/js/guard.js"></script>
@@ -145,134 +147,414 @@
 <script>
 HoaGuard.protect('review-admins');
 
-// ── Tabs ──
+// ── Tabs ──────────────────────────────────────────────────────────────────────
 function showTab(tabId) {
   document.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.remove('active'); });
   document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
   document.getElementById(tabId).classList.add('active');
-  // Find the button that matches
-  var btns = document.querySelectorAll('.tab-btn');
-  btns.forEach(function (b) {
+  document.querySelectorAll('.tab-btn').forEach(function (b) {
     if (b.getAttribute('onclick').indexOf(tabId) >= 0) b.classList.add('active');
   });
 }
 
-// ── Create & Load Cycle (combined) ──
+// ── Parse state ───────────────────────────────────────────────────────────────
+var parsedFieldGuide   = null;
+var parsedGovDoc       = null;
+var parsedDocumentSetId = null;
+var parseErrors        = [];
+
+// ── Shared parse helpers ──────────────────────────────────────────────────────
+function cleanText(text) {
+  return (text || '').replace(/\s+/g, ' ').trim();
+}
+
+function romanToInt(roman) {
+  var map = { I:1, V:5, X:10, L:50, C:100, D:500, M:1000 };
+  var result = 0;
+  var upper = roman.toUpperCase();
+  for (var i = 0; i < upper.length; i++) {
+    var curr = map[upper[i]] || 0;
+    var next = map[upper[i + 1]] || 0;
+    result += curr < next ? -curr : curr;
+  }
+  return result;
+}
+
+function parseSectionNumber(str) {
+  var trimmed = str.trim().replace(/\.$/, '');
+  var asInt = parseInt(trimmed, 10);
+  return String(asInt) === trimmed ? asInt : trimmed;
+}
+
+function classifyLabel(label) {
+  var upper = label.toUpperCase();
+  if (upper.indexOf('REQUIRED BY TEXAS LAW') >= 0)     return 'required_by_law';
+  if (upper.indexOf('REQUIRED BY CITY') >= 0)           return 'required_by_city';
+  if (upper.indexOf('RECOMMENDED BEST PRACTICE') >= 0)  return 'best_practice';
+  if (upper.indexOf('COMMUNITY CHOICE') >= 0)           return 'community_choice';
+  return 'best_practice';
+}
+
+function sectionKey(artNum, secNum) {
+  return artNum + '-' + secNum;
+}
+
+// ── Field Guide parser ────────────────────────────────────────────────────────
+// Reads mammoth HTML output; matches on textContent so heading tag level doesn't matter.
+function parseFieldGuideHtml(html) {
+  var doc = new DOMParser().parseFromString(html, 'text/html');
+  var articles = [];
+  var currentArticle = null;
+  var currentSection = null;
+  var collectingField = null;
+
+  var articleRe  = /^Article\s+([IVXLCDM]+)\s*[—–\-]+\s*(.+)$/i;
+  var sectionRe  = /Art\.\s+[IVXLCDM]+,\s+§(\S+)\s*[—–\-]+\s*(.+)/i;
+  var classRe    = /(REQUIRED BY TEXAS LAW|REQUIRED BY CITY OF AUSTIN|RECOMMENDED BEST PRACTICE|COMMUNITY CHOICE)/i;
+  var whyRe      = /^Why it.?s here:?\s*(.*)/i;
+  var whatRe     = /^What you can do:?\s*(.*)/i;
+  var impactRe   = /^Community Impact:?\s*(.*)/i;
+  var skipRe     = /[☐☑✓✗]\s*(Approve|Disapprove|Discuss)|^Notes?:|^[–—-]{5,}$/i;
+
+  function finishSection() {
+    if (currentSection && currentArticle) {
+      currentSection.whyItsHere  = cleanText(currentSection.whyItsHere);
+      currentSection.whatYouCanDo = cleanText(currentSection.whatYouCanDo);
+      if (currentSection.communityImpact !== undefined) {
+        currentSection.communityImpact = cleanText(currentSection.communityImpact);
+      }
+      currentArticle.sections.push(currentSection);
+    }
+    currentSection = null;
+    collectingField = null;
+  }
+
+  function finishArticle() {
+    finishSection();
+    if (currentArticle) articles.push(currentArticle);
+    currentArticle = null;
+  }
+
+  var nodes = doc.body.querySelectorAll('h1,h2,h3,h4,h5,h6,p,li');
+  for (var i = 0; i < nodes.length; i++) {
+    var text = nodes[i].textContent.trim();
+    if (!text) continue;
+
+    var artMatch = text.match(articleRe);
+    if (artMatch) {
+      finishArticle();
+      currentArticle = { articleNumber: romanToInt(artMatch[1]), articleTitle: cleanText(artMatch[2]), sections: [] };
+      continue;
+    }
+    if (!currentArticle) continue;
+
+    var secMatch = text.match(sectionRe);
+    if (secMatch) {
+      finishSection();
+      currentSection = {
+        sectionNumber:  parseSectionNumber(secMatch[1]),
+        sectionTitle:   cleanText(secMatch[2]),
+        classification: 'best_practice',
+        whyItsHere:     '',
+        whatYouCanDo:   '',
+      };
+      continue;
+    }
+    if (!currentSection) continue;
+
+    if (skipRe.test(text)) continue;
+
+    var classMatch = text.match(classRe);
+    if (classMatch) { currentSection.classification = classifyLabel(classMatch[1]); continue; }
+
+    var whyMatch = text.match(whyRe);
+    if (whyMatch) { collectingField = 'why';    currentSection.whyItsHere    = whyMatch[1];   continue; }
+    var whatMatch = text.match(whatRe);
+    if (whatMatch) { collectingField = 'what';  currentSection.whatYouCanDo  = whatMatch[1];  continue; }
+    var impactMatch = text.match(impactRe);
+    if (impactMatch) { collectingField = 'impact'; currentSection.communityImpact = impactMatch[1]; continue; }
+
+    // Continuation lines
+    if (collectingField) {
+      if (collectingField === 'why')    currentSection.whyItsHere    += ' ' + text;
+      else if (collectingField === 'what')   currentSection.whatYouCanDo  += ' ' + text;
+      else if (collectingField === 'impact') currentSection.communityImpact += ' ' + text;
+    }
+  }
+  finishArticle();
+  return { articles: articles };
+}
+
+// ── Governing Document parser ─────────────────────────────────────────────────
+function parseGovDocHtml(html) {
+  var doc = new DOMParser().parseFromString(html, 'text/html');
+  var articles = [];
+  var currentArticle = null;
+  var currentSection = null;
+  var textParts = [];
+
+  var articleRe = /^ARTICLE\s+([IVXLCDM]+)\s*[-–—]\s*(.+)$/i;
+  var sectionRe = /^Section\s+(\S+?)\.?\s+(.+)$/i;
+
+  function finishSection() {
+    if (currentSection && currentArticle) {
+      currentSection.text = cleanText(textParts.join(' '));
+      currentArticle.sections.push(currentSection);
+    }
+    currentSection = null;
+    textParts = [];
+  }
+
+  function finishArticle() {
+    finishSection();
+    if (currentArticle) articles.push(currentArticle);
+    currentArticle = null;
+  }
+
+  var nodes = doc.body.querySelectorAll('h1,h2,h3,h4,h5,h6,p,li');
+  for (var i = 0; i < nodes.length; i++) {
+    var text = nodes[i].textContent.trim();
+    if (!text) continue;
+
+    var artMatch = text.match(articleRe);
+    if (artMatch) {
+      finishArticle();
+      currentArticle = { articleNumber: romanToInt(artMatch[1]), articleTitle: cleanText(artMatch[2]), sections: [] };
+      continue;
+    }
+    if (!currentArticle) continue;
+
+    var secMatch = text.match(sectionRe);
+    if (secMatch) {
+      finishSection();
+      var title = secMatch[2].replace(/^["\u201C]|["\u201D]\.?$/g, '').replace(/\.$/, '').trim();
+      currentSection = { sectionNumber: parseSectionNumber(secMatch[1]), sectionTitle: title };
+      textParts = [];
+      continue;
+    }
+
+    if (currentSection) textParts.push(text);
+  }
+  finishArticle();
+  return { articles: articles };
+}
+
+// ── Validation ────────────────────────────────────────────────────────────────
+function validateAlignment(fg, gd) {
+  var errors   = [];
+  var warnings = [];
+  var fgSections = new Map();
+  var gdSections = new Map();
+
+  fg.articles.forEach(function (art) {
+    art.sections.forEach(function (sec) {
+      fgSections.set(sectionKey(art.articleNumber, sec.sectionNumber),
+        { articleTitle: art.articleTitle, sectionTitle: sec.sectionTitle });
+    });
+  });
+  gd.articles.forEach(function (art) {
+    art.sections.forEach(function (sec) {
+      gdSections.set(sectionKey(art.articleNumber, sec.sectionNumber),
+        { articleTitle: art.articleTitle, sectionTitle: sec.sectionTitle });
+    });
+  });
+
+  if (fg.articles.length !== gd.articles.length) {
+    warnings.push('Article count differs: Field Guide has ' + fg.articles.length +
+      ', Governing Doc has ' + gd.articles.length);
+  }
+
+  var fgArtNums = new Set(fg.articles.map(function (a) { return a.articleNumber; }));
+  var gdArtNums = new Set(gd.articles.map(function (a) { return a.articleNumber; }));
+  fgArtNums.forEach(function (n) {
+    if (!gdArtNums.has(n)) errors.push('Article ' + n + ' is in Field Guide but NOT in Governing Document');
+  });
+  gdArtNums.forEach(function (n) {
+    if (!fgArtNums.has(n)) warnings.push('Article ' + n + ' is in Governing Document but NOT in Field Guide');
+  });
+
+  var matchCount = 0;
+  fgSections.forEach(function (fg, key) {
+    if (gdSections.has(key)) { matchCount++; }
+    else { warnings.push('Section ' + key + ' (' + fg.sectionTitle + ') in Field Guide but not Governing Doc — View Text unavailable'); }
+  });
+  gdSections.forEach(function (gd, key) {
+    if (!fgSections.has(key)) {
+      warnings.push('Section ' + key + ' (' + gd.sectionTitle + ') in Governing Doc but not Field Guide');
+    }
+  });
+
+  return { errors: errors, warnings: warnings, matchCount: matchCount,
+           fgTotal: fgSections.size, gdTotal: gdSections.size };
+}
+
+// ── DocumentSetId (browser SHA-256) ──────────────────────────────────────────
+async function computeDocumentSetId(name, fg) {
+  var structure = fg.articles.map(function (a) {
+    return a.articleNumber + ':' + a.sections.map(function (s) { return s.sectionNumber; }).join(',');
+  }).join('|');
+  var encoded = new TextEncoder().encode(structure);
+  var hashBuf = await crypto.subtle.digest('SHA-256', encoded);
+  var hex = Array.from(new Uint8Array(hashBuf)).map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+  return name + '-' + hex.substring(0, 12);
+}
+
+// ── File input handler ────────────────────────────────────────────────────────
+async function onDocxFile(input, type) {
+  var file = input.files[0];
+  if (!file) return;
+
+  var statusEl = document.getElementById(type === 'fg' ? 'fg-status' : 'gd-status');
+  statusEl.style.color = 'var(--text3)';
+  statusEl.textContent = 'Parsing…';
+
+  // Reset validation when either file changes
+  parsedDocumentSetId = null;
+  parseErrors = [];
+  document.getElementById('parse-results').style.display = 'none';
+
+  try {
+    var arrayBuffer = await file.arrayBuffer();
+    var result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
+
+    if (type === 'fg') {
+      parsedFieldGuide = parseFieldGuideHtml(result.value);
+      var fgTotal = parsedFieldGuide.articles.reduce(function (s, a) { return s + a.sections.length; }, 0);
+      statusEl.style.color = '#1e7e34';
+      statusEl.textContent = parsedFieldGuide.articles.length + ' articles, ' + fgTotal + ' sections found.';
+    } else {
+      parsedGovDoc = parseGovDocHtml(result.value);
+      var gdTotal = parsedGovDoc.articles.reduce(function (s, a) { return s + a.sections.length; }, 0);
+      statusEl.style.color = '#1e7e34';
+      statusEl.textContent = parsedGovDoc.articles.length + ' articles, ' + gdTotal + ' sections found.';
+    }
+
+    // Run cross-validation once both docs are loaded
+    if (parsedFieldGuide && parsedGovDoc) {
+      await runValidation();
+    }
+  } catch (err) {
+    if (type === 'fg') parsedFieldGuide = null;
+    else parsedGovDoc = null;
+    statusEl.style.color = '#b71c1c';
+    statusEl.textContent = 'Parse failed: ' + err.message;
+  }
+}
+
+// ── Cross-doc validation + results panel ──────────────────────────────────────
+async function runValidation() {
+  var cycleId = document.getElementById('create-id').value.trim() || 'cycle';
+  var validation = validateAlignment(parsedFieldGuide, parsedGovDoc);
+  parseErrors = validation.errors;
+
+  // Compute documentSetId
+  parsedDocumentSetId = await computeDocumentSetId(cycleId, parsedFieldGuide);
+
+  var resultsEl = document.getElementById('parse-results');
+  resultsEl.style.display = 'block';
+
+  var fgTotal = parsedFieldGuide.articles.reduce(function (s, a) { return s + a.sections.length; }, 0);
+  var gdTotal = parsedGovDoc.articles.reduce(function (s, a) { return s + a.sections.length; }, 0);
+
+  var html = '<div style="background:var(--surf2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 18px;margin-top:4px;">';
+  html += '<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:10px;">Parse &amp; Validation Results</div>';
+
+  // Counts row
+  html += '<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:10px;font-size:13px;">';
+  html += '<div><strong>Field Guide:</strong> ' + parsedFieldGuide.articles.length + ' articles, ' + fgTotal + ' sections</div>';
+  html += '<div><strong>Governing Doc:</strong> ' + parsedGovDoc.articles.length + ' articles, ' + gdTotal + ' sections</div>';
+  html += '<div><strong>Matched:</strong> ' + validation.matchCount + ' / ' + validation.fgTotal + ' sections</div>';
+  html += '</div>';
+
+  // Errors
+  if (validation.errors.length > 0) {
+    html += '<div style="background:#fde8e8;border:1px solid #f5aaaa;border-radius:var(--r);padding:10px 14px;margin-bottom:8px;">';
+    html += '<div style="font-weight:700;color:#b71c1c;margin-bottom:4px;">Errors — must fix before loading:</div>';
+    html += '<ul style="margin:0;padding-left:18px;font-size:13px;color:#b71c1c;">';
+    validation.errors.forEach(function (e) { html += '<li>' + escHtml(e) + '</li>'; });
+    html += '</ul></div>';
+  }
+
+  // Warnings
+  if (validation.warnings.length > 0) {
+    html += '<div style="background:#fff8e1;border:1px solid #ffe082;border-radius:var(--r);padding:10px 14px;margin-bottom:8px;">';
+    html += '<div style="font-weight:700;color:#7a6100;margin-bottom:4px;">Warnings (' + validation.warnings.length + '):</div>';
+    html += '<ul style="margin:0;padding-left:18px;font-size:13px;color:#7a6100;max-height:120px;overflow-y:auto;">';
+    validation.warnings.forEach(function (w) { html += '<li>' + escHtml(w) + '</li>'; });
+    html += '</ul></div>';
+  }
+
+  // DocumentSetId + status
+  if (validation.errors.length === 0) {
+    html += '<div style="background:#e6f4ea;border:1px solid #a8d5b8;border-radius:var(--r);padding:10px 14px;font-size:13px;color:#1e7e34;">';
+    html += validation.warnings.length === 0
+      ? '<strong>All sections matched.</strong> '
+      : '<strong>Ready to load</strong> (with warnings above). ';
+    html += 'Document Set ID: <strong>' + escHtml(parsedDocumentSetId) + '</strong></div>';
+  }
+
+  html += '</div>';
+  resultsEl.innerHTML = html;
+}
+
+// ── Create & Load Cycle ───────────────────────────────────────────────────────
 async function doCreateAndLoad() {
-  var doc = document.getElementById('create-doc').value;
-  var id = document.getElementById('create-id').value.trim();
+  var doc   = document.getElementById('create-doc').value;
+  var id    = document.getElementById('create-id').value.trim();
   var title = document.getElementById('create-title').value.trim();
-  var from = document.getElementById('create-from').value || undefined;
-  var pairSel = document.getElementById('create-file-pair');
+  var from  = document.getElementById('create-from').value || undefined;
   var msgEl = document.getElementById('create-msg');
 
   if (!id || !title) {
     msgEl.innerHTML = '<div class="alert alert-error">Cycle ID and Title are required.</div>';
     return;
   }
-
-  var pairIdx = pairSel.value;
-  if (pairIdx === '') {
-    msgEl.innerHTML = '<div class="alert alert-error">Select a file pair to load.</div>';
+  if (!parsedFieldGuide || !parsedGovDoc) {
+    msgEl.innerHTML = '<div class="alert alert-error">Select and parse both Word documents first.</div>';
+    return;
+  }
+  if (parseErrors.length > 0) {
+    msgEl.innerHTML = '<div class="alert alert-error">Fix document errors shown above before loading.</div>';
     return;
   }
 
-  var pair = cachedPairs[parseInt(pairIdx, 10)];
-  if (!pair) {
-    msgEl.innerHTML = '<div class="alert alert-error">Invalid file pair selection.</div>';
-    return;
-  }
+  // Re-compute documentSetId using the actual cycle ID the user entered
+  var setId = await computeDocumentSetId(id, parsedFieldGuide);
+  parsedDocumentSetId = setId;
 
   msgEl.innerHTML = '<div class="alert alert-info">Step 1/3: Creating cycle…</div>';
 
   try {
-    // Step 1: Create the cycle
     var createResult = await ReviewApi.createCycle(doc, id, title, from);
     var msg = 'Cycle "' + escHtml(id) + '" created.';
-    if (createResult.carriedForward > 0) {
-      msg += ' Carried forward ' + createResult.carriedForward + ' sections.';
-    }
+    if (createResult.carriedForward > 0) msg += ' Carried forward ' + createResult.carriedForward + ' sections.';
 
-    // Step 2: Seed the review content
-    msgEl.innerHTML = '<div class="alert alert-info">Step 2/3: Loading review sections from ' + escHtml(pair.seedKey) + '…</div>';
-    var seedResult = await ReviewApi.seedCycle(id, { s3Key: pair.seedKey });
-    var seedSetId = seedResult.documentSetId || null;
+    msgEl.innerHTML = '<div class="alert alert-info">Step 2/3: Loading review sections…</div>';
+    var seedResult = await ReviewApi.seedCycle(id, { documentSetId: setId, articles: parsedFieldGuide.articles });
 
-    // Step 3: Upload the document text
-    msgEl.innerHTML = '<div class="alert alert-info">Step 3/3: Loading document text from ' + escHtml(pair.textKey) + '…</div>';
-    var textResult = await ReviewApi.uploadDocText(id, { s3Key: pair.textKey });
-    var textSetId = textResult.documentSetId || null;
+    msgEl.innerHTML = '<div class="alert alert-info">Step 3/3: Loading document text…</div>';
+    var textResult = await ReviewApi.uploadDocText(id, { documentSetId: setId, articles: parsedGovDoc.articles });
 
-    // Validate documentSetId match
-    var warning = '';
-    if (seedSetId && textSetId && seedSetId !== textSetId) {
-      warning = '<div class="alert alert-error" style="margin-top:8px;">WARNING: Document Set IDs do not match!<br>' +
-        'Seed file: <strong>' + escHtml(seedSetId) + '</strong><br>' +
-        'Text file: <strong>' + escHtml(textSetId) + '</strong><br>' +
-        'These files may be from different documents. Please verify.</div>';
-    } else if (seedSetId && textSetId && seedSetId === textSetId) {
-      warning = '<div class="alert alert-success" style="margin-top:8px;">Document Set ID verified: <strong>' + escHtml(seedSetId) + '</strong> — files are matched.</div>';
-    }
-
-    msgEl.innerHTML = '<div class="alert alert-success">' + msg + ' Loaded ' +
+    msgEl.innerHTML =
+      '<div class="alert alert-success">' + msg + ' Loaded ' +
       (seedResult.sectionsSeeded || 0) + ' review sections and ' +
-      (textResult.sectionsLoaded || 0) + ' document text sections.</div>' + warning;
+      (textResult.sectionsLoaded || 0) + ' document text sections.</div>' +
+      '<div class="alert alert-success" style="margin-top:8px;">Document Set ID: <strong>' +
+      escHtml(setId) + '</strong></div>';
 
     loadExistingCycles();
-
   } catch (err) {
     msgEl.innerHTML = '<div class="alert alert-error">Failed: ' + escHtml(err.message) + '</div>';
   }
 }
 
-// ── Load seed file pairs from S3 ──
-var cachedPairs = [];
-
-async function loadSeedFiles() {
-  var sel = document.getElementById('create-file-pair');
-  sel.innerHTML = '<option value="">Loading available files…</option>';
-
-  try {
-    var data = await ReviewApi.listSeeds();
-    cachedPairs = data.pairs || [];
-
-    sel.innerHTML = '<option value="">— Select a file pair —</option>';
-    if (cachedPairs.length === 0) {
-      sel.innerHTML = '<option value="">No file pairs found in S3</option>';
-      return;
-    }
-    for (var i = 0; i < cachedPairs.length; i++) {
-      var p = cachedPairs[i];
-      var opt = document.createElement('option');
-      opt.value = i;
-      opt.textContent = p.name + ' (uploaded ' + (p.lastModified || 'unknown').substring(0, 10) + ')';
-      sel.appendChild(opt);
-    }
-  } catch (err) {
-    sel.innerHTML = '<option value="">Failed to load files: ' + escHtml(err.message) + '</option>';
-  }
-}
-
-function onFilePairChange() {
-  var sel = document.getElementById('create-file-pair');
-  var detail = document.getElementById('file-pair-detail');
-  var idx = sel.value;
-  if (idx === '' || !cachedPairs[parseInt(idx, 10)]) {
-    detail.textContent = '';
-    return;
-  }
-  var pair = cachedPairs[parseInt(idx, 10)];
-  detail.innerHTML = 'Seed: <strong>' + escHtml(pair.seedKey) + '</strong> &nbsp;|&nbsp; Text: <strong>' + escHtml(pair.textKey) + '</strong>';
-}
-
-
-// ── Summary Ballot ──
+// ── Summary Ballot ────────────────────────────────────────────────────────────
 async function loadSummary() {
   var cycleId = document.getElementById('summary-cycle').value.trim();
   var container = document.getElementById('summary-container');
 
   if (!cycleId) {
-    container.innerHTML = '<div class="alert alert-error">Enter a Cycle ID.</div>';
+    container.innerHTML = '<div class="alert alert-error">Select a cycle.</div>';
     return;
   }
 
@@ -302,45 +584,32 @@ async function loadSummary() {
         var currentDecision = s.summary ? s.summary.finalVote : '';
 
         html += '<div class="agg-section" style="flex-wrap:wrap;">';
-
-        // Title + vote counts
-        html += '<div class="agg-title" style="min-width:200px;">';
-        html += '§' + s.sectionNumber + ' — ' + escHtml(s.sectionTitle);
-        html += '</div>';
+        html += '<div class="agg-title" style="min-width:200px;">§' + s.sectionNumber + ' — ' + escHtml(s.sectionTitle) + '</div>';
 
         html += '<div class="agg-votes">';
-        if (v.approve > 0) html += '<span class="agg-badge approve">✓ ' + v.approve + '</span>';
+        if (v.approve    > 0) html += '<span class="agg-badge approve">✓ '  + v.approve    + '</span>';
         if (v.disapprove > 0) html += '<span class="agg-badge disapprove">✗ ' + v.disapprove + '</span>';
-        if (v.discuss > 0) html += '<span class="agg-badge discuss">? ' + v.discuss + '</span>';
+        if (v.discuss    > 0) html += '<span class="agg-badge discuss">? '  + v.discuss    + '</span>';
         html += '</div>';
 
-        // Decision buttons
         html += '<div class="summary-btns">';
-        html += summaryBtn(cycleId, secId, 'approve', 'Approve', currentDecision);
+        html += summaryBtn(cycleId, secId, 'approve',    'Approve',    currentDecision);
         html += summaryBtn(cycleId, secId, 'disapprove', 'Disapprove', currentDecision);
-        html += summaryBtn(cycleId, secId, 'remove', 'Remove', currentDecision);
+        html += summaryBtn(cycleId, secId, 'remove',     'Remove',     currentDecision);
         html += '</div>';
 
         html += '<div class="save-indicator" id="summary-status-' + secId + '" style="width:100%;"></div>';
-
         html += '</div>';
 
-        // Notes
         if (s.notes && s.notes.length > 0) {
-          html += '<div style="padding:0 18px 12px;">';
-          html += '<ul class="agg-notes-list">';
-          for (var k = 0; k < s.notes.length; k++) {
-            html += '<li>' + escHtml(s.notes[k]) + '</li>';
-          }
+          html += '<div style="padding:0 18px 12px;"><ul class="agg-notes-list">';
+          for (var k = 0; k < s.notes.length; k++) html += '<li>' + escHtml(s.notes[k]) + '</li>';
           html += '</ul></div>';
         }
       }
-
       html += '</div></div>';
     }
-
     container.innerHTML = html;
-
   } catch (err) {
     container.innerHTML = '<div class="alert alert-error">Failed: ' + escHtml(err.message) + '</div>';
   }
@@ -349,18 +618,15 @@ async function loadSummary() {
 function summaryBtn(cycleId, secId, value, label, currentDecision) {
   var selected = currentDecision === value ? ' selected' : '';
   return '<button class="summary-btn ' + value + selected + '" ' +
-    'onclick="onSummaryClick(\'' + cycleId + '\', \'' + secId + '\', \'' + value + '\', this)">' +
+    'onclick="onSummaryClick(\'' + cycleId + '\',\'' + secId + '\',\'' + value + '\',this)">' +
     label + '</button>';
 }
 
 async function onSummaryClick(cycleId, secId, finalVote, btn) {
-  var buttons = btn.parentElement.querySelectorAll('.summary-btn');
-  buttons.forEach(function (b) { b.classList.remove('selected'); });
+  btn.parentElement.querySelectorAll('.summary-btn').forEach(function (b) { b.classList.remove('selected'); });
   btn.classList.add('selected');
-
   var statusEl = document.getElementById('summary-status-' + secId);
   if (statusEl) { statusEl.className = 'save-indicator saving'; statusEl.textContent = 'Saving…'; }
-
   try {
     await ReviewApi.saveSummaryDecision(cycleId, secId, finalVote);
     if (statusEl) { statusEl.className = 'save-indicator saved'; statusEl.textContent = 'Saved ✓'; }
@@ -369,6 +635,7 @@ async function onSummaryClick(cycleId, secId, finalVote, btn) {
   }
 }
 
+// ── Utilities ─────────────────────────────────────────────────────────────────
 function pad(n) { return String(n).padStart(2, '0'); }
 
 function escHtml(s) {
@@ -377,13 +644,12 @@ function escHtml(s) {
   return d.innerHTML;
 }
 
-// ── Load existing cycles ──
+// ── Existing cycles ───────────────────────────────────────────────────────────
 var cachedCycles = [];
 
 async function loadExistingCycles() {
   var listEl = document.getElementById('cycles-list');
   listEl.textContent = 'Loading…';
-
   try {
     var data = await ReviewApi.listCycles();
     cachedCycles = data.cycles || [];
@@ -408,46 +674,41 @@ async function loadExistingCycles() {
       html += '</table>';
       listEl.innerHTML = html;
     }
-
-    // Populate all cycle dropdowns
     populateCycleDropdowns();
-
   } catch (err) {
     listEl.innerHTML = '<span style="color:var(--red-600);">Failed to load: ' + escHtml(err.message) + '</span>';
   }
 }
 
 function populateCycleDropdowns() {
-  var selects = ['summary-cycle'];
-  for (var i = 0; i < selects.length; i++) {
-    var sel = document.getElementById(selects[i]);
-    if (!sel) continue;
-    var currentVal = sel.value;
-    sel.innerHTML = '<option value="">— Select a cycle —</option>';
-    for (var j = 0; j < cachedCycles.length; j++) {
-      var c = cachedCycles[j];
+  // Summary cycle dropdown
+  var summarySel = document.getElementById('summary-cycle');
+  if (summarySel) {
+    var summaryVal = summarySel.value;
+    summarySel.innerHTML = '<option value="">— Select a cycle —</option>';
+    cachedCycles.forEach(function (c) {
       var opt = document.createElement('option');
       opt.value = c.cycleId;
       opt.textContent = c.cycleId + ' — ' + (c.title || c.document || '');
-      sel.appendChild(opt);
-    }
-    if (currentVal) sel.value = currentVal;
+      summarySel.appendChild(opt);
+    });
+    if (summaryVal) summarySel.value = summaryVal;
   }
 
-  // Also populate the "Copy from prior cycle" dropdown
+  // Copy-from dropdown
   var fromSel = document.getElementById('create-from');
   var fromVal = fromSel.value;
   fromSel.innerHTML = '<option value="">— None (new cycle) —</option>';
-  for (var j = 0; j < cachedCycles.length; j++) {
-    var c = cachedCycles[j];
+  cachedCycles.forEach(function (c) {
     var opt = document.createElement('option');
     opt.value = c.cycleId;
     opt.textContent = c.cycleId + ' — ' + (c.title || c.document || '');
     fromSel.appendChild(opt);
-  }
+  });
   if (fromVal) fromSel.value = fromVal;
 }
 
+// ── Init ──────────────────────────────────────────────────────────────────────
 var guardCheck = setInterval(function () {
   if (HoaGuard.getUser()) {
     clearInterval(guardCheck);
@@ -456,7 +717,6 @@ var guardCheck = setInterval(function () {
       document.getElementById('nav-avatar').textContent = uname.textContent.charAt(0).toUpperCase();
     }
     loadExistingCycles();
-    loadSeedFiles();
   }
 }, 100);
 </script>
