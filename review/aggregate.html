@@ -17,6 +17,11 @@
     text-transform:uppercase;padding:2px 8px;border-radius:10px;
     background:#fde8e8;color:#b71c1c;border:1px solid #f5aaaa;margin-right:6px;
   }
+  .pend-badge {
+    display:inline-block;font-size:11px;font-weight:700;letter-spacing:.4px;
+    text-transform:uppercase;padding:2px 8px;border-radius:10px;
+    background:#f0f0f0;color:#888;border:1px solid #ccc;margin-right:6px;
+  }
   @media print {
     .site-header, .site-footer, #print-btn, .logout-btn,
     #back-link, .nav-user { display:none !important; }
@@ -140,23 +145,23 @@ async function loadAggregate() {
         var s = art.sections[j];
         var v = s.votes || {};
         var totalVotes = (v.approve || 0) + (v.disapprove || 0) + (v.discuss || 0);
-        var unanimous = (v.approve === totalVotes && totalVotes > 0);
 
         html += '<div class="agg-section">';
         html += '<div class="agg-title">';
 
-        // PASSED / FAILED badge
-        if (threshold) {
+        // PASS / FAIL / PEND badge
+        if (totalVotes === 0) {
+          html += '<span class="pend-badge">PEND</span>';
+        } else if (threshold) {
           var approveCount = v.approve || 0;
           if (approveCount >= threshold) {
-            html += '<span class="pass-badge">PASSED</span>';
+            html += '<span class="pass-badge">PASS</span>';
           } else {
-            html += '<span class="fail-badge">FAILED</span>';
+            html += '<span class="fail-badge">FAIL</span>';
           }
         }
 
         html += '§' + s.sectionNumber + ' — ' + escHtml(s.sectionTitle);
-        if (unanimous) html += ' <span style="color:var(--green-600);font-size:12px;">✓ Unanimous</span>';
         html += '</div>';
         html += '<div class="agg-votes">';
         if (v.approve > 0) html += '<span class="agg-badge approve">✓ ' + v.approve + '</span>';
