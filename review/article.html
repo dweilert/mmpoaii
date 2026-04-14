@@ -77,6 +77,26 @@
   <div>Document Review System — Confidential</div>
 </footer>
 
+<!-- Approve All Progress Modal -->
+<div id="approve-modal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.5);overflow-y:auto;">
+  <div style="max-width:520px;margin:80px auto;background:#fff;border-radius:var(--r2);box-shadow:0 8px 32px rgba(0,0,0,.2);overflow:hidden;">
+    <div style="background:var(--green-600);color:#fff;padding:16px 24px;">
+      <div style="font-family:var(--serif);font-size:17px;font-weight:700;">Approve All Sections</div>
+    </div>
+    <div style="padding:20px 24px;">
+      <div id="approve-modal-progress" style="font-size:14px;color:var(--text);margin-bottom:12px;">Preparing…</div>
+      <div style="background:var(--gray-100);border-radius:4px;height:8px;overflow:hidden;margin-bottom:16px;">
+        <div id="approve-modal-bar" style="height:100%;width:0%;background:var(--green-600);border-radius:4px;transition:width .2s;"></div>
+      </div>
+      <div id="approve-modal-log" style="max-height:200px;overflow-y:auto;font-size:13px;line-height:1.6;border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;background:var(--surf2);"></div>
+      <div id="approve-modal-summary" style="display:none;margin-top:14px;padding:12px 16px;border-radius:var(--r);font-size:14px;font-weight:600;"></div>
+      <div style="text-align:right;margin-top:16px;">
+        <button id="approve-modal-close" class="btn-primary" onclick="closeApproveModal()" style="display:none;">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Document Text Modal -->
 <div id="doctext-modal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.5);overflow-y:auto;" onclick="if(event.target===this)closeDocTextModal()">
   <div style="max-width:720px;margin:40px auto;background:#fff;border-radius:var(--r2);box-shadow:0 8px 32px rgba(0,0,0,.2);overflow:hidden;">
@@ -352,15 +372,52 @@ document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') closeDocTextModal();
 });
 
-// ── Approve All Sections ──
+// ── Approve All Sections (with modal + retry) ──
+function closeApproveModal() {
+  document.getElementById('approve-modal').style.display = 'none';
+}
+
+function appendLog(msg, color) {
+  var log = document.getElementById('approve-modal-log');
+  var line = document.createElement('div');
+  if (color) line.style.color = color;
+  line.textContent = msg;
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+}
+
+async function saveVoteWithRetry(cycleId, secId, vote, notes) {
+  try {
+    await ReviewApi.saveVote(cycleId, secId, vote, notes);
+    return { ok: true };
+  } catch (err) {
+    // Retry once for network/timeout errors
+    var retryable = err.message && (
+      err.message.indexOf('timed out') >= 0 ||
+      err.message.indexOf('Failed to fetch') >= 0 ||
+      err.message.indexOf('NetworkError') >= 0 ||
+      err.message.indexOf('network') >= 0 ||
+      (err.status && err.status >= 500)
+    );
+    if (retryable) {
+      await new Promise(function (r) { setTimeout(r, 1000); });
+      try {
+        await ReviewApi.saveVote(cycleId, secId, vote, notes);
+        return { ok: true, retried: true };
+      } catch (err2) {
+        return { ok: false, error: err2.message || 'Unknown error', retried: true };
+      }
+    }
+    return { ok: false, error: err.message || 'Unknown error', retried: false };
+  }
+}
+
 async function approveAllSections() {
   var btn = document.getElementById('approve-all-btn');
-  var status = document.getElementById('approve-all-status');
   btn.disabled = true;
   btn.textContent = 'Approving…';
-  status.textContent = '';
 
-  // Find all section cards that don't already have "approve" selected
+  // Find sections to approve
   var cards = document.querySelectorAll('.section-card');
   var toApprove = [];
   cards.forEach(function (card) {
@@ -371,60 +428,105 @@ async function approveAllSections() {
   });
 
   if (toApprove.length === 0) {
-    status.textContent = 'All sections already approved.';
+    document.getElementById('approve-all-status').textContent = 'All sections already approved.';
     btn.disabled = false;
     btn.textContent = 'Approve All Sections';
     return;
   }
 
+  // Open modal
+  var modal = document.getElementById('approve-modal');
+  var progressEl = document.getElementById('approve-modal-progress');
+  var barEl = document.getElementById('approve-modal-bar');
+  var logEl = document.getElementById('approve-modal-log');
+  var summaryEl = document.getElementById('approve-modal-summary');
+  var closeBtn = document.getElementById('approve-modal-close');
+
+  modal.style.display = '';
+  closeBtn.style.display = 'none';
+  summaryEl.style.display = 'none';
+  logEl.innerHTML = '';
+  barEl.style.width = '0%';
+  progressEl.textContent = 'Approving ' + toApprove.length + ' sections…';
+
   var saved = 0;
   var failed = 0;
+  var failedSections = [];
 
   for (var i = 0; i < toApprove.length; i++) {
     var item = toApprove[i];
-    // Select the approve button visually
-    var allBtns = item.card.querySelectorAll('.vote-btn');
-    allBtns.forEach(function (b) { b.classList.remove('selected'); });
-    item.btn.classList.add('selected');
-
-    // Get secId from data attribute
     var secId = item.btn.dataset.secId;
-    if (!secId) { failed++; continue; }
+    if (!secId) {
+      failed++;
+      appendLog('Section ' + (i + 1) + ': Missing section ID — skipped', '#b71c1c');
+      continue;
+    }
 
-    // Get notes if any
+    // Get section label for the log
+    var titleEl = item.card.querySelector('.sc-title');
+    var secLabel = titleEl ? titleEl.textContent : secId;
+
     var notesEl = document.getElementById('notes-' + secId);
     var notes = notesEl ? notesEl.value : undefined;
 
-    status.textContent = 'Saving ' + (i + 1) + ' of ' + toApprove.length + '…';
+    progressEl.textContent = 'Saving ' + (i + 1) + ' of ' + toApprove.length + '…';
+    barEl.style.width = Math.round(((i + 1) / toApprove.length) * 100) + '%';
 
-    try {
-      await ReviewApi.saveVote(cycleId, secId, 'approve', notes);
+    var result = await saveVoteWithRetry(cycleId, secId, 'approve', notes);
+
+    if (result.ok) {
+      // Update UI
+      var allBtns = item.card.querySelectorAll('.vote-btn');
+      allBtns.forEach(function (b) { b.classList.remove('selected'); });
+      item.btn.classList.add('selected');
       setStatus(secId, 'saved', 'Saved ✓');
       var voteStatusEl = document.getElementById('vote-status-' + secId);
       if (voteStatusEl) { voteStatusEl.textContent = 'Approved'; voteStatusEl.style.color = '#1e7e34'; voteStatusEl.style.background = '#e6f4ea'; }
       saved++;
-    } catch (err) {
+      var retryNote = result.retried ? ' (succeeded on retry)' : '';
+      appendLog('✓ ' + secLabel + retryNote, '#1e7e34');
+    } else {
       setStatus(secId, 'error', 'Save failed');
       failed++;
+      failedSections.push(secLabel);
+      var retryNote2 = result.retried ? ' (failed after retry)' : '';
+      appendLog('✗ ' + secLabel + ' — ' + result.error + retryNote2, '#b71c1c');
     }
   }
 
-  btn.disabled = false;
-  btn.textContent = 'Approve All Sections';
+  // Show summary
+  barEl.style.width = '100%';
   if (failed === 0) {
-    status.textContent = 'Approved ' + saved + ' sections ✓';
+    progressEl.textContent = 'Complete — all ' + saved + ' sections approved.';
+    summaryEl.style.display = '';
+    summaryEl.style.background = '#e6f4ea';
+    summaryEl.style.color = '#1e7e34';
+    summaryEl.textContent = 'All ' + saved + ' sections approved successfully.';
+    barEl.style.background = 'var(--green-600)';
   } else {
-    status.textContent = 'Approved ' + saved + ', failed ' + failed;
+    progressEl.textContent = 'Complete — ' + saved + ' approved, ' + failed + ' failed.';
+    summaryEl.style.display = '';
+    summaryEl.style.background = '#fde8e8';
+    summaryEl.style.color = '#b71c1c';
+    summaryEl.innerHTML = '<div>' + failed + ' section(s) failed to save:</div>' +
+      '<ul style="margin:6px 0 0;padding-left:18px;font-weight:400;font-size:13px;">' +
+      failedSections.map(function (s) { return '<li>' + escHtml(s) + '</li>'; }).join('') +
+      '</ul>' +
+      '<div style="margin-top:8px;font-weight:400;font-size:13px;">You can close this dialog and try voting on these sections individually.</div>';
+    barEl.style.background = '#b71c1c';
   }
 
+  closeBtn.style.display = '';
+  btn.disabled = false;
+  btn.textContent = 'Approve All Sections';
+  document.getElementById('approve-all-status').textContent = '';
+
   // Update progress text
-  var totalCards = document.querySelectorAll('.section-card').length;
-  var votedCards = document.querySelectorAll('.vote-btn.selected').length;
-  // Each card has 3 vote buttons, count cards with any selected
   var votedCount = 0;
   document.querySelectorAll('.section-card').forEach(function (c) {
     if (c.querySelector('.vote-btn.selected')) votedCount++;
   });
+  var totalCards = document.querySelectorAll('.section-card').length;
   document.getElementById('article-progress').textContent =
     votedCount + ' of ' + totalCards + ' sections voted in this article';
 }
