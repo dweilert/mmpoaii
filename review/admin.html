@@ -42,8 +42,7 @@
 
   <!-- Tabs -->
   <div class="tab-bar">
-    <button class="tab-btn active" onclick="showTab('tab-create')">Create Cycle</button>
-    <button class="tab-btn" onclick="showTab('tab-load')">Load Review Data</button>
+    <button class="tab-btn active" onclick="showTab('tab-create')">Create &amp; Load Cycle</button>
     <button class="tab-btn" onclick="showTab('tab-summary')">Summary Ballot</button>
   </div>
 
@@ -56,42 +55,12 @@
     <div id="cycles-list" style="font-size:13px;color:var(--text2);">Loading…</div>
   </div>
 
-  <!-- ── Tab 1: Create Cycle ── -->
+  <!-- ── Tab 1: Create & Load Cycle ── -->
   <div class="tab-panel active" id="tab-create">
     <div class="admin-form">
-      <div class="form-row">
-        <label for="create-doc">Document</label>
-        <select id="create-doc">
-          <option value="CCRS">CC&Rs</option>
-          <option value="BYLAWS">Bylaws</option>
-          <option value="CONDUCT">Rules of Conduct</option>
-        </select>
-      </div>
-      <div class="form-row">
-        <label for="create-id">Cycle ID</label>
-        <input type="text" id="create-id" placeholder="e.g. CCRS-2026-01">
-      </div>
-      <div class="form-row">
-        <label for="create-title">Title</label>
-        <input type="text" id="create-title" placeholder="e.g. CC&Rs Review — April 2026">
-      </div>
-      <div class="form-row">
-        <label for="create-from">Copy from prior cycle (optional)</label>
-        <select id="create-from">
-          <option value="">— None (new cycle) —</option>
-        </select>
-      </div>
-      <div id="create-msg" style="margin-bottom:12px;"></div>
-      <button class="btn-primary" onclick="doCreateCycle()">Create Cycle</button>
-    </div>
-  </div>
 
-  <!-- ── Tab 2: Load Review Data ── -->
-  <div class="tab-panel" id="tab-load">
-    <div class="admin-form">
       <p style="font-size:14px;color:var(--text2);margin-bottom:16px;">
-        Load both the Field Guide (review content) and Governing Document (legal text) into a cycle.<br>
-        Generate both files with the combined script:
+        Before creating a cycle, run the parse script to prepare the data files:
       </p>
       <pre style="background:var(--surf2);padding:10px 14px;border-radius:var(--r);font-size:12px;overflow-x:auto;margin-bottom:16px;border:1px solid var(--border);">node backend/scripts/parse-review-docs.js \
   --field-guide "FieldGuide.docx" \
@@ -100,30 +69,51 @@
   --name ccrs-2026-01 \
   --upload</pre>
 
+      <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:8px;">Cycle Details</h3>
+
+      <div style="display:flex;gap:16px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:200px;" class="form-row">
+          <label for="create-doc">Document</label>
+          <select id="create-doc">
+            <option value="CCRS">CC&Rs</option>
+            <option value="BYLAWS">Bylaws</option>
+            <option value="CONDUCT">Rules of Conduct</option>
+          </select>
+        </div>
+        <div style="flex:1;min-width:200px;" class="form-row">
+          <label for="create-id">Cycle ID</label>
+          <input type="text" id="create-id" placeholder="e.g. CCRS-2026-01">
+        </div>
+      </div>
+
       <div class="form-row">
-        <label for="load-cycle">Cycle ID</label>
-        <select id="load-cycle">
-          <option value="">— Select a cycle —</option>
+        <label for="create-title">Title (shown to reviewers)</label>
+        <input type="text" id="create-title" placeholder="e.g. CC&Rs Review — April 2026">
+      </div>
+
+      <div class="form-row">
+        <label for="create-from">Copy from prior cycle (optional — carries forward unresolved sections)</label>
+        <select id="create-from">
+          <option value="">— None (new cycle) —</option>
         </select>
       </div>
 
-      <div style="display:flex;gap:16px;flex-wrap:wrap;">
-        <div style="flex:1;min-width:250px;" class="form-row">
-          <label for="load-seed-key">Seed File (Field Guide) — S3 Key</label>
-          <input type="text" id="load-seed-key" placeholder="e.g. ccrs-2026-01-seed.json">
-        </div>
-        <div style="flex:1;min-width:250px;" class="form-row">
-          <label for="load-text-key">Text File (Governing Doc) — S3 Key</label>
-          <input type="text" id="load-text-key" placeholder="e.g. ccrs-2026-01-text.json">
-        </div>
+      <h3 style="font-size:14px;font-weight:700;color:var(--text);margin:20px 0 12px;border-bottom:1px solid var(--border);padding-bottom:8px;">Document Files to Load</h3>
+
+      <div class="form-row">
+        <label for="create-file-pair">Select the matched file pair from S3</label>
+        <select id="create-file-pair" onchange="onFilePairChange()">
+          <option value="">Loading available files…</option>
+        </select>
+        <div id="file-pair-detail" style="font-size:12px;color:var(--text3);margin-top:4px;"></div>
       </div>
 
-      <div id="load-msg" style="margin-bottom:12px;"></div>
-      <button class="btn-primary" onclick="doLoadReviewData()">Load Review Data</button>
+      <div id="create-msg" style="margin-bottom:12px;"></div>
+      <button class="btn-primary" onclick="doCreateAndLoad()" style="padding:12px 28px;font-size:15px;">Create Cycle &amp; Load Data</button>
     </div>
   </div>
 
-  <!-- ── Tab 4: Summary Ballot ── -->
+  <!-- ── Tab 2: Summary Ballot ── -->
   <div class="tab-panel" id="tab-summary">
     <div class="admin-form" style="margin-bottom:16px;">
       <div class="form-row" style="margin-bottom:0;display:flex;gap:8px;align-items:flex-end;">
@@ -167,34 +157,53 @@ function showTab(tabId) {
   });
 }
 
-// ── Load Review Data (combined seed + doctext) ──
-async function doLoadReviewData() {
-  var cycleId = document.getElementById('load-cycle').value;
-  var seedKey = document.getElementById('load-seed-key').value.trim();
-  var textKey = document.getElementById('load-text-key').value.trim();
-  var msgEl = document.getElementById('load-msg');
+// ── Create & Load Cycle (combined) ──
+async function doCreateAndLoad() {
+  var doc = document.getElementById('create-doc').value;
+  var id = document.getElementById('create-id').value.trim();
+  var title = document.getElementById('create-title').value.trim();
+  var from = document.getElementById('create-from').value || undefined;
+  var pairSel = document.getElementById('create-file-pair');
+  var msgEl = document.getElementById('create-msg');
 
-  if (!cycleId) {
-    msgEl.innerHTML = '<div class="alert alert-error">Select a cycle.</div>';
-    return;
-  }
-  if (!seedKey || !textKey) {
-    msgEl.innerHTML = '<div class="alert alert-error">Both the Seed File and Text File S3 keys are required.</div>';
+  if (!id || !title) {
+    msgEl.innerHTML = '<div class="alert alert-error">Cycle ID and Title are required.</div>';
     return;
   }
 
-  msgEl.innerHTML = '<div class="alert alert-info">Validating files and loading data…</div>';
+  var pairIdx = pairSel.value;
+  if (pairIdx === '') {
+    msgEl.innerHTML = '<div class="alert alert-error">Select a file pair to load.</div>';
+    return;
+  }
+
+  var pair = cachedPairs[parseInt(pairIdx, 10)];
+  if (!pair) {
+    msgEl.innerHTML = '<div class="alert alert-error">Invalid file pair selection.</div>';
+    return;
+  }
+
+  msgEl.innerHTML = '<div class="alert alert-info">Step 1/3: Creating cycle…</div>';
 
   try {
-    // Step 1: Seed the review content
-    var seedResult = await ReviewApi.seedCycle(cycleId, { s3Key: seedKey, returnDocumentSetId: true });
+    // Step 1: Create the cycle
+    var createResult = await ReviewApi.createCycle(doc, id, title, from);
+    var msg = 'Cycle "' + escHtml(id) + '" created.';
+    if (createResult.carriedForward > 0) {
+      msg += ' Carried forward ' + createResult.carriedForward + ' sections.';
+    }
+
+    // Step 2: Seed the review content
+    msgEl.innerHTML = '<div class="alert alert-info">Step 2/3: Loading review sections from ' + escHtml(pair.seedKey) + '…</div>';
+    var seedResult = await ReviewApi.seedCycle(id, { s3Key: pair.seedKey });
     var seedSetId = seedResult.documentSetId || null;
 
-    // Step 2: Upload the document text
-    var textResult = await ReviewApi.uploadDocText(cycleId, { s3Key: textKey, returnDocumentSetId: true });
+    // Step 3: Upload the document text
+    msgEl.innerHTML = '<div class="alert alert-info">Step 3/3: Loading document text from ' + escHtml(pair.textKey) + '…</div>';
+    var textResult = await ReviewApi.uploadDocText(id, { s3Key: pair.textKey });
     var textSetId = textResult.documentSetId || null;
 
-    // Step 3: Validate documentSetId match
+    // Validate documentSetId match
     var warning = '';
     if (seedSetId && textSetId && seedSetId !== textSetId) {
       warning = '<div class="alert alert-error" style="margin-top:8px;">WARNING: Document Set IDs do not match!<br>' +
@@ -205,42 +214,55 @@ async function doLoadReviewData() {
       warning = '<div class="alert alert-success" style="margin-top:8px;">Document Set ID verified: <strong>' + escHtml(seedSetId) + '</strong> — files are matched.</div>';
     }
 
-    msgEl.innerHTML = '<div class="alert alert-success">Loaded ' +
+    msgEl.innerHTML = '<div class="alert alert-success">' + msg + ' Loaded ' +
       (seedResult.sectionsSeeded || 0) + ' review sections and ' +
-      (textResult.sectionsLoaded || 0) + ' document text sections into cycle "' +
-      escHtml(cycleId) + '".</div>' + warning;
+      (textResult.sectionsLoaded || 0) + ' document text sections.</div>' + warning;
+
+    loadExistingCycles();
 
   } catch (err) {
     msgEl.innerHTML = '<div class="alert alert-error">Failed: ' + escHtml(err.message) + '</div>';
   }
 }
 
-// ── Create Cycle ──
-async function doCreateCycle() {
-  var doc = document.getElementById('create-doc').value;
-  var id = document.getElementById('create-id').value.trim();
-  var title = document.getElementById('create-title').value.trim();
-  var from = document.getElementById('create-from').value || undefined;
-  var msgEl = document.getElementById('create-msg');
+// ── Load seed file pairs from S3 ──
+var cachedPairs = [];
 
-  if (!id || !title) {
-    msgEl.innerHTML = '<div class="alert alert-error">Cycle ID and Title are required.</div>';
-    return;
-  }
-
-  msgEl.innerHTML = '<div class="alert alert-info">Creating cycle…</div>';
+async function loadSeedFiles() {
+  var sel = document.getElementById('create-file-pair');
+  sel.innerHTML = '<option value="">Loading available files…</option>';
 
   try {
-    var result = await ReviewApi.createCycle(doc, id, title, from);
-    var msg = 'Cycle "' + escHtml(id) + '" created successfully.';
-    if (result.carriedForward > 0) {
-      msg += ' Carried forward ' + result.carriedForward + ' sections from prior cycle.';
+    var data = await ReviewApi.listSeeds();
+    cachedPairs = data.pairs || [];
+
+    sel.innerHTML = '<option value="">— Select a file pair —</option>';
+    if (cachedPairs.length === 0) {
+      sel.innerHTML = '<option value="">No file pairs found in S3</option>';
+      return;
     }
-    msgEl.innerHTML = '<div class="alert alert-success">' + msg + '</div>';
-    loadExistingCycles();
+    for (var i = 0; i < cachedPairs.length; i++) {
+      var p = cachedPairs[i];
+      var opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = p.name + ' (uploaded ' + (p.lastModified || 'unknown').substring(0, 10) + ')';
+      sel.appendChild(opt);
+    }
   } catch (err) {
-    msgEl.innerHTML = '<div class="alert alert-error">Failed: ' + escHtml(err.message) + '</div>';
+    sel.innerHTML = '<option value="">Failed to load files: ' + escHtml(err.message) + '</option>';
   }
+}
+
+function onFilePairChange() {
+  var sel = document.getElementById('create-file-pair');
+  var detail = document.getElementById('file-pair-detail');
+  var idx = sel.value;
+  if (idx === '' || !cachedPairs[parseInt(idx, 10)]) {
+    detail.textContent = '';
+    return;
+  }
+  var pair = cachedPairs[parseInt(idx, 10)];
+  detail.innerHTML = 'Seed: <strong>' + escHtml(pair.seedKey) + '</strong> &nbsp;|&nbsp; Text: <strong>' + escHtml(pair.textKey) + '</strong>';
 }
 
 
@@ -396,9 +418,10 @@ async function loadExistingCycles() {
 }
 
 function populateCycleDropdowns() {
-  var selects = ['load-cycle', 'summary-cycle'];
+  var selects = ['summary-cycle'];
   for (var i = 0; i < selects.length; i++) {
     var sel = document.getElementById(selects[i]);
+    if (!sel) continue;
     var currentVal = sel.value;
     sel.innerHTML = '<option value="">— Select a cycle —</option>';
     for (var j = 0; j < cachedCycles.length; j++) {
@@ -433,6 +456,7 @@ var guardCheck = setInterval(function () {
       document.getElementById('nav-avatar').textContent = uname.textContent.charAt(0).toUpperCase();
     }
     loadExistingCycles();
+    loadSeedFiles();
   }
 }, 100);
 </script>

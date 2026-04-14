@@ -118,6 +118,11 @@ const ReviewApi = (function () {
     return apiFetch('GET', '/cycles/' + encodeURIComponent(cycleId) + '/doctext/' + encodeURIComponent(safeSectionId));
   }
 
+  /** GET /seeds — list available seed files in S3 */
+  function listSeeds() {
+    return apiFetch('GET', '/seeds');
+  }
+
   return {
     listCycles,
     createCycle,
@@ -131,6 +136,7 @@ const ReviewApi = (function () {
     saveSummaryDecision,
     uploadDocText,
     getDocText,
+    listSeeds,
   };
 
 })();

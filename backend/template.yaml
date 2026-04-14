@@ -333,6 +333,24 @@ Resources:
             Path: /cycles/{cycleId}/doctext/{sectionId}
             Method: GET
 
+  # GET /seeds
+  SeedsListFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mmpoa-review-seeds-list
+      Handler: seeds-list.handler
+      CodeUri: lambdas/
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref SeedBucketName
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ReviewApi
+            Path: /seeds
+            Method: GET
+
 # ---------------------------------------------------------------------------
 # Outputs
 # ---------------------------------------------------------------------------
