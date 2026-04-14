@@ -508,11 +508,10 @@ async function approveAllSections() {
     summaryEl.style.display = '';
     summaryEl.style.background = '#fde8e8';
     summaryEl.style.color = '#b71c1c';
-    summaryEl.innerHTML = '<div>' + failed + ' section(s) failed to save:</div>' +
+    summaryEl.innerHTML = '<div>' + failed + ' section(s) failed to save. Please scroll down to find each section listed below and vote on it individually:</div>' +
       '<ul style="margin:6px 0 0;padding-left:18px;font-weight:400;font-size:13px;">' +
       failedSections.map(function (s) { return '<li>' + escHtml(s) + '</li>'; }).join('') +
-      '</ul>' +
-      '<div style="margin-top:8px;font-weight:400;font-size:13px;">You can close this dialog and try voting on these sections individually.</div>';
+      '</ul>';
     barEl.style.background = '#b71c1c';
   }
 
