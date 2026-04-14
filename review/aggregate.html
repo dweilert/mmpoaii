@@ -135,8 +135,8 @@
       font-size:9pt;
     }
 
-    /* Keep article groups together where possible */
-    #agg-container > div { page-break-inside:avoid; }
+    /* Only keep individual rows together, not entire articles */
+    .print-section-row { break-inside:avoid; page-break-inside:avoid; }
   }
 </style>
 </head>
