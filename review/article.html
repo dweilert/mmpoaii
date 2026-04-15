@@ -242,7 +242,7 @@ async function loadArticle() {
       html += '<div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">';
       html += '<span id="vote-status-' + secId + '" style="font-size:12px;font-weight:700;padding:4px 10px;border-radius:12px;background:' + voteStatusBg + ';color:' + voteStatusColor + ';">' + voteStatusLabel + '</span>';
       html += '<button onclick="showKeyQuestions(\'' + cls + '\')" style="white-space:nowrap;padding:7px 16px;font-size:13px;border:1px solid #bbb;color:#555;background:#fafafa;border-radius:var(--r);cursor:pointer;font-weight:600;">View Key Questions</button>';
-      html += '<button onclick="showFieldNotes(\'' + secId + '\', ' + artNum + ', \'' + escHtml(s.sectionTitle).replace(/'/g, "\\'") + '\', ' + s.sectionNumber + ')" style="white-space:nowrap;padding:7px 16px;font-size:13px;border:1px solid var(--purple-600);color:var(--purple-700);background:#fff;border-radius:var(--r);cursor:pointer;font-weight:600;">View Field Notes</button>';
+      html += '<button onclick="showFieldNotes(\'' + secId + '\', ' + artNum + ', \'' + escHtml(s.sectionTitle).replace(/'/g, "\\'") + '\', ' + s.sectionNumber + ')" style="white-space:nowrap;padding:7px 16px;font-size:13px;border:1px solid #bbb;color:#555;background:#fafafa;border-radius:var(--r);cursor:pointer;font-weight:600;">View Field Notes</button>';
       html += '</div>';
       html += '</div></div>';
 
