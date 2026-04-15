@@ -220,16 +220,16 @@ async function loadArticle() {
 
       html += '<div class="section-card" id="sec-' + s.sectionNumber + '">';
 
-      // Header
+      // Header — line 1: title only, line 2: category+buttons left, status+actions right
       html += '<div class="sc-header">';
-      html += '<div class="sc-title-group" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">';
-      html += '<div>';
       html += '<div class="sc-title">Art. ' + artNum + ', §' + s.sectionNumber + ' — ' + escHtml(s.sectionTitle) + '</div>';
-      html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:2px;">';
+      html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:6px;">';
+      // Left side: classification + key questions
+      html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">';
       html += '<span class="sc-classification cls-' + cls + '">' + escHtml(classLabels[cls] || cls) + '</span>';
       html += '<button onclick="showKeyQuestions(\'' + cls + '\')" style="white-space:nowrap;padding:2px 10px;font-size:11px;border:1px solid #bbb;color:#555;background:#fafafa;border-radius:4px;cursor:pointer;font-weight:600;letter-spacing:.3px;">View Key Questions</button>';
       html += '</div>';
-      html += '</div>';
+      // Right side: vote status + field notes + impact
       var voteStatusLabel = 'Waiting for Vote';
       var voteStatusColor = '#888';
       var voteStatusBg = '#f0f0f0';
