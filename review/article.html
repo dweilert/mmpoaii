@@ -517,7 +517,10 @@ function showFieldNotes(secId, artNum, sectionTitle, sectionNumber) {
   body += '<div style="margin-bottom:18px;"><div style="' + fnLabel + '">Why It\'s Here</div><div style="font-size:17px;line-height:1.7;">' + escHtml(fd.whyItsHere) + '</div></div>';
   body += '<div style="margin-bottom:18px;"><div style="' + fnLabel + '">What You Can Do</div><div style="font-size:17px;line-height:1.7;">' + escHtml(fd.whatYouCanDo) + '</div></div>';
   if (fd.communityImpact) {
-    body += '<div style="margin-bottom:8px;"><div style="' + fnLabel + '">Community Impact</div><div style="font-size:17px;line-height:1.7;">' + escHtml(fd.communityImpact) + '</div></div>';
+    body += '<div style="margin-bottom:8px;padding:14px 18px;background:#FFF3E0;border:1px solid #FFE0B2;border-radius:8px;">';
+    body += '<div style="' + fnLabel + 'color:#E65100;">&#9733; Community Impact</div>';
+    body += '<div style="font-size:17px;line-height:1.7;color:#E65100;">' + escHtml(fd.communityImpact) + '</div>';
+    body += '</div>';
   }
 
   document.getElementById('modal-body').innerHTML = body;
