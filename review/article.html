@@ -290,11 +290,9 @@ async function loadArticle() {
       html += '</div>';
       html += '</div>'; // /sc-body
 
-      // Vote controls
+      // Vote controls (Discuss + notes only; Approve/Disapprove are on the title line)
       html += '<div class="vote-controls">';
       html += '<div class="vote-buttons">';
-      html += voteButton(secId, 'approve', 'Approve', currentVote);
-      html += voteButton(secId, 'disapprove', 'Disapprove', currentVote);
       html += voteButton(secId, 'discuss', 'Discuss', currentVote);
       html += '</div>';
       html += '<textarea class="vote-notes" id="notes-' + secId + '" ' +
