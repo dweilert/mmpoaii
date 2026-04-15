@@ -281,11 +281,11 @@ async function loadArticle() {
     document.getElementById('nav-bottom').style.display = 'flex';
     document.getElementById('approve-all-bar').style.display = '';
 
-    // Fetch governing document text for all sections in parallel
-    data.sections.forEach(function (s) {
-      var secId = 'ART-' + pad(artNum) + '#SEC-' + pad(s.sectionNumber);
-      loadDocText(secId);
+    // Fetch governing document text — 3 at a time to avoid overwhelming the API
+    var secIds = data.sections.map(function (s) {
+      return 'ART-' + pad(artNum) + '#SEC-' + pad(s.sectionNumber);
     });
+    loadDocTextBatch(secIds, 0);
 
   } catch (err) {
     document.getElementById('sections-container').innerHTML =
@@ -393,18 +393,34 @@ function escHtml(s) {
   return d.innerHTML;
 }
 
-// ── Load document text with retry ──
-function loadDocText(secId) {
+// ── Load document text with auto-retry and batching ──
+var DOC_TEXT_BATCH_SIZE = 3;   // concurrent requests at a time
+var DOC_TEXT_MAX_RETRIES = 2;  // auto-retry up to 2 times before showing button
+
+// Process secIds in batches of DOC_TEXT_BATCH_SIZE
+function loadDocTextBatch(secIds, startIdx) {
+  if (startIdx >= secIds.length) return;
+  var batch = secIds.slice(startIdx, startIdx + DOC_TEXT_BATCH_SIZE);
+  var promises = batch.map(function (secId) { return loadDocText(secId, 0); });
+  Promise.all(promises).then(function () {
+    loadDocTextBatch(secIds, startIdx + DOC_TEXT_BATCH_SIZE);
+  });
+}
+
+// Load a single section's doc text with auto-retry
+function loadDocText(secId, attempt) {
+  if (attempt === undefined) attempt = 0;
   var el = document.getElementById('doctext-' + secId);
-  if (!el) return;
-  el.textContent = 'Loading document text\u2026';
+  if (!el) return Promise.resolve();
+
+  el.textContent = attempt > 0 ? 'Retrying\u2026 (attempt ' + (attempt + 1) + ')' : 'Loading document text\u2026';
   el.style.color = 'var(--text2)';
   el.style.fontStyle = 'normal';
   // Remove any existing retry button
   var existing = document.getElementById('retry-' + secId);
   if (existing) existing.remove();
 
-  ReviewApi.getDocText(cycleId, secId).then(function (d) {
+  return ReviewApi.getDocText(cycleId, secId).then(function (d) {
     el.textContent = d.text;
     el.style.color = 'var(--text)';
   }).catch(function (err) {
@@ -412,17 +428,24 @@ function loadDocText(secId) {
       el.textContent = 'Document text not yet available for this section.';
       el.style.color = 'var(--text3)';
       el.style.fontStyle = 'italic';
-    } else {
-      el.textContent = 'Could not load document text. This may be a temporary network issue.';
-      el.style.color = '#b71c1c';
-      // Add retry button
-      var btn = document.createElement('button');
-      btn.id = 'retry-' + secId;
-      btn.textContent = 'Retry Loading';
-      btn.style.cssText = 'display:block;margin-top:12px;padding:8px 20px;font-size:14px;font-weight:700;color:#fff;background:#b71c1c;border:none;border-radius:6px;cursor:pointer;';
-      btn.onclick = function () { loadDocText(secId); };
-      el.parentElement.appendChild(btn);
+      return;
     }
+    // Auto-retry if we haven't exhausted attempts
+    if (attempt < DOC_TEXT_MAX_RETRIES) {
+      var delay = (attempt + 1) * 1500; // 1.5s, 3s
+      return new Promise(function (resolve) {
+        setTimeout(function () { resolve(loadDocText(secId, attempt + 1)); }, delay);
+      });
+    }
+    // All retries exhausted — show error with manual retry button
+    el.textContent = 'Could not load document text after ' + (DOC_TEXT_MAX_RETRIES + 1) + ' attempts.';
+    el.style.color = '#b71c1c';
+    var btn = document.createElement('button');
+    btn.id = 'retry-' + secId;
+    btn.textContent = 'Retry Loading';
+    btn.style.cssText = 'display:block;margin-top:12px;padding:8px 20px;font-size:14px;font-weight:700;color:#fff;background:#b71c1c;border:none;border-radius:6px;cursor:pointer;';
+    btn.onclick = function () { loadDocText(secId, 0); };
+    el.parentElement.appendChild(btn);
   });
 }
 
