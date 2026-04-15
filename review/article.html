@@ -47,9 +47,10 @@
     <h2 id="article-title">Loading…</h2>
     <p id="article-progress" style="font-size:13px;color:var(--text3);margin-top:4px;"></p>
     <p style="font-size:13px;color:var(--text3);margin-top:4px;">For each section below, click <strong>Approve</strong>, <strong>Disapprove</strong>, or <strong>Discuss</strong> to cast your vote. You can also add optional notes.</p>
-    <div id="approve-all-bar" style="display:none;margin-top:12px;">
+    <div id="approve-all-bar" style="display:none;margin-top:12px;align-items:center;gap:12px;flex-wrap:wrap;">
       <button class="btn-primary" onclick="approveAllSections()" id="approve-all-btn" style="background:#e6f4ea;color:#1e7e34;border:1px solid #a8d5b8;">Approve All Sections</button>
-      <span id="approve-all-status" style="margin-left:12px;font-size:13px;color:var(--text3);"></span>
+      <button id="reading-mode-btn" onclick="toggleReadingMode()" style="padding:7px 16px;font-size:13px;font-weight:600;border:1px solid #bbb;color:#555;background:#fafafa;border-radius:var(--r);cursor:pointer;">Just the Facts</button>
+      <span id="approve-all-status" style="font-size:13px;color:var(--text3);"></span>
     </div>
   </div>
 
@@ -280,7 +281,7 @@ async function loadArticle() {
     html += '</div>';
     document.getElementById('sections-container').innerHTML = html;
     document.getElementById('nav-bottom').style.display = 'flex';
-    document.getElementById('approve-all-bar').style.display = '';
+    document.getElementById('approve-all-bar').style.display = 'flex';
 
     // Fetch governing document text — 3 at a time to avoid overwhelming the API
     var secIds = data.sections.map(function (s) {
@@ -392,6 +393,43 @@ function escHtml(s) {
   var d = document.createElement('div');
   d.textContent = s || '';
   return d.innerHTML;
+}
+
+// ── "Just the Facts" reading mode toggle ──
+var readingMode = false;
+
+function toggleReadingMode() {
+  readingMode = !readingMode;
+  var btn = document.getElementById('reading-mode-btn');
+  var approveBtn = document.getElementById('approve-all-btn');
+
+  if (readingMode) {
+    btn.textContent = 'Show All Controls';
+    btn.style.background = '#555';
+    btn.style.color = '#fff';
+    btn.style.borderColor = '#555';
+    approveBtn.style.display = 'none';
+  } else {
+    btn.textContent = 'Just the Facts';
+    btn.style.background = '#fafafa';
+    btn.style.color = '#555';
+    btn.style.borderColor = '#bbb';
+    approveBtn.style.display = '';
+  }
+
+  // Toggle visibility of controls row and vote controls in each card
+  var cards = document.querySelectorAll('.section-card');
+  cards.forEach(function (card) {
+    // The controls row is the second child of sc-header (the flex row with category/buttons)
+    var header = card.querySelector('.sc-header');
+    if (header) {
+      var controlsRow = header.children[1]; // second child = controls row
+      if (controlsRow) controlsRow.style.display = readingMode ? 'none' : '';
+    }
+    // Hide vote controls
+    var voteControls = card.querySelector('.vote-controls');
+    if (voteControls) voteControls.style.display = readingMode ? 'none' : '';
+  });
 }
 
 // ── Load document text with auto-retry and batching ──
