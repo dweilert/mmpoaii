@@ -314,6 +314,9 @@
 /* ── Article header (voting page) ── */
 .article-header {
   margin-bottom: 8px;
+  position: sticky; top: 0; z-index: 100;
+  background: #fff; padding-bottom: 12px;
+  border-bottom: 1px solid var(--border2);
 }
 .article-header h2 { font-family: var(--serif); font-size: 22px; font-weight: 700; }
 .article-header .ah-nav {
