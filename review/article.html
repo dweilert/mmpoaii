@@ -653,7 +653,7 @@ async function approveAllSections() {
   var cards = document.querySelectorAll('.section-card');
   var toApprove = [];
   cards.forEach(function (card) {
-    var approveBtn = card.querySelector('.vote-btn.approve');
+    var approveBtn = card.querySelector('.vote-btn-sm.approve');
     if (approveBtn && !approveBtn.classList.contains('selected')) {
       toApprove.push({ card: card, btn: approveBtn });
     }
@@ -707,10 +707,10 @@ async function approveAllSections() {
     var result = await saveVoteWithRetry(cycleId, secId, 'approve', notes);
 
     if (result.ok) {
-      // Update UI
-      var allBtns = item.card.querySelectorAll('.vote-btn');
+      // Update UI — sync all vote buttons (compact + full) for this section
+      var allBtns = document.querySelectorAll('[data-sec-id="' + secId + '"]');
       allBtns.forEach(function (b) { b.classList.remove('selected'); });
-      item.btn.classList.add('selected');
+      allBtns.forEach(function (b) { if (b.dataset.vote === 'approve') b.classList.add('selected'); });
       setStatus(secId, 'saved', 'Saved ✓');
       var voteStatusEl = document.getElementById('vote-status-' + secId);
       if (voteStatusEl) { voteStatusEl.textContent = 'Approved'; voteStatusEl.style.color = '#1e7e34'; voteStatusEl.style.background = '#e6f4ea'; }
