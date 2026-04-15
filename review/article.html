@@ -100,10 +100,11 @@
 <!-- Key Questions Modal -->
 <div id="kq-modal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.5);overflow-y:auto;" onclick="if(event.target===this)closeKqModal()">
   <div style="max-width:640px;margin:60px auto;background:#fff;border-radius:var(--r2);box-shadow:0 8px 32px rgba(0,0,0,.2);overflow:hidden;">
-    <div id="kq-modal-header" style="color:#fff;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;">
+    <div id="kq-modal-header" style="color:#fff;padding:16px 24px;display:flex;align-items:flex-start;justify-content:space-between;">
       <div>
         <div id="kq-modal-title" style="font-family:var(--serif);font-size:17px;font-weight:700;"></div>
-        <div id="kq-modal-subtitle" style="font-size:13px;opacity:.85;margin-top:2px;"></div>
+        <div id="kq-modal-category" style="margin-top:8px;"></div>
+        <div id="kq-modal-subtitle" style="font-size:13px;opacity:.85;margin-top:4px;"></div>
       </div>
       <button onclick="closeKqModal()" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer;padding:0 4px;line-height:1;">&times;</button>
     </div>
@@ -470,7 +471,11 @@ function showKeyQuestions(cls) {
   var colors = kqHeaderColors[cls] || { bg: '#555', text: '#fff' };
   header.style.background = colors.bg;
   header.style.color = colors.text;
-  document.getElementById('kq-modal-title').innerHTML = 'Key Questions: <span class="sc-classification cls-' + cls + '" style="font-size:11px;vertical-align:middle;">' + escHtml(classLabels[cls] || cls) + '</span>';
+  document.getElementById('kq-modal-title').textContent = 'Key Questions:';
+  // Category badge with doc-matching background colors and sans-serif font
+  var kqBadgeBg = { required_by_law: '#FADBD8', required_by_city: '#FADBD8', best_practice: '#D6EAF8', community_choice: '#D5F5E3' };
+  var kqBadgeColor = { required_by_law: '#C0392B', required_by_city: '#C0392B', best_practice: '#1A5276', community_choice: '#1E7B1E' };
+  document.getElementById('kq-modal-category').innerHTML = '<span style="display:inline-block;padding:6px 16px;border-radius:6px;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;background:' + (kqBadgeBg[cls] || '#eee') + ';color:' + (kqBadgeColor[cls] || '#333') + ';">' + escHtml(classLabels[cls] || cls) + '</span>';
   document.getElementById('kq-modal-subtitle').textContent = kqSubtitles[cls] || '';
 
   var questions = keyQuestions[cls] || [];
@@ -507,7 +512,7 @@ function showFieldNotes(secId, artNum, sectionTitle, sectionNumber) {
   var fd = sectionFieldData[secId] || {};
   var cls = fd.classification || 'best_practice';
   var body = '';
-  body += '<div style="margin-bottom:16px;"><span class="sc-classification cls-' + cls + '">' + escHtml(classLabels[cls] || cls) + '</span></div>';
+  body += '<div style="margin-bottom:16px;"><span class="sc-classification cls-' + cls + '" style="padding:6px 16px;border-radius:6px;font-family:Arial,Helvetica,sans-serif;font-size:13px;">' + escHtml(classLabels[cls] || cls) + '</span></div>';
   var fnLabel = 'font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:6px;';
   body += '<div style="margin-bottom:18px;"><div style="' + fnLabel + '">Why It\'s Here</div><div style="font-size:17px;line-height:1.7;">' + escHtml(fd.whyItsHere) + '</div></div>';
   body += '<div style="margin-bottom:18px;"><div style="' + fnLabel + '">What You Can Do</div><div style="font-size:17px;line-height:1.7;">' + escHtml(fd.whatYouCanDo) + '</div></div>';
