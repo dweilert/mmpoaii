@@ -97,6 +97,20 @@
   </div>
 </div>
 
+<!-- Key Questions Modal -->
+<div id="kq-modal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.5);overflow-y:auto;" onclick="if(event.target===this)closeKqModal()">
+  <div style="max-width:640px;margin:60px auto;background:#fff;border-radius:var(--r2);box-shadow:0 8px 32px rgba(0,0,0,.2);overflow:hidden;">
+    <div id="kq-modal-header" style="color:#fff;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div id="kq-modal-title" style="font-family:var(--serif);font-size:17px;font-weight:700;"></div>
+        <div id="kq-modal-subtitle" style="font-size:13px;opacity:.85;margin-top:2px;"></div>
+      </div>
+      <button onclick="closeKqModal()" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer;padding:0 4px;line-height:1;">&times;</button>
+    </div>
+    <div id="kq-modal-body" style="padding:24px;font-size:16px;line-height:1.7;color:var(--text);"></div>
+  </div>
+</div>
+
 <!-- Document Text Modal -->
 <div id="doctext-modal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.5);overflow-y:auto;" onclick="if(event.target===this)closeDocTextModal()">
   <div style="max-width:720px;margin:40px auto;background:#fff;border-radius:var(--r2);box-shadow:0 8px 32px rgba(0,0,0,.2);overflow:hidden;">
@@ -144,6 +158,38 @@ var classLabels = {
   community_choice: 'Community Choice'
 };
 
+// Key Questions per classification (from MMPOA Key Questions V2)
+var keyQuestions = {
+  required_by_law: [
+    'Is the legal citation correct? Verify that the Texas Property Code section referenced actually requires what the provision says. Laws change \u2014 confirm the reference is current.',
+    'Does the language match the statute? Some provisions paraphrase the law. Check that the paraphrase is accurate and doesn\u2019t accidentally weaken or overstate the legal requirement.',
+    'Are the timelines compliant? Texas law specifies minimum notice periods (e.g., 30 days for lien notice). Confirm our documents meet or exceed \u2014 never fall below \u2014 statutory minimums.',
+    'Is this implemented correctly elsewhere? A required provision may depend on procedures in the Bylaws or Rules. Verify the cross-references work and the procedures are actually in place.',
+    'Are there any gaps? Texas Property Code Chapter 209 has many requirements. If you notice something the law requires that isn\u2019t addressed in our documents, flag it.'
+  ],
+  required_by_city: [
+    'Is the legal citation correct? Verify that the City of Austin ordinance referenced actually requires what the provision says. Laws change \u2014 confirm the reference is current.',
+    'Does the language match the statute? Some provisions paraphrase the law. Check that the paraphrase is accurate and doesn\u2019t accidentally weaken or overstate the legal requirement.',
+    'Are the timelines compliant? City ordinances may specify minimum notice periods. Confirm our documents meet or exceed \u2014 never fall below \u2014 statutory minimums.',
+    'Is this implemented correctly elsewhere? A required provision may depend on procedures in the Bylaws or Rules. Verify the cross-references work and the procedures are actually in place.',
+    'Are there any gaps? If you notice something the City of Austin requires that isn\u2019t addressed in our documents, flag it.'
+  ],
+  best_practice: [
+    'What risk does this provision reduce? The Field Guide explains the risk for each recommended provision. Before voting to remove one, make sure you understand what could go wrong without it.',
+    'Do other Texas HOAs include this? If a provision is standard across well-managed HOAs, there\u2019s usually a good reason. Removing something everyone else keeps should require strong justification.',
+    'Can we adjust it instead of removing it? Many provisions have tunable values (dollar thresholds, time periods, percentages). You may be able to keep the protection while adjusting the specifics to fit our community.',
+    'What\u2019s the financial exposure? Some best practices protect against lawsuits, special assessments, or uninsured losses. Ask: what\u2019s the worst-case cost if we remove this provision?',
+    'Does our community have a history here? If the community has experienced problems in an area (e.g., delinquent assessments, contractor disputes), keeping the related best practice is especially important.'
+  ],
+  community_choice: [
+    'Does this reflect how we actually live? Community choice provisions should match reality. If a rule is routinely ignored, it may need to be updated, relaxed, or better enforced \u2014 not just left on paper.',
+    'Is this the right threshold or limit? Many community choices involve specific numbers: fine amounts, pet limits, parking rules, noise hours. Ask whether the current values are reasonable and enforceable.',
+    'Would this affect property values? Some provisions (exterior standards, short-term rental restrictions) directly affect home values. Consider whether a change helps or hurts the neighborhood\u2019s appeal.',
+    'Is this enforceable and fair? A rule that can\u2019t be enforced consistently is worse than no rule. Consider whether the Board can realistically monitor and enforce what\u2019s written.',
+    'What do the neighbors think? Community choice means community input. If you feel strongly about a provision, talk to your neighbors. The final vote will reflect the majority\u2019s preferences.'
+  ]
+};
+
 async function loadArticle() {
   try {
     var data = await ReviewApi.getArticle(cycleId, articleId);
@@ -179,7 +225,10 @@ async function loadArticle() {
       html += '<div class="sc-title-group" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">';
       html += '<div>';
       html += '<div class="sc-title">Art. ' + artNum + ', §' + s.sectionNumber + ' — ' + escHtml(s.sectionTitle) + '</div>';
+      html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:2px;">';
       html += '<span class="sc-classification cls-' + cls + '">' + escHtml(classLabels[cls] || cls) + '</span>';
+      html += '<button onclick="showKeyQuestions(\'' + cls + '\')" style="white-space:nowrap;padding:2px 10px;font-size:11px;border:1px solid #bbb;color:#555;background:#fafafa;border-radius:4px;cursor:pointer;font-weight:600;letter-spacing:.3px;">Key Questions</button>';
+      html += '</div>';
       html += '</div>';
       var voteStatusLabel = 'Waiting for Vote';
       var voteStatusColor = '#888';
@@ -191,7 +240,7 @@ async function loadArticle() {
       html += '<span id="vote-status-' + secId + '" style="font-size:12px;font-weight:700;padding:4px 10px;border-radius:12px;background:' + voteStatusBg + ';color:' + voteStatusColor + ';">' + voteStatusLabel + '</span>';
       html += '<button onclick="showFieldNotes(\'' + secId + '\', ' + artNum + ', \'' + escHtml(s.sectionTitle).replace(/'/g, "\\'") + '\', ' + s.sectionNumber + ')" style="white-space:nowrap;padding:6px 14px;font-size:13px;border:1px solid var(--purple-600);color:var(--purple-700);background:#fff;border-radius:var(--r1);cursor:pointer;font-weight:600;">View Field Notes</button>';
       if (s.communityImpact) {
-        html += '<span title="Has Community Impact notes" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--purple-100);color:var(--purple-700);font-size:13px;font-weight:700;cursor:help;flex-shrink:0;">i</span>';
+        html += '<span title="This section has Community Impact notes — click View Field Notes to read them" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;background:#FFF3E0;color:#E65100;font-size:11px;font-weight:700;cursor:help;flex-shrink:0;border:1px solid #FFE0B2;letter-spacing:.2px;"><span style="font-size:14px;line-height:1;">&#9733;</span> Impact</span>';
       }
       html += '</div>';
       html += '</div></div>';
@@ -358,6 +407,52 @@ function escHtml(s) {
   return d.innerHTML;
 }
 
+// ── Key Questions Modal ──
+var kqHeaderColors = {
+  required_by_law: { bg: '#C0392B', text: '#fff' },
+  required_by_city: { bg: '#C0392B', text: '#fff' },
+  best_practice: { bg: '#1A5276', text: '#fff' },
+  community_choice: { bg: '#1E7B1E', text: '#fff' }
+};
+
+var kqSubtitles = {
+  required_by_law: 'Cannot be changed',
+  required_by_city: 'Cannot be changed',
+  best_practice: 'Change with caution',
+  community_choice: 'Open for discussion'
+};
+
+function showKeyQuestions(cls) {
+  var modal = document.getElementById('kq-modal');
+  var header = document.getElementById('kq-modal-header');
+  var colors = kqHeaderColors[cls] || { bg: '#555', text: '#fff' };
+  header.style.background = colors.bg;
+  header.style.color = colors.text;
+  document.getElementById('kq-modal-title').textContent = 'Key Questions: ' + (classLabels[cls] || cls);
+  document.getElementById('kq-modal-subtitle').textContent = kqSubtitles[cls] || '';
+
+  var questions = keyQuestions[cls] || [];
+  var body = '<ol style="margin:0;padding-left:24px;">';
+  for (var i = 0; i < questions.length; i++) {
+    var parts = questions[i].split('?');
+    var bold = parts[0] + '?';
+    var rest = parts.slice(1).join('?');
+    body += '<li style="margin-bottom:14px;"><strong>' + escHtml(bold) + '</strong>' + escHtml(rest) + '</li>';
+  }
+  body += '</ol>';
+  if (cls === 'required_by_law' || cls === 'required_by_city') {
+    body += '<div style="margin-top:16px;padding:12px 16px;background:#FFF8E1;border-radius:6px;border:1px solid #FFE082;font-size:14px;color:#7A6100;"><strong>Note:</strong> Please read these sections, but don\u2019t worry about validating the questions as AI software will be used to perform this check.</div>';
+  }
+  document.getElementById('kq-modal-body').innerHTML = body;
+  modal.style.display = '';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeKqModal() {
+  document.getElementById('kq-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
 // ── Field Notes Modal (shows Field Guide content) ──
 // sectionFieldData is populated during loadArticle for use by the modal
 var sectionFieldData = {};
@@ -387,9 +482,9 @@ function closeDocTextModal() {
   document.body.style.overflow = '';
 }
 
-// Close modal on Escape key
+// Close modals on Escape key
 document.addEventListener('keydown', function (e) {
-  if (e.key === 'Escape') closeDocTextModal();
+  if (e.key === 'Escape') { closeDocTextModal(); closeKqModal(); }
 });
 
 // ── Approve All Sections (with modal + retry) ──

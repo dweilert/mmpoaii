@@ -111,10 +111,10 @@
   font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
   padding: 2px 8px; border-radius: 4px;
 }
-.cls-required_by_law      { background: var(--red-50); color: var(--red-600); }
-.cls-required_by_city     { background: var(--amber-50); color: var(--amber-600); }
-.cls-best_practice        { background: var(--purple-50); color: var(--purple-800); }
-.cls-community_choice     { background: var(--teal-50); color: var(--teal-700); }
+.cls-required_by_law      { background: #FADBD8; color: #C0392B; }
+.cls-required_by_city     { background: #FADBD8; color: #C0392B; }
+.cls-best_practice        { background: #D6EAF8; color: #1A5276; }
+.cls-community_choice     { background: #D5F5E3; color: #1E7B1E; }
 
 .section-card .sc-body { padding: 16px 20px; }
 .section-card .sc-field { margin-bottom: 14px; }
