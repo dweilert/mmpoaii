@@ -35,22 +35,25 @@
 <div id="page-content">
 <div class="review-wrap">
 
+  <div style="margin-bottom:8px;">
+    <a href="#" id="back-to-articles" style="font-size:14px;color:var(--purple-800);text-decoration:none;font-weight:600;">← Back to Articles</a>
+  </div>
+
   <div class="article-header">
-    <div style="margin-bottom:8px;">
-      <a href="#" id="back-to-articles" style="font-size:14px;color:var(--purple-800);text-decoration:none;font-weight:600;">← Back to Articles</a>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+      <h2 id="article-title" style="margin:0;">Loading…</h2>
+      <div id="approve-all-bar" style="display:none;align-items:center;gap:10px;flex-shrink:0;">
+        <button class="btn-primary" onclick="approveAllSections()" id="approve-all-btn" style="background:#e6f4ea;color:#1e7e34;border:1px solid #a8d5b8;padding:8px 18px;font-size:13px;">Approve All Sections</button>
+        <button id="reading-mode-btn" onclick="toggleReadingMode()" style="padding:8px 18px;font-size:13px;font-weight:600;border:1px solid #bbb;color:#555;background:#fafafa;border-radius:var(--r);cursor:pointer;">Just the Facts</button>
+        <span id="approve-all-status" style="font-size:13px;color:var(--text3);"></span>
+      </div>
     </div>
-    <div class="ah-nav" id="art-nav">
-      <a href="#" id="prev-link" style="display:none;">← Previous Article</a>
-      <span style="flex:1"></span>
-      <a href="#" id="next-link" style="display:none;">Next Article →</a>
-    </div>
-    <h2 id="article-title">Loading…</h2>
-    <p id="article-progress" style="font-size:13px;color:var(--text3);margin-top:4px;"></p>
-    <p style="font-size:13px;color:var(--text3);margin-top:4px;">For each section below, click <strong>Approve</strong>, <strong>Disapprove</strong>, or <strong>Discuss</strong> to cast your vote. You can also add optional notes.</p>
-    <div id="approve-all-bar" style="display:none;margin-top:12px;align-items:center;gap:12px;flex-wrap:wrap;">
-      <button class="btn-primary" onclick="approveAllSections()" id="approve-all-btn" style="background:#e6f4ea;color:#1e7e34;border:1px solid #a8d5b8;">Approve All Sections</button>
-      <button id="reading-mode-btn" onclick="toggleReadingMode()" style="padding:7px 16px;font-size:13px;font-weight:600;border:1px solid #bbb;color:#555;background:#fafafa;border-radius:var(--r);cursor:pointer;">Just the Facts</button>
-      <span id="approve-all-status" style="font-size:13px;color:var(--text3);"></span>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:6px;">
+      <p id="article-progress" style="font-size:13px;color:var(--text3);margin:0;"></p>
+      <div class="ah-nav" id="art-nav" style="margin:0;gap:16px;">
+        <a href="#" id="prev-link" style="display:none;">← Previous</a>
+        <a href="#" id="next-link" style="display:none;">Next →</a>
+      </div>
     </div>
   </div>
 
@@ -424,7 +427,7 @@ function toggleReadingMode() {
     var header = card.querySelector('.sc-header');
     if (header) {
       var controlsRow = header.children[1]; // second child = controls row
-      if (controlsRow) controlsRow.style.display = readingMode ? 'none' : '';
+      if (controlsRow) controlsRow.style.display = readingMode ? 'none' : 'flex';
     }
     // Hide vote controls
     var voteControls = card.querySelector('.vote-controls');
