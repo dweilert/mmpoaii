@@ -470,7 +470,7 @@ function showKeyQuestions(cls) {
   var colors = kqHeaderColors[cls] || { bg: '#555', text: '#fff' };
   header.style.background = colors.bg;
   header.style.color = colors.text;
-  document.getElementById('kq-modal-title').textContent = 'Key Questions: ' + (classLabels[cls] || cls);
+  document.getElementById('kq-modal-title').innerHTML = 'Key Questions: <span class="sc-classification cls-' + cls + '" style="font-size:11px;vertical-align:middle;">' + escHtml(classLabels[cls] || cls) + '</span>';
   document.getElementById('kq-modal-subtitle').textContent = kqSubtitles[cls] || '';
 
   var questions = keyQuestions[cls] || [];
@@ -508,10 +508,11 @@ function showFieldNotes(secId, artNum, sectionTitle, sectionNumber) {
   var cls = fd.classification || 'best_practice';
   var body = '';
   body += '<div style="margin-bottom:16px;"><span class="sc-classification cls-' + cls + '">' + escHtml(classLabels[cls] || cls) + '</span></div>';
-  body += '<div style="margin-bottom:18px;"><div style="font-weight:700;font-size:14px;color:var(--text3);margin-bottom:4px;">Why It\'s Here</div><div style="font-size:17px;line-height:1.7;">' + escHtml(fd.whyItsHere) + '</div></div>';
-  body += '<div style="margin-bottom:18px;"><div style="font-weight:700;font-size:14px;color:var(--text3);margin-bottom:4px;">What You Can Do</div><div style="font-size:17px;line-height:1.7;">' + escHtml(fd.whatYouCanDo) + '</div></div>';
+  var fnLabel = 'font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:6px;';
+  body += '<div style="margin-bottom:18px;"><div style="' + fnLabel + '">Why It\'s Here</div><div style="font-size:17px;line-height:1.7;">' + escHtml(fd.whyItsHere) + '</div></div>';
+  body += '<div style="margin-bottom:18px;"><div style="' + fnLabel + '">What You Can Do</div><div style="font-size:17px;line-height:1.7;">' + escHtml(fd.whatYouCanDo) + '</div></div>';
   if (fd.communityImpact) {
-    body += '<div style="margin-bottom:8px;"><div style="font-weight:700;font-size:14px;color:var(--text3);margin-bottom:4px;">Community Impact</div><div style="font-size:17px;line-height:1.7;">' + escHtml(fd.communityImpact) + '</div></div>';
+    body += '<div style="margin-bottom:8px;"><div style="' + fnLabel + '">Community Impact</div><div style="font-size:17px;line-height:1.7;">' + escHtml(fd.communityImpact) + '</div></div>';
   }
 
   document.getElementById('modal-body').innerHTML = body;
