@@ -189,30 +189,27 @@ async function loadArticle() {
       else if (currentVote === 'discuss') { voteStatusLabel = 'Discuss'; voteStatusColor = '#7a6100'; voteStatusBg = '#fff8e1'; }
       html += '<div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">';
       html += '<span id="vote-status-' + secId + '" style="font-size:12px;font-weight:700;padding:4px 10px;border-radius:12px;background:' + voteStatusBg + ';color:' + voteStatusColor + ';">' + voteStatusLabel + '</span>';
-      html += '<button onclick="showDocText(\'' + secId + '\', ' + artNum + ', \'' + escHtml(s.sectionTitle).replace(/'/g, "\\'") + '\', ' + s.sectionNumber + ')" style="white-space:nowrap;padding:6px 14px;font-size:13px;border:1px solid var(--purple-600);color:var(--purple-700);background:#fff;border-radius:var(--r1);cursor:pointer;font-weight:600;">View Text</button>';
+      html += '<button onclick="showFieldNotes(\'' + secId + '\', ' + artNum + ', \'' + escHtml(s.sectionTitle).replace(/'/g, "\\'") + '\', ' + s.sectionNumber + ')" style="white-space:nowrap;padding:6px 14px;font-size:13px;border:1px solid var(--purple-600);color:var(--purple-700);background:#fff;border-radius:var(--r1);cursor:pointer;font-weight:600;">View Field Notes</button>';
+      if (s.communityImpact) {
+        html += '<span title="Has Community Impact notes" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--purple-100);color:var(--purple-700);font-size:13px;font-weight:700;cursor:help;flex-shrink:0;">i</span>';
+      }
       html += '</div>';
       html += '</div></div>';
 
-      // Body
+      // Store field guide data for the modal
+      sectionFieldData[secId] = {
+        whyItsHere: s.whyItsHere,
+        whatYouCanDo: s.whatYouCanDo,
+        communityImpact: s.communityImpact,
+        classification: s.classification
+      };
+
+      // Body — show governing document text (loaded async)
       html += '<div class="sc-body">';
-
       html += '<div class="sc-field">';
-      html += '<div class="sc-label">Why It\'s Here</div>';
-      html += '<div class="sc-text">' + escHtml(s.whyItsHere) + '</div>';
+      html += '<div class="sc-label">Governing Document Text</div>';
+      html += '<div class="sc-text" id="doctext-' + secId + '" style="white-space:pre-wrap;font-family:var(--serif);font-size:16px;line-height:1.7;color:var(--text2);">Loading document text…</div>';
       html += '</div>';
-
-      html += '<div class="sc-field">';
-      html += '<div class="sc-label">What You Can Do</div>';
-      html += '<div class="sc-text">' + escHtml(s.whatYouCanDo) + '</div>';
-      html += '</div>';
-
-      if (s.communityImpact) {
-        html += '<div class="sc-impact">';
-        html += '<div class="sc-label">Community Impact</div>';
-        html += '<div class="sc-text">' + escHtml(s.communityImpact) + '</div>';
-        html += '</div>';
-      }
-
       html += '</div>'; // /sc-body
 
       // Vote controls
@@ -234,6 +231,26 @@ async function loadArticle() {
     document.getElementById('sections-container').innerHTML = html;
     document.getElementById('nav-bottom').style.display = 'flex';
     document.getElementById('approve-all-bar').style.display = '';
+
+    // Fetch governing document text for all sections in parallel
+    data.sections.forEach(function (s) {
+      var secId = 'ART-' + pad(artNum) + '#SEC-' + pad(s.sectionNumber);
+      var el = document.getElementById('doctext-' + secId);
+      if (!el) return;
+      ReviewApi.getDocText(cycleId, secId).then(function (d) {
+        el.textContent = d.text;
+        el.style.color = 'var(--text)';
+      }).catch(function (err) {
+        if (err.status === 404) {
+          el.textContent = 'Document text not yet available for this section.';
+          el.style.color = 'var(--text3)';
+          el.style.fontStyle = 'italic';
+        } else {
+          el.textContent = 'Failed to load document text: ' + err.message;
+          el.style.color = '#b71c1c';
+        }
+      });
+    });
 
   } catch (err) {
     document.getElementById('sections-container').innerHTML =
@@ -341,25 +358,28 @@ function escHtml(s) {
   return d.innerHTML;
 }
 
-// ── Document Text Modal ──
-async function showDocText(secId, artNum, sectionTitle, sectionNumber) {
+// ── Field Notes Modal (shows Field Guide content) ──
+// sectionFieldData is populated during loadArticle for use by the modal
+var sectionFieldData = {};
+
+function showFieldNotes(secId, artNum, sectionTitle, sectionNumber) {
   var modal = document.getElementById('doctext-modal');
   document.getElementById('modal-title').textContent = 'Art. ' + artNum + ', §' + sectionNumber + ' — ' + sectionTitle;
-  document.getElementById('modal-subtitle').textContent = 'Original Document Text';
-  document.getElementById('modal-body').textContent = 'Loading…';
+  document.getElementById('modal-subtitle').textContent = 'Reviewers Field Guide Notes';
+
+  var fd = sectionFieldData[secId] || {};
+  var cls = fd.classification || 'best_practice';
+  var body = '';
+  body += '<div style="margin-bottom:16px;"><span class="sc-classification cls-' + cls + '">' + escHtml(classLabels[cls] || cls) + '</span></div>';
+  body += '<div style="margin-bottom:18px;"><div style="font-weight:700;font-size:14px;color:var(--text3);margin-bottom:4px;">Why It\'s Here</div><div style="font-size:17px;line-height:1.7;">' + escHtml(fd.whyItsHere) + '</div></div>';
+  body += '<div style="margin-bottom:18px;"><div style="font-weight:700;font-size:14px;color:var(--text3);margin-bottom:4px;">What You Can Do</div><div style="font-size:17px;line-height:1.7;">' + escHtml(fd.whatYouCanDo) + '</div></div>';
+  if (fd.communityImpact) {
+    body += '<div style="margin-bottom:8px;"><div style="font-weight:700;font-size:14px;color:var(--text3);margin-bottom:4px;">Community Impact</div><div style="font-size:17px;line-height:1.7;">' + escHtml(fd.communityImpact) + '</div></div>';
+  }
+
+  document.getElementById('modal-body').innerHTML = body;
   modal.style.display = '';
   document.body.style.overflow = 'hidden';
-
-  try {
-    var data = await ReviewApi.getDocText(cycleId, secId);
-    document.getElementById('modal-body').textContent = data.text;
-  } catch (err) {
-    if (err.status === 404) {
-      document.getElementById('modal-body').textContent = 'Document text not available for this section.\n\nAn administrator needs to upload the document text via the Admin Console.';
-    } else {
-      document.getElementById('modal-body').textContent = 'Failed to load: ' + err.message;
-    }
-  }
 }
 
 function closeDocTextModal() {
