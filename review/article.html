@@ -284,21 +284,7 @@ async function loadArticle() {
     // Fetch governing document text for all sections in parallel
     data.sections.forEach(function (s) {
       var secId = 'ART-' + pad(artNum) + '#SEC-' + pad(s.sectionNumber);
-      var el = document.getElementById('doctext-' + secId);
-      if (!el) return;
-      ReviewApi.getDocText(cycleId, secId).then(function (d) {
-        el.textContent = d.text;
-        el.style.color = 'var(--text)';
-      }).catch(function (err) {
-        if (err.status === 404) {
-          el.textContent = 'Document text not yet available for this section.';
-          el.style.color = 'var(--text3)';
-          el.style.fontStyle = 'italic';
-        } else {
-          el.textContent = 'Failed to load document text: ' + err.message;
-          el.style.color = '#b71c1c';
-        }
-      });
+      loadDocText(secId);
     });
 
   } catch (err) {
@@ -405,6 +391,39 @@ function escHtml(s) {
   var d = document.createElement('div');
   d.textContent = s || '';
   return d.innerHTML;
+}
+
+// ── Load document text with retry ──
+function loadDocText(secId) {
+  var el = document.getElementById('doctext-' + secId);
+  if (!el) return;
+  el.textContent = 'Loading document text\u2026';
+  el.style.color = 'var(--text2)';
+  el.style.fontStyle = 'normal';
+  // Remove any existing retry button
+  var existing = document.getElementById('retry-' + secId);
+  if (existing) existing.remove();
+
+  ReviewApi.getDocText(cycleId, secId).then(function (d) {
+    el.textContent = d.text;
+    el.style.color = 'var(--text)';
+  }).catch(function (err) {
+    if (err.status === 404) {
+      el.textContent = 'Document text not yet available for this section.';
+      el.style.color = 'var(--text3)';
+      el.style.fontStyle = 'italic';
+    } else {
+      el.textContent = 'Could not load document text. This may be a temporary network issue.';
+      el.style.color = '#b71c1c';
+      // Add retry button
+      var btn = document.createElement('button');
+      btn.id = 'retry-' + secId;
+      btn.textContent = 'Retry Loading';
+      btn.style.cssText = 'display:block;margin-top:12px;padding:8px 20px;font-size:14px;font-weight:700;color:#fff;background:#b71c1c;border:none;border-radius:6px;cursor:pointer;';
+      btn.onclick = function () { loadDocText(secId); };
+      el.parentElement.appendChild(btn);
+    }
+  });
 }
 
 // ── Key Questions Modal ──
