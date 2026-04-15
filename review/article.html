@@ -234,9 +234,13 @@ async function loadArticle() {
       else if (currentVote === 'discuss') { voteStatusLabel = 'Discuss'; voteStatusColor = '#7a6100'; voteStatusBg = '#fff8e1'; }
 
       html += '<div class="sc-header">';
-      html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">';
-      html += '<div class="sc-title" style="margin:0;">Art. ' + artNum + ', §' + s.sectionNumber + ' — ' + escHtml(s.sectionTitle) + '</div>';
-      html += '<span id="vote-status-' + secId + '" style="font-size:12px;font-weight:700;padding:4px 10px;border-radius:12px;background:' + voteStatusBg + ';color:' + voteStatusColor + ';white-space:nowrap;flex-shrink:0;">' + voteStatusLabel + '</span>';
+      html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">';
+      html += '<div class="sc-title" style="margin:0;min-width:0;overflow:hidden;text-overflow:ellipsis;">Art. ' + artNum + ', §' + s.sectionNumber + ' — ' + escHtml(s.sectionTitle) + '</div>';
+      html += '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">';
+      html += '<span id="vote-status-' + secId + '" style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:10px;background:' + voteStatusBg + ';color:' + voteStatusColor + ';white-space:nowrap;">' + voteStatusLabel + '</span>';
+      html += '<button class="vote-btn-sm approve' + (currentVote === 'approve' ? ' selected' : '') + '" data-sec-id="' + secId + '" data-vote="approve" onclick="onVoteClick(\'' + secId + '\', \'approve\', this)" title="Approve">✓</button>';
+      html += '<button class="vote-btn-sm disapprove' + (currentVote === 'disapprove' ? ' selected' : '') + '" data-sec-id="' + secId + '" data-vote="disapprove" onclick="onVoteClick(\'' + secId + '\', \'disapprove\', this)" title="Disapprove">✗</button>';
+      html += '</div>';
       html += '</div>';
       html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:6px;">';
       // Left side: classification badge + impact indicator
@@ -330,10 +334,12 @@ function setupNav(artNum) {
 
 // ── Vote click handler (immediate save) ──
 async function onVoteClick(secId, vote, btn) {
-  // Update button states
-  var buttons = btn.parentElement.querySelectorAll('.vote-btn');
-  buttons.forEach(function (b) { b.classList.remove('selected'); });
-  btn.classList.add('selected');
+  // Update all vote buttons (both full-size and compact) for this section
+  var allBtns = document.querySelectorAll('[data-sec-id="' + secId + '"]');
+  allBtns.forEach(function (b) { b.classList.remove('selected'); });
+  allBtns.forEach(function (b) {
+    if (b.dataset.vote === vote) b.classList.add('selected');
+  });
 
   // Update vote status badge
   var statusEl = document.getElementById('vote-status-' + secId);
