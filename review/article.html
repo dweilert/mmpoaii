@@ -195,13 +195,30 @@ var keyQuestions = {
   ]
 };
 
+// Short document type labels
+var docTypeLabels = {
+  'CC&Rs': 'CC&Rs',
+  'Bylaws': 'Bylaws',
+  'Rules of Conduct': 'Rules'
+};
+
 async function loadArticle() {
   try {
     var data = await ReviewApi.getArticle(cycleId, articleId);
     var artNum = parseInt(articleId, 10);
 
+    // Fetch document type from cycle metadata
+    var docPrefix = '';
+    try {
+      var cycles = await ReviewApi.listCycles();
+      var cycle = cycles.find(function (c) { return c.cycleId === cycleId; });
+      if (cycle && cycle.document) {
+        docPrefix = (docTypeLabels[cycle.document] || cycle.document) + ' — ';
+      }
+    } catch (e) { /* non-critical, skip */ }
+
     document.getElementById('article-title').textContent =
-      'Article ' + data.articleNumber + ' — ' + data.articleTitle;
+      docPrefix + 'Article ' + data.articleNumber + ' — ' + data.articleTitle;
 
     var voted = 0;
     var total = data.sections.length;
@@ -268,7 +285,7 @@ async function loadArticle() {
       // Body — show governing document text (loaded async)
       html += '<div class="sc-body">';
       html += '<div class="sc-field">';
-      html += '<div class="sc-label">Governing Document Text</div>';
+      html += '<div class="sc-label doctext-label">Governing Document Text</div>';
       html += '<div class="sc-text" id="doctext-' + secId + '" style="white-space:pre-wrap;font-family:var(--serif);font-size:16px;line-height:1.7;color:var(--text2);">Loading document text…</div>';
       html += '</div>';
       html += '</div>'; // /sc-body
@@ -441,6 +458,9 @@ function toggleReadingMode() {
     // Hide vote controls
     var voteControls = card.querySelector('.vote-controls');
     if (voteControls) voteControls.style.display = readingMode ? 'none' : '';
+    // Hide "GOVERNING DOCUMENT TEXT" label
+    var docLabel = card.querySelector('.doctext-label');
+    if (docLabel) docLabel.style.display = readingMode ? 'none' : '';
   });
 }
 
