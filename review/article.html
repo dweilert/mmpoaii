@@ -488,7 +488,7 @@ function showKeyQuestions(cls) {
   }
   body += '</ol>';
   if (cls === 'required_by_law' || cls === 'required_by_city') {
-    body += '<div style="margin-top:16px;padding:12px 16px;background:#FFF8E1;border-radius:6px;border:1px solid #FFE082;font-size:14px;color:#7A6100;"><strong>Note:</strong> Please read these sections, but don\u2019t worry about validating the questions as AI software will be used to perform this check.</div>';
+    body += '<div style="margin-top:16px;padding:12px 16px;background:#FFF8E1;border-radius:6px;border:1px solid #FFE082;font-size:14px;color:#7A6100;"><strong>Note:</strong> This section is required and cannot be removed from the governing documents. Focus your review on how the language is written \u2014 is it clear, accurate, and complete? The provision itself will always remain.</div>';
   }
   document.getElementById('kq-modal-body').innerHTML = body;
   modal.style.display = '';
