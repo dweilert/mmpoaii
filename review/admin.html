@@ -6,6 +6,34 @@
 <title>Review Admin — MMPOAII</title>
 <link rel="stylesheet" href="/css/site.css">
 <link rel="stylesheet" href="/css/review.css">
+<style>
+.drop-zone {
+  border: 2px dashed var(--border, #ccc);
+  border-radius: 8px;
+  padding: 20px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+  background: var(--surf, #fafafa);
+}
+.drop-zone:hover { border-color: var(--purple-600, #7c3aed); background: #f5f0ff; }
+.drop-zone.drag-over { border-color: var(--purple-600, #7c3aed); background: #ede5ff; border-style: solid; }
+.drop-zone.has-file { border-color: #1e7e34; border-style: solid; background: #f0faf0; }
+.drop-zone-icon { font-size: 28px; margin-bottom: 6px; }
+.drop-zone-text { font-size: 13px; color: var(--text2, #666); margin-bottom: 8px; line-height: 1.4; }
+.drop-zone-btn {
+  display: inline-block; padding: 6px 16px; font-size: 12px; font-weight: 600;
+  background: var(--purple-600, #7c3aed); color: #fff; border-radius: 6px; cursor: pointer;
+  transition: background .15s;
+}
+.drop-zone-btn:hover { background: var(--purple-700, #6d28d9); }
+.drop-zone-filename {
+  display: none; margin-top: 8px; font-size: 12px; font-weight: 600; color: #1e7e34;
+  word-break: break-all;
+}
+.drop-zone.has-file .drop-zone-filename { display: block; }
+.drop-zone.has-file .drop-zone-icon::after { content: ' ✓'; }
+</style>
 </head>
 <body>
 
@@ -62,12 +90,28 @@
       <div style="display:flex;gap:16px;flex-wrap:wrap;">
         <div style="flex:1;min-width:220px;" class="form-row">
           <label for="fg-file">Field Guide (.docx)</label>
-          <input type="file" id="fg-file" accept=".docx" onchange="onDocxFile(this,'fg')">
+          <div class="drop-zone" id="fg-drop" data-type="fg">
+            <div class="drop-zone-content">
+              <div class="drop-zone-icon">📄</div>
+              <div class="drop-zone-text">Drag & drop file here<br><span style="font-size:11px;color:var(--text3);">or</span></div>
+              <label for="fg-file" class="drop-zone-btn">Choose File</label>
+              <input type="file" id="fg-file" accept=".docx" onchange="onDocxFile(this,'fg')" style="display:none;">
+            </div>
+            <div class="drop-zone-filename" id="fg-filename"></div>
+          </div>
           <div id="fg-status" style="font-size:12px;margin-top:4px;min-height:18px;"></div>
         </div>
         <div style="flex:1;min-width:220px;" class="form-row">
           <label for="gd-file">Governing Document (.docx)</label>
-          <input type="file" id="gd-file" accept=".docx" onchange="onDocxFile(this,'gd')">
+          <div class="drop-zone" id="gd-drop" data-type="gd">
+            <div class="drop-zone-content">
+              <div class="drop-zone-icon">📄</div>
+              <div class="drop-zone-text">Drag & drop file here<br><span style="font-size:11px;color:var(--text3);">or</span></div>
+              <label for="gd-file" class="drop-zone-btn">Choose File</label>
+              <input type="file" id="gd-file" accept=".docx" onchange="onDocxFile(this,'gd')" style="display:none;">
+            </div>
+            <div class="drop-zone-filename" id="gd-filename"></div>
+          </div>
           <div id="gd-status" style="font-size:12px;margin-top:4px;min-height:18px;"></div>
         </div>
       </div>
@@ -395,10 +439,19 @@ async function computeDocumentSetId(name, fg) {
 async function onDocxFile(input, type) {
   var file = input.files[0];
   if (!file) return;
+  processDocxFile(file, type);
+}
 
+async function processDocxFile(file, type) {
   var statusEl = document.getElementById(type === 'fg' ? 'fg-status' : 'gd-status');
+  var dropZone = document.getElementById(type + '-drop');
+  var filenameEl = document.getElementById(type + '-filename');
   statusEl.style.color = 'var(--text3)';
   statusEl.textContent = 'Parsing…';
+
+  // Show filename in drop zone
+  filenameEl.textContent = file.name;
+  dropZone.classList.add('has-file');
 
   // Reset validation when either file changes
   parsedDocumentSetId = null;
@@ -431,10 +484,46 @@ async function onDocxFile(input, type) {
   } catch (err) {
     if (type === 'fg') parsedFieldGuide = null;
     else parsedGovDoc = null;
+    dropZone.classList.remove('has-file');
+    filenameEl.textContent = '';
     statusEl.style.color = '#b71c1c';
     statusEl.textContent = 'Parse failed: ' + err.message;
   }
 }
+
+// ── Drag & drop setup ────────────────────────────────────────────────────────
+function initDropZones() {
+  document.querySelectorAll('.drop-zone').forEach(function (zone) {
+    var type = zone.dataset.type;
+
+    zone.addEventListener('dragenter', function (e) { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragover', function (e) { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', function (e) {
+      // Only remove if we actually left the zone (not entering a child)
+      if (!zone.contains(e.relatedTarget)) zone.classList.remove('drag-over');
+    });
+    zone.addEventListener('drop', function (e) {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      var files = e.dataTransfer.files;
+      if (files.length === 0) return;
+      var file = files[0];
+      if (!file.name.toLowerCase().endsWith('.docx')) {
+        var statusEl = document.getElementById(type + '-status');
+        statusEl.style.color = '#b71c1c';
+        statusEl.textContent = 'Please drop a .docx file.';
+        return;
+      }
+      // Update the file input too so it stays in sync
+      var input = document.getElementById(type + '-file');
+      var dt = new DataTransfer();
+      dt.items.add(file);
+      input.files = dt.files;
+      processDocxFile(file, type);
+    });
+  });
+}
+document.addEventListener('DOMContentLoaded', initDropZones);
 
 // ── Cross-doc validation + results panel ──────────────────────────────────────
 async function runValidation() {
