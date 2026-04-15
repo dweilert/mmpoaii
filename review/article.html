@@ -210,8 +210,8 @@ async function loadArticle() {
     // Fetch document type from cycle metadata
     var docPrefix = '';
     try {
-      var cycles = await ReviewApi.listCycles();
-      var cycle = cycles.find(function (c) { return c.cycleId === cycleId; });
+      var cyclesData = await ReviewApi.listCycles();
+      var cycle = (cyclesData.cycles || []).find(function (c) { return c.cycleId === cycleId; });
       if (cycle && cycle.document) {
         docPrefix = (docTypeLabels[cycle.document] || cycle.document) + ' — ';
       }
@@ -375,9 +375,20 @@ async function onVoteClick(secId, vote, btn) {
   try {
     await ReviewApi.saveVote(cycleId, secId, vote, notes);
     setStatus(secId, 'saved', 'Saved ✓');
+    updateProgressCount();
   } catch (err) {
     setStatus(secId, 'error', 'Save failed: ' + err.message);
   }
+}
+
+function updateProgressCount() {
+  var votedCount = 0;
+  document.querySelectorAll('.section-card').forEach(function (c) {
+    if (c.querySelector('.vote-btn-sm.selected') || c.querySelector('.vote-btn.selected')) votedCount++;
+  });
+  var totalCards = document.querySelectorAll('.section-card').length;
+  document.getElementById('article-progress').textContent =
+    votedCount + ' of ' + totalCards + ' sections voted in this article';
 }
 
 // ── Notes input handler (debounced 500ms) ──
@@ -753,13 +764,7 @@ async function approveAllSections() {
   document.getElementById('approve-all-status').textContent = '';
 
   // Update progress text
-  var votedCount = 0;
-  document.querySelectorAll('.section-card').forEach(function (c) {
-    if (c.querySelector('.vote-btn.selected')) votedCount++;
-  });
-  var totalCards = document.querySelectorAll('.section-card').length;
-  document.getElementById('article-progress').textContent =
-    votedCount + ' of ' + totalCards + ' sections voted in this article';
+  updateProgressCount();
 }
 
 var guardCheck = setInterval(function () {
