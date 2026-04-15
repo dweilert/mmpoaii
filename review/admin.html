@@ -201,6 +201,7 @@ function parseFieldGuideHtml(html) {
 
   var articleRe  = /^Article\s+([IVXLCDM]+)\s*[—–\-]+\s*(.+)$/i;
   var sectionRe  = /Art\.\s+[IVXLCDM]+,\s+§(\S+)\s*[—–\-]+\s*(.+)/i;
+  var sectionRe2 = /^Section\s+(\S+?)\s*[—–\-]+\s*(.+)$/i;
   var classRe    = /(REQUIRED BY TEXAS LAW|REQUIRED BY CITY OF AUSTIN|RECOMMENDED BEST PRACTICE|COMMUNITY CHOICE)/i;
   var whyRe      = /^Why it.?s here:?\s*(.*)/i;
   var whatRe     = /^What you can do:?\s*(.*)/i;
@@ -239,7 +240,7 @@ function parseFieldGuideHtml(html) {
     }
     if (!currentArticle) continue;
 
-    var secMatch = text.match(sectionRe);
+    var secMatch = text.match(sectionRe) || text.match(sectionRe2);
     if (secMatch) {
       finishSection();
       currentSection = {
@@ -318,7 +319,7 @@ function parseGovDocHtml(html) {
     var secMatch = text.match(sectionRe);
     if (secMatch) {
       finishSection();
-      var title = secMatch[2].replace(/^["\u201C]|["\u201D]\.?$/g, '').replace(/\.$/, '').trim();
+      var title = secMatch[2].replace(/^[—–\-]+\s*/, '').replace(/^["\u201C]|["\u201D]\.?$/g, '').replace(/\.$/, '').trim();
       currentSection = { sectionNumber: parseSectionNumber(secMatch[1]), sectionTitle: title };
       textParts = [];
       continue;
