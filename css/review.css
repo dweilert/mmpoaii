@@ -102,7 +102,7 @@
 .section-card .sc-header {
   padding: 16px 20px 12px;
   border-bottom: 1px solid var(--border2);
-  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  display: flex; flex-direction: column; gap: 0;
 }
 .section-card .sc-title-group { flex: 1; }
 .section-card .sc-title { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
