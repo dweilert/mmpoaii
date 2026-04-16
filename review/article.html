@@ -239,7 +239,7 @@ async function loadArticle() {
       var secId = 'ART-' + pad(artNum) + '#SEC-' + pad(s.sectionNumber);
       var cls = s.classification || 'best_practice';
       var currentVote = (s.myVote && s.myVote.vote) || '';
-      var currentNotes = (s.myVote && s.myVote.notes) || '';
+      var currentNotes = ''; // comments append to list; always start empty
 
       html += '<div class="section-card" id="sec-' + s.sectionNumber + '">';
 

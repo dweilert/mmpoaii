@@ -157,7 +157,7 @@
 .vote-btn.selected { border-color: transparent; }
 .vote-btn.selected.approve   { background: #1e7e34; color: #fff; }
 .vote-btn.selected.disapprove { background: #b71c1c; color: #fff; }
-.vote-btn.selected.discuss   { background: #7a6100; color: #fff; }
+.vote-btn.selected.discuss   { background: #c49a3c; color: #fff; }
 
 /* Compact vote buttons on title line */
 .vote-btn-sm {
@@ -172,7 +172,7 @@
 .vote-btn-sm:hover { border-color: var(--purple-600); }
 .vote-btn-sm.selected.approve   { background: #1e7e34; color: #fff; border-color: transparent; }
 .vote-btn-sm.selected.disapprove { background: #b71c1c; color: #fff; border-color: transparent; }
-.vote-btn-sm.selected.discuss   { background: #7a6100; color: #fff; border-color: transparent; }
+.vote-btn-sm.selected.discuss   { background: #c49a3c; color: #fff; border-color: transparent; }
 
 .vote-notes {
   width: 100%; min-height: 60px; padding: 10px 12px;
