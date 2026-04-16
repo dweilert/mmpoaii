@@ -168,9 +168,11 @@
 }
 .vote-btn-sm.approve   { background: #e6f4ea; border-color: #a8d5b8; color: #1e7e34; }
 .vote-btn-sm.disapprove { background: #fde8e8; border-color: #f5aaaa; color: #b71c1c; }
+.vote-btn-sm.discuss   { background: #fff8e1; border-color: #ffe082; color: #7a6100; }
 .vote-btn-sm:hover { border-color: var(--purple-600); }
 .vote-btn-sm.selected.approve   { background: #1e7e34; color: #fff; border-color: transparent; }
 .vote-btn-sm.selected.disapprove { background: #b71c1c; color: #fff; border-color: transparent; }
+.vote-btn-sm.selected.discuss   { background: #7a6100; color: #fff; border-color: transparent; }
 
 .vote-notes {
   width: 100%; min-height: 60px; padding: 10px 12px;

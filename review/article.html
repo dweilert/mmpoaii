@@ -258,6 +258,7 @@ async function loadArticle() {
       html += '<span id="vote-status-' + secId + '" style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:10px;background:' + voteStatusBg + ';color:' + voteStatusColor + ';white-space:nowrap;">' + voteStatusLabel + '</span>';
       html += '<button class="vote-btn-sm approve' + (currentVote === 'approve' ? ' selected' : '') + '" data-sec-id="' + secId + '" data-vote="approve" onclick="onVoteClick(\'' + secId + '\', \'approve\', this)" title="Approve">✓</button>';
       html += '<button class="vote-btn-sm disapprove' + (currentVote === 'disapprove' ? ' selected' : '') + '" data-sec-id="' + secId + '" data-vote="disapprove" onclick="onVoteClick(\'' + secId + '\', \'disapprove\', this)" title="Disapprove">✗</button>';
+      html += '<button class="vote-btn-sm discuss' + (currentVote === 'discuss' ? ' selected' : '') + '" data-sec-id="' + secId + '" data-vote="discuss" onclick="onVoteClick(\'' + secId + '\', \'discuss\', this)" title="Discuss">💬</button>';
       html += '</div>';
       html += '</div>';
       html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:6px;">';
@@ -291,11 +292,8 @@ async function loadArticle() {
       html += '</div>';
       html += '</div>'; // /sc-body
 
-      // Vote controls (Discuss + notes only; Approve/Disapprove are on the title line)
+      // Comment area (vote buttons are all on the title line now)
       html += '<div class="vote-controls">';
-      html += '<div class="vote-buttons">';
-      html += voteButton(secId, 'discuss', 'Discuss', currentVote);
-      html += '</div>';
       html += '<textarea class="vote-notes" id="notes-' + secId + '" ' +
               'placeholder="Type your comment here…" rows="2" ' +
               'oninput="onNotesInput(\'' + secId + '\')">' + escHtml(currentNotes) + '</textarea>';
@@ -314,7 +312,7 @@ async function loadArticle() {
               'background:#eef2f7;border:1px solid #d0d7e0;border-radius:6px;transition:background .2s;">';
       html += '<span class="rc-toggle" id="rc-toggle-' + secId + '" style="font-size:10px;color:#5a6a7a;transition:transform .2s;">&#9654;</span>';
       html += '<span style="font-size:12px;font-weight:700;color:#5a6a7a;text-transform:uppercase;letter-spacing:.5px;">Reviewer Comments</span>';
-      html += '<span class="rc-count" id="rc-count-' + secId + '" style="font-size:11px;font-weight:600;color:#5a6a7a;"></span>';
+      html += '<span class="rc-count" id="rc-count-' + secId + '" style="font-size:13px;font-weight:700;color:#5a6a7a;"></span>';
       html += '</div>';
       html += '<div class="rc-body" id="rc-body-' + secId + '" style="display:none;max-height:300px;overflow-y:auto;padding:4px 0 0;"></div>';
       html += '</div>'; // /reviewer-comments
@@ -458,24 +456,10 @@ async function submitComment(secId) {
   // Cancel any pending autosave
   if (noteTimers[secId]) clearTimeout(noteTimers[secId]);
 
-  // Find current vote
+  // Find current vote (does not auto-set discuss — reviewer must choose)
   var card = notesEl.closest('.section-card');
   var selectedBtn = card ? (card.querySelector('.vote-btn-sm.selected') || card.querySelector('.vote-btn.selected')) : null;
-  var vote = selectedBtn ? selectedBtn.dataset.vote : 'discuss';
-
-  // If no vote is selected, set discuss automatically
-  if (!selectedBtn) {
-    var allBtns = document.querySelectorAll('[data-sec-id="' + secId + '"]');
-    allBtns.forEach(function (b) {
-      if (b.dataset.vote === 'discuss') b.classList.add('selected');
-    });
-    var statusBadge = document.getElementById('vote-status-' + secId);
-    if (statusBadge) {
-      statusBadge.textContent = 'Discuss';
-      statusBadge.style.color = '#7a6100';
-      statusBadge.style.background = '#fff8e1';
-    }
-  }
+  var vote = selectedBtn ? selectedBtn.dataset.vote : undefined;
 
   setStatus(secId, 'saving', 'Posting comment…');
   try {
@@ -571,7 +555,7 @@ function renderComments(secId, entries) {
       countEl.style.color = '#fff';
       countEl.style.padding = '1px 8px';
       countEl.style.borderRadius = '10px';
-      countEl.style.fontSize = '11px';
+      countEl.style.fontSize = '13px';
       countEl.style.fontWeight = '700';
     } else {
       countEl.style.background = '';
