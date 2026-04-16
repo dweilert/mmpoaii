@@ -45,6 +45,7 @@
       <div id="approve-all-bar" style="display:none;align-items:center;gap:10px;flex-shrink:0;">
         <button class="btn-primary" onclick="approveAllSections()" id="approve-all-btn" style="background:#e6f4ea;color:#1e7e34;border:1px solid #a8d5b8;padding:8px 18px;font-size:13px;">Approve All Sections</button>
         <button id="reading-mode-btn" onclick="toggleReadingMode()" style="padding:8px 18px;font-size:13px;font-weight:600;border:1px solid #bbb;color:#555;background:#fafafa;border-radius:var(--r);cursor:pointer;">Just the Facts</button>
+        <button id="hide-approved-btn" onclick="toggleHideApproved()" style="padding:8px 18px;font-size:13px;font-weight:600;border:1px solid #bbb;color:#555;background:#fafafa;border-radius:var(--r);cursor:pointer;">Hide Approved</button>
         <span id="approve-all-status" style="font-size:13px;color:var(--text3);"></span>
       </div>
       <div style="display:flex;align-items:center;gap:16px;margin-left:auto;">
@@ -326,8 +327,9 @@ async function loadArticle() {
     });
     loadDocTextBatch(secIds, 0);
 
-    // Load other reviewers' comments
+    // Load other reviewers' comments + start polling
     loadReviewerComments(artNum);
+    startCommentPolling(artNum);
 
   } catch (err) {
     document.getElementById('sections-container').innerHTML =
@@ -407,6 +409,8 @@ function updateProgressCount() {
   var totalCards = document.querySelectorAll('.section-card').length;
   document.getElementById('article-progress').textContent =
     votedCount + ' of ' + totalCards + ' sections voted in this article';
+  // Re-apply hide filter if active (a vote may have changed a section to approved)
+  if (hideApproved) applyHideApproved();
 }
 
 // ── Notes input handler (debounced 500ms) ──
@@ -619,6 +623,86 @@ function toggleReadingMode() {
     if (docLabel) docLabel.style.display = readingMode ? 'none' : '';
   });
 }
+
+// ── Hide Approved toggle ──
+var hideApproved = false;
+
+function toggleHideApproved() {
+  hideApproved = !hideApproved;
+  var btn = document.getElementById('hide-approved-btn');
+
+  if (hideApproved) {
+    btn.textContent = 'Show All Sections';
+    btn.style.background = '#1e7e34';
+    btn.style.color = '#fff';
+    btn.style.borderColor = '#1e7e34';
+  } else {
+    btn.textContent = 'Hide Approved';
+    btn.style.background = '#fafafa';
+    btn.style.color = '#555';
+    btn.style.borderColor = '#bbb';
+  }
+
+  applyHideApproved();
+}
+
+function applyHideApproved() {
+  var hiddenCount = 0;
+  document.querySelectorAll('.section-card').forEach(function (card) {
+    var isApproved = !!card.querySelector('.vote-btn-sm.approve.selected');
+    if (hideApproved && isApproved) {
+      card.style.display = 'none';
+      hiddenCount++;
+    } else {
+      card.style.display = '';
+    }
+  });
+
+  // Show/hide a message about hidden sections
+  var msgEl = document.getElementById('hide-approved-msg');
+  if (!msgEl) {
+    msgEl = document.createElement('div');
+    msgEl.id = 'hide-approved-msg';
+    msgEl.style.cssText = 'font-size:13px;color:#1e7e34;font-weight:600;padding:10px 16px;background:#e6f4ea;border:1px solid #a8d5b8;border-radius:6px;margin-bottom:10px;';
+    var container = document.getElementById('sections-container');
+    if (container) container.parentNode.insertBefore(msgEl, container);
+  }
+  if (hideApproved && hiddenCount > 0) {
+    msgEl.textContent = hiddenCount + ' approved section' + (hiddenCount !== 1 ? 's' : '') + ' hidden — showing sections that still need attention.';
+    msgEl.style.display = '';
+  } else {
+    msgEl.style.display = 'none';
+  }
+}
+
+// ── Comment polling (30s, paused when tab hidden) ──
+var commentPollTimer = null;
+var lastArticleNum = null;
+
+function startCommentPolling(artNum) {
+  lastArticleNum = artNum;
+  stopCommentPolling();
+  commentPollTimer = setInterval(function () {
+    if (!document.hidden && lastArticleNum) {
+      loadReviewerComments(lastArticleNum);
+    }
+  }, 30000);
+}
+
+function stopCommentPolling() {
+  if (commentPollTimer) {
+    clearInterval(commentPollTimer);
+    commentPollTimer = null;
+  }
+}
+
+// Pause/resume polling on tab visibility
+document.addEventListener('visibilitychange', function () {
+  if (!document.hidden && lastArticleNum) {
+    // Immediately refresh when tab becomes visible again
+    loadReviewerComments(lastArticleNum);
+  }
+});
 
 // ── Load document text with auto-retry and batching ──
 var DOC_TEXT_BATCH_SIZE = 3;   // concurrent requests at a time
