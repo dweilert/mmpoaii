@@ -33,7 +33,6 @@ const ReviewApi = (function () {
       headers: {
         'Authorization': token,
         'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache',
       },
     };
     if (body !== undefined) {
