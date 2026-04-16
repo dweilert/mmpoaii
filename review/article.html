@@ -512,7 +512,8 @@ function renderComments(secId, entries) {
 
     html += '<div style="padding:8px 10px;border-left:3px solid var(--border);margin:4px 0;background:var(--surf);border-radius:0 6px 6px 0;">';
     html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:' + (c.notes ? '4px' : '0') + ';">';
-    html += '<span style="font-size:12px;font-weight:600;color:var(--text);">' + escHtml(c.displayName) + '</span>';
+    var youTag = c.isYou ? ' <span style="font-size:10px;font-weight:400;color:var(--text3);">(You)</span>' : '';
+    html += '<span style="font-size:12px;font-weight:600;color:var(--text);">' + escHtml(c.displayName) + youTag + '</span>';
     html += voteBadge;
     html += '<span style="flex:1;"></span>';
     html += ts;

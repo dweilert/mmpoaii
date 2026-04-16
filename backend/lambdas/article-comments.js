@@ -36,8 +36,8 @@ exports.handler = async (event) => {
       },
     }));
 
-    // Group by section, exclude caller's own votes
-    const sectionComments = {}; // "ART-01#SEC-01" -> [{ displayName, vote, notes, updatedAt }]
+    // Group by section, include all reviewers (caller marked with isYou flag)
+    const sectionComments = {}; // "ART-01#SEC-01" -> [{ displayName, vote, notes, updatedAt, isYou }]
 
     for (const item of (voteResult.Items || [])) {
       const match = item.SK.match(/VOTE#(ART-\d+#SEC-[\dA-Za-z]+)#USER#(.+)$/);
@@ -45,9 +45,6 @@ exports.handler = async (event) => {
 
       const secKey = match[1];
       const userSub = match[2];
-
-      // Skip the caller's own votes (they already see their own)
-      if (userSub === callerSub) continue;
 
       // Only include entries that have notes or a discuss vote
       if (!item.notes && item.vote !== 'discuss') continue;
@@ -59,6 +56,7 @@ exports.handler = async (event) => {
         vote: item.vote || null,
         notes: item.notes || '',
         updatedAt: item.updatedAt || null,
+        isYou: userSub === callerSub,
       });
     }
 
