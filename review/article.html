@@ -761,18 +761,17 @@ function cycleFontSize() {
   fontSizeLevel = (fontSizeLevel + 1) % 3;
   var scale = fontSizeScales[fontSizeLevel];
   var btn = document.getElementById('font-size-btn');
-  // Apply to the whole page content area
+  // Use CSS zoom to scale everything including hard-coded px sizes
   var pageEl = document.getElementById('page-content') || document.body;
 
   if (fontSizeLevel === 0) {
-    // Reset to normal
-    pageEl.style.fontSize = '';
+    pageEl.style.zoom = '';
     btn.textContent = 'A+ Text Size';
     btn.style.background = '#fafafa';
     btn.style.color = '#555';
     btn.style.borderColor = '#bbb';
   } else {
-    pageEl.style.fontSize = (scale * 100) + '%';
+    pageEl.style.zoom = scale;
     var label = fontSizeLevel === 1 ? 'A+ Larger Text' : 'A++ Largest Text';
     btn.textContent = label;
     btn.style.background = '#1565c0';
