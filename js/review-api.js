@@ -33,6 +33,7 @@ const ReviewApi = (function () {
       headers: {
         'Authorization': token,
         'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache',
       },
     };
     if (body !== undefined) {
@@ -100,7 +101,9 @@ const ReviewApi = (function () {
 
   /** GET /cycles/{cycleId}/articles/{articleId}/comments — all reviewers' comments */
   function getArticleComments(cycleId, articleId) {
-    return apiFetch('GET', '/cycles/' + encodeURIComponent(cycleId) + '/articles/' + encodeURIComponent(articleId) + '/comments');
+    // Cache-bust to ensure polling always gets fresh data
+    var cb = '_t=' + Date.now();
+    return apiFetch('GET', '/cycles/' + encodeURIComponent(cycleId) + '/articles/' + encodeURIComponent(articleId) + '/comments?' + cb);
   }
 
   /** PUT /cycles/{cycleId}/votes/{sectionId} — save vote/notes */

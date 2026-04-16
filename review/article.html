@@ -684,9 +684,10 @@ function startCommentPolling(artNum) {
   stopCommentPolling();
   commentPollTimer = setInterval(function () {
     if (!document.hidden && lastArticleNum) {
+      console.log('[poll] refreshing comments for article', lastArticleNum);
       loadReviewerComments(lastArticleNum);
     }
-  }, 30000);
+  }, 15000);
 }
 
 function stopCommentPolling() {
