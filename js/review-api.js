@@ -98,6 +98,11 @@ const ReviewApi = (function () {
     return apiFetch('GET', '/cycles/' + encodeURIComponent(cycleId) + '/articles/' + encodeURIComponent(articleId));
   }
 
+  /** GET /cycles/{cycleId}/articles/{articleId}/comments — all reviewers' comments */
+  function getArticleComments(cycleId, articleId) {
+    return apiFetch('GET', '/cycles/' + encodeURIComponent(cycleId) + '/articles/' + encodeURIComponent(articleId) + '/comments');
+  }
+
   /** PUT /cycles/{cycleId}/votes/{sectionId} — save vote/notes */
   function saveVote(cycleId, sectionId, vote, notes) {
     var body = {};
@@ -159,6 +164,7 @@ const ReviewApi = (function () {
     seedCycle,
     listArticles,
     getArticle,
+    getArticleComments,
     saveVote,
     submitBallot,
     getAggregate,

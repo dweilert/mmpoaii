@@ -2,7 +2,7 @@
 
 const { PutCommand, GetCommand, UpdateCommand } = require('@aws-sdk/lib-dynamodb');
 const { ddb, TABLE_NAME } = require('./shared/dynamo');
-const { requireGroup, getUserSub, ok, forbidden, badRequest, serverError } = require('./shared/auth');
+const { requireGroup, getUserSub, getClaims, ok, forbidden, badRequest, serverError } = require('./shared/auth');
 const { logAudit } = require('./shared/audit');
 
 const VALID_VOTES = ['approve', 'disapprove', 'discuss'];
@@ -79,6 +79,13 @@ exports.handler = async (event) => {
       names['#notes'] = 'notes';
       values[':notes'] = notes;
     }
+
+    // Store display name for comment visibility
+    const claims = getClaims(event);
+    const displayName = claims.name || claims.given_name || claims.email || 'Reviewer';
+    updateParts.push('#displayName = :displayName');
+    names['#displayName'] = 'displayName';
+    values[':displayName'] = displayName;
 
     // Also write GSI1 keys so we can query by user
     updateParts.push('GSI1PK = :gsi1pk', 'GSI1SK = :gsi1sk');

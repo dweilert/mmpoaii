@@ -301,6 +301,16 @@ async function loadArticle() {
       html += '<div class="save-indicator" id="status-' + secId + '"></div>';
       html += '</div>'; // /vote-controls
 
+      // Other Reviewers' Comments panel
+      html += '<div class="reviewer-comments" id="comments-' + secId + '">';
+      html += '<div class="rc-header" onclick="toggleComments(\'' + secId + '\')" style="cursor:pointer;display:flex;align-items:center;gap:6px;padding:8px 0 4px;">';
+      html += '<span class="rc-toggle" id="rc-toggle-' + secId + '" style="font-size:10px;color:var(--text3);transition:transform .2s;">&#9654;</span>';
+      html += '<span style="font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;">Other Reviewers</span>';
+      html += '<span class="rc-count" id="rc-count-' + secId + '" style="font-size:11px;color:var(--text3);"></span>';
+      html += '</div>';
+      html += '<div class="rc-body" id="rc-body-' + secId + '" style="display:none;"></div>';
+      html += '</div>'; // /reviewer-comments
+
       html += '</div>'; // /section-card
     }
     html += '</div>';
@@ -313,6 +323,9 @@ async function loadArticle() {
       return 'ART-' + pad(artNum) + '#SEC-' + pad(s.sectionNumber);
     });
     loadDocTextBatch(secIds, 0);
+
+    // Load other reviewers' comments
+    loadReviewerComments(artNum);
 
   } catch (err) {
     document.getElementById('sections-container').innerHTML =
@@ -373,9 +386,12 @@ async function onVoteClick(secId, vote, btn) {
 
   setStatus(secId, 'saving', 'Saving…');
   try {
-    await ReviewApi.saveVote(cycleId, secId, vote, notes);
-    setStatus(secId, 'saved', 'Saved ✓');
+    var result = await ReviewApi.saveVote(cycleId, secId, vote, notes);
+    var ts = result.updatedAt ? ' — ' + formatTimestamp(result.updatedAt) : '';
+    setStatus(secId, 'saved', 'Saved ✓' + ts);
     updateProgressCount();
+    // Refresh comments panel so others see latest
+    refreshSectionComments(secId);
   } catch (err) {
     setStatus(secId, 'error', 'Save failed: ' + err.message);
   }
@@ -402,15 +418,16 @@ function onNotesInput(secId) {
     if (!notesEl) return;
     var notes = notesEl.value;
 
-    // Find current vote from data attribute
-    var container = notesEl.closest('.vote-controls');
-    var selectedBtn = container ? container.querySelector('.vote-btn.selected') : null;
+    // Find current vote from any button (compact or full-size) in this section card
+    var card = notesEl.closest('.section-card');
+    var selectedBtn = card ? (card.querySelector('.vote-btn-sm.selected') || card.querySelector('.vote-btn.selected')) : null;
     var vote = selectedBtn ? selectedBtn.dataset.vote : undefined;
 
     setStatus(secId, 'saving', 'Saving notes…');
     try {
-      await ReviewApi.saveVote(cycleId, secId, vote, notes);
-      setStatus(secId, 'saved', 'Saved ✓');
+      var result = await ReviewApi.saveVote(cycleId, secId, vote, notes);
+      var ts = result.updatedAt ? ' — ' + formatTimestamp(result.updatedAt) : '';
+      setStatus(secId, 'saved', 'Saved ✓' + ts);
     } catch (err) {
       setStatus(secId, 'error', 'Save failed: ' + err.message);
     }
@@ -422,6 +439,107 @@ function setStatus(secId, cls, text) {
   if (el) {
     el.className = 'save-indicator ' + cls;
     el.textContent = text;
+  }
+}
+
+// ── Reviewer Comments ────────────────────────────────────────────────────────
+function toggleComments(secId) {
+  var body = document.getElementById('rc-body-' + secId);
+  var toggle = document.getElementById('rc-toggle-' + secId);
+  if (!body) return;
+  var show = body.style.display === 'none';
+  body.style.display = show ? 'block' : 'none';
+  toggle.style.transform = show ? 'rotate(90deg)' : '';
+}
+
+function formatTimestamp(iso) {
+  if (!iso) return '';
+  var d = new Date(iso);
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var mo = months[d.getMonth()];
+  var day = d.getDate();
+  var h = d.getHours();
+  var m = String(d.getMinutes()).padStart(2, '0');
+  var ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  return mo + ' ' + day + ' at ' + h + ':' + m + ' ' + ampm;
+}
+
+async function loadReviewerComments(artNum) {
+  try {
+    var result = await ReviewApi.getArticleComments(cycleId, artNum);
+    var comments = result.comments || {};
+    // Update each section's comment panel
+    Object.keys(comments).forEach(function (secKey) {
+      renderComments(secKey, comments[secKey]);
+    });
+    // Sections with no comments get a "none yet" message
+    document.querySelectorAll('.reviewer-comments').forEach(function (panel) {
+      var secId = panel.id.replace('comments-', '');
+      if (!comments[secId]) {
+        document.getElementById('rc-count-' + secId).textContent = '(0)';
+      }
+    });
+  } catch (err) {
+    console.warn('Could not load reviewer comments:', err.message);
+  }
+}
+
+function renderComments(secId, entries) {
+  var countEl = document.getElementById('rc-count-' + secId);
+  var bodyEl = document.getElementById('rc-body-' + secId);
+  if (!countEl || !bodyEl) return;
+
+  countEl.textContent = '(' + entries.length + ')';
+
+  if (entries.length === 0) {
+    bodyEl.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:4px 0;">No comments from other reviewers yet.</div>';
+    return;
+  }
+
+  var html = '';
+  entries.forEach(function (c) {
+    var voteBadge = '';
+    if (c.vote) {
+      var voteColors = { approve: '#1e7e34', disapprove: '#b71c1c', discuss: '#7a6100' };
+      var voteBgs = { approve: '#e6f4ea', disapprove: '#fde8e8', discuss: '#fff8e1' };
+      var voteLabels = { approve: 'Approve', disapprove: 'Disapprove', discuss: 'Discuss' };
+      voteBadge = '<span style="display:inline-block;font-size:10px;font-weight:600;padding:1px 8px;border-radius:10px;' +
+        'background:' + (voteBgs[c.vote] || '#f0f0f0') + ';color:' + (voteColors[c.vote] || '#888') + ';">' +
+        (voteLabels[c.vote] || c.vote) + '</span>';
+    }
+    var ts = c.updatedAt ? '<span style="font-size:11px;color:var(--text3);">' + formatTimestamp(c.updatedAt) + '</span>' : '';
+
+    html += '<div style="padding:8px 10px;border-left:3px solid var(--border);margin:4px 0;background:var(--surf);border-radius:0 6px 6px 0;">';
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:' + (c.notes ? '4px' : '0') + ';">';
+    html += '<span style="font-size:12px;font-weight:600;color:var(--text);">' + escHtml(c.displayName) + '</span>';
+    html += voteBadge;
+    html += '<span style="flex:1;"></span>';
+    html += ts;
+    html += '</div>';
+    if (c.notes) {
+      html += '<div style="font-size:13px;color:var(--text2);line-height:1.4;white-space:pre-wrap;">' + escHtml(c.notes) + '</div>';
+    }
+    html += '</div>';
+  });
+
+  bodyEl.innerHTML = html;
+}
+
+async function refreshSectionComments(secId) {
+  // Extract article number from secId like "ART-01#SEC-03"
+  var artMatch = secId.match(/ART-(\d+)/);
+  if (!artMatch) return;
+  var artNum = parseInt(artMatch[1], 10);
+  try {
+    var result = await ReviewApi.getArticleComments(cycleId, artNum);
+    var comments = result.comments || {};
+    // Re-render just this section's comments
+    if (comments[secId]) {
+      renderComments(secId, comments[secId]);
+    }
+  } catch (err) {
+    console.warn('Could not refresh comments:', err.message);
   }
 }
 
@@ -465,6 +583,9 @@ function toggleReadingMode() {
     // Hide vote controls
     var voteControls = card.querySelector('.vote-controls');
     if (voteControls) voteControls.style.display = readingMode ? 'none' : '';
+    // Hide reviewer comments panel
+    var commentsPanel = card.querySelector('.reviewer-comments');
+    if (commentsPanel) commentsPanel.style.display = readingMode ? 'none' : '';
     // Hide "GOVERNING DOCUMENT TEXT" label
     var docLabel = card.querySelector('.doctext-label');
     if (docLabel) docLabel.style.display = readingMode ? 'none' : '';

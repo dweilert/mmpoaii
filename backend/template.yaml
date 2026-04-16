@@ -243,6 +243,24 @@ Resources:
             Path: /cycles/{cycleId}/articles/{articleId}
             Method: GET
 
+  # GET /cycles/{cycleId}/articles/{articleId}/comments
+  ArticleCommentsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mmpoa-review-article-comments
+      Handler: article-comments.handler
+      CodeUri: lambdas/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref ReviewTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ReviewApi
+            Path: /cycles/{cycleId}/articles/{articleId}/comments
+            Method: GET
+
   # PUT /cycles/{cycleId}/votes/{sectionId}
   VoteSaveFunction:
     Type: AWS::Serverless::Function
