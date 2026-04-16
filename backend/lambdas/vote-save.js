@@ -78,6 +78,14 @@ exports.handler = async (event) => {
       updateParts.push('#notes = :notes');
       names['#notes'] = 'notes';
       values[':notes'] = notes;
+
+      // Append to comments list for discussion history
+      if (notes.trim()) {
+        updateParts.push('#comments = list_append(if_not_exists(#comments, :emptyList), :newComment)');
+        names['#comments'] = 'comments';
+        values[':emptyList'] = [];
+        values[':newComment'] = [{ text: notes.trim(), at: now }];
+      }
     }
 
     // Store display name for comment visibility

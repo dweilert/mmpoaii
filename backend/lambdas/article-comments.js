@@ -46,18 +46,42 @@ exports.handler = async (event) => {
       const secKey = match[1];
       const userSub = match[2];
 
-      // Only include entries that have notes or a discuss vote
-      if (!item.notes && item.vote !== 'discuss') continue;
+      // Only include entries that have comments, notes, or a discuss vote
+      const hasComments = item.comments && item.comments.length > 0;
+      if (!hasComments && !item.notes && item.vote !== 'discuss') continue;
 
       if (!sectionComments[secKey]) sectionComments[secKey] = [];
 
-      sectionComments[secKey].push({
-        displayName: item.displayName || 'Reviewer',
-        vote: item.vote || null,
-        notes: item.notes || '',
-        updatedAt: item.updatedAt || null,
-        isYou: userSub === callerSub,
-      });
+      // If we have a comments list, emit one entry per comment
+      if (hasComments) {
+        for (const c of item.comments) {
+          sectionComments[secKey].push({
+            displayName: item.displayName || 'Reviewer',
+            vote: item.vote || null,
+            notes: c.text || '',
+            updatedAt: c.at || item.updatedAt || null,
+            isYou: userSub === callerSub,
+          });
+        }
+      } else if (item.notes) {
+        // Legacy: single notes field (before comments list was added)
+        sectionComments[secKey].push({
+          displayName: item.displayName || 'Reviewer',
+          vote: item.vote || null,
+          notes: item.notes || '',
+          updatedAt: item.updatedAt || null,
+          isYou: userSub === callerSub,
+        });
+      } else {
+        // Discuss vote with no notes
+        sectionComments[secKey].push({
+          displayName: item.displayName || 'Reviewer',
+          vote: item.vote || null,
+          notes: '',
+          updatedAt: item.updatedAt || null,
+          isYou: userSub === callerSub,
+        });
+      }
     }
 
     // Sort each section's comments by timestamp (newest first)

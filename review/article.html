@@ -297,12 +297,17 @@ async function loadArticle() {
       html += voteButton(secId, 'discuss', 'Discuss', currentVote);
       html += '</div>';
       html += '<textarea class="vote-notes" id="notes-' + secId + '" ' +
-              'placeholder="Optional notes or comments…" ' +
+              'placeholder="Type your comment here…" rows="2" ' +
               'oninput="onNotesInput(\'' + secId + '\')">' + escHtml(currentNotes) + '</textarea>';
-      html += '<div class="save-indicator" id="status-' + secId + '"></div>';
+      html += '<div style="display:flex;align-items:center;gap:10px;margin-top:4px;">';
+      html += '<button class="submit-comment-btn" onclick="submitComment(\'' + secId + '\')" ' +
+              'style="padding:6px 16px;font-size:12px;font-weight:600;background:#4285f4;color:#fff;border:none;border-radius:6px;cursor:pointer;">Submit Comment</button>';
+      html += '<span style="font-size:11px;color:var(--text3);">Press to post your comment to the discussion</span>';
+      html += '<span class="save-indicator" id="status-' + secId + '" style="margin-left:auto;"></span>';
+      html += '</div>';
       html += '</div>'; // /vote-controls
 
-      // Other Reviewers' Comments panel
+      // Reviewer Comments panel
       html += '<div class="reviewer-comments" id="comments-' + secId + '" style="margin-top:8px;">';
       html += '<div class="rc-header" id="rc-header-' + secId + '" onclick="toggleComments(\'' + secId + '\')" ' +
               'style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:10px 14px;' +
@@ -311,7 +316,7 @@ async function loadArticle() {
       html += '<span style="font-size:12px;font-weight:700;color:#5a6a7a;text-transform:uppercase;letter-spacing:.5px;">Reviewer Comments</span>';
       html += '<span class="rc-count" id="rc-count-' + secId + '" style="font-size:11px;font-weight:600;color:#5a6a7a;"></span>';
       html += '</div>';
-      html += '<div class="rc-body" id="rc-body-' + secId + '" style="display:none;padding:4px 0 0;"></div>';
+      html += '<div class="rc-body" id="rc-body-' + secId + '" style="display:none;max-height:300px;overflow-y:auto;padding:4px 0 0;"></div>';
       html += '</div>'; // /reviewer-comments
 
       html += '</div>'; // /section-card
@@ -438,6 +443,60 @@ function onNotesInput(secId) {
       setStatus(secId, 'error', 'Save failed: ' + err.message);
     }
   }, 500);
+}
+
+// ── Submit Comment (explicit post + clear) ──
+async function submitComment(secId) {
+  var notesEl = document.getElementById('notes-' + secId);
+  if (!notesEl) return;
+  var notes = notesEl.value.trim();
+  if (!notes) {
+    setStatus(secId, 'error', 'Type a comment before submitting.');
+    return;
+  }
+
+  // Cancel any pending autosave
+  if (noteTimers[secId]) clearTimeout(noteTimers[secId]);
+
+  // Find current vote
+  var card = notesEl.closest('.section-card');
+  var selectedBtn = card ? (card.querySelector('.vote-btn-sm.selected') || card.querySelector('.vote-btn.selected')) : null;
+  var vote = selectedBtn ? selectedBtn.dataset.vote : 'discuss';
+
+  // If no vote is selected, set discuss automatically
+  if (!selectedBtn) {
+    var allBtns = document.querySelectorAll('[data-sec-id="' + secId + '"]');
+    allBtns.forEach(function (b) {
+      if (b.dataset.vote === 'discuss') b.classList.add('selected');
+    });
+    var statusBadge = document.getElementById('vote-status-' + secId);
+    if (statusBadge) {
+      statusBadge.textContent = 'Discuss';
+      statusBadge.style.color = '#7a6100';
+      statusBadge.style.background = '#fff8e1';
+    }
+  }
+
+  setStatus(secId, 'saving', 'Posting comment…');
+  try {
+    var result = await ReviewApi.saveVote(cycleId, secId, vote, notes);
+    var ts = result.updatedAt ? ' — ' + formatTimestamp(result.updatedAt) : '';
+    setStatus(secId, 'saved', 'Comment posted ✓' + ts);
+    // Clear the textarea
+    notesEl.value = '';
+    updateProgressCount();
+    // Refresh comments panel to show the new comment
+    refreshSectionComments(secId);
+    // Auto-expand the comments panel so they see their post
+    var bodyEl = document.getElementById('rc-body-' + secId);
+    var toggleEl = document.getElementById('rc-toggle-' + secId);
+    if (bodyEl && bodyEl.style.display === 'none') {
+      bodyEl.style.display = 'block';
+      if (toggleEl) toggleEl.style.transform = 'rotate(90deg)';
+    }
+  } catch (err) {
+    setStatus(secId, 'error', 'Post failed: ' + err.message);
+  }
 }
 
 function setStatus(secId, cls, text) {
