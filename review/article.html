@@ -154,8 +154,6 @@ document.getElementById('back-link').href = articlesUrl;
 document.getElementById('back-to-articles').href = articlesUrl;
 document.getElementById('back-to-articles-bottom').href = articlesUrl;
 
-// Debounce timers for notes autosave
-var noteTimers = {};
 
 // Classification labels
 var classLabels = {
@@ -388,13 +386,9 @@ async function onVoteClick(secId, vote, btn) {
     statusEl.style.background = bgs[vote] || '#f0f0f0';
   }
 
-  // Get current notes
-  var notesEl = document.getElementById('notes-' + secId);
-  var notes = notesEl ? notesEl.value : undefined;
-
   setStatus(secId, 'saving', 'Saving…');
   try {
-    var result = await ReviewApi.saveVote(cycleId, secId, vote, notes);
+    var result = await ReviewApi.saveVote(cycleId, secId, vote, undefined);
     var ts = result.updatedAt ? ' — ' + formatTimestamp(result.updatedAt) : '';
     setStatus(secId, 'saved', 'Saved ✓' + ts);
     updateProgressCount();
@@ -418,32 +412,6 @@ function updateProgressCount() {
 }
 
 // ── Notes input handler (debounced 500ms) ──
-function onNotesInput(secId) {
-  if (noteTimers[secId]) clearTimeout(noteTimers[secId]);
-
-  setStatus(secId, 'saving', 'Typing…');
-
-  noteTimers[secId] = setTimeout(async function () {
-    var notesEl = document.getElementById('notes-' + secId);
-    if (!notesEl) return;
-    var notes = notesEl.value;
-
-    // Find current vote from any button (compact or full-size) in this section card
-    var card = notesEl.closest('.section-card');
-    var selectedBtn = card ? (card.querySelector('.vote-btn-sm.selected') || card.querySelector('.vote-btn.selected')) : null;
-    var vote = selectedBtn ? selectedBtn.dataset.vote : undefined;
-
-    setStatus(secId, 'saving', 'Saving notes…');
-    try {
-      var result = await ReviewApi.saveVote(cycleId, secId, vote, notes);
-      var ts = result.updatedAt ? ' — ' + formatTimestamp(result.updatedAt) : '';
-      setStatus(secId, 'saved', 'Saved ✓' + ts);
-    } catch (err) {
-      setStatus(secId, 'error', 'Save failed: ' + err.message);
-    }
-  }, 500);
-}
-
 // ── Submit Comment (explicit post + clear) ──
 async function submitComment(secId) {
   var notesEl = document.getElementById('notes-' + secId);
@@ -453,9 +421,6 @@ async function submitComment(secId) {
     setStatus(secId, 'error', 'Type a comment before submitting.');
     return;
   }
-
-  // Cancel any pending autosave
-  if (noteTimers[secId]) clearTimeout(noteTimers[secId]);
 
   // Find current vote (does not auto-set discuss — reviewer must choose)
   var card = notesEl.closest('.section-card');
@@ -1049,13 +1014,10 @@ async function approveAllSections() {
     var titleEl = item.card.querySelector('.sc-title');
     var secLabel = titleEl ? titleEl.textContent : secId;
 
-    var notesEl = document.getElementById('notes-' + secId);
-    var notes = notesEl ? notesEl.value : undefined;
-
     progressEl.textContent = 'Saving ' + (i + 1) + ' of ' + toApprove.length + '…';
     barEl.style.width = Math.round(((i + 1) / toApprove.length) * 100) + '%';
 
-    var result = await saveVoteWithRetry(cycleId, secId, 'approve', notes);
+    var result = await saveVoteWithRetry(cycleId, secId, 'approve', undefined);
 
     if (result.ok) {
       // Update UI — sync all vote buttons (compact + full) for this section

@@ -39,8 +39,8 @@ exports.handler = async (event) => {
   if (vote && !VALID_VOTES.includes(vote)) {
     return badRequest(`vote must be one of: ${VALID_VOTES.join(', ')}`);
   }
-  if (!vote && notes === undefined) {
-    return badRequest('Provide vote and/or notes');
+  if (!vote && (notes === undefined || !notes.trim())) {
+    return badRequest('Provide vote and/or a comment');
   }
 
   const userSub = getUserSub(event);
@@ -74,18 +74,12 @@ exports.handler = async (event) => {
       names['#vote'] = 'vote';
       values[':vote'] = vote;
     }
-    if (notes !== undefined) {
-      updateParts.push('#notes = :notes');
-      names['#notes'] = 'notes';
-      values[':notes'] = notes;
-
-      // Append to comments list for discussion history
-      if (notes.trim()) {
-        updateParts.push('#comments = list_append(if_not_exists(#comments, :emptyList), :newComment)');
-        names['#comments'] = 'comments';
-        values[':emptyList'] = [];
-        values[':newComment'] = [{ text: notes.trim(), at: now }];
-      }
+    // Append comment to the comments list (no longer writes legacy notes field)
+    if (notes !== undefined && notes.trim()) {
+      updateParts.push('#comments = list_append(if_not_exists(#comments, :emptyList), :newComment)');
+      names['#comments'] = 'comments';
+      values[':emptyList'] = [];
+      values[':newComment'] = [{ text: notes.trim(), at: now }];
     }
 
     // Store display name for comment visibility
