@@ -43,7 +43,7 @@
     <h2 id="article-title" style="margin:0 0 8px;">Loading…</h2>
     <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
       <div id="approve-all-bar" style="display:none;align-items:center;gap:10px;flex-shrink:0;">
-        <button class="btn-primary" onclick="approveAllSections()" id="approve-all-btn" style="background:#e6f4ea;color:#1e7e34;border:1px solid #a8d5b8;padding:8px 18px;font-size:13px;">Approve All Sections</button>
+        <button class="btn-primary" onclick="approveAllSections()" id="approve-all-btn" style="background:#e6f4ea;color:#1e7e34;border:1px solid #a8d5b8;padding:8px 18px;font-size:13px;font-weight:600;line-height:1;box-sizing:border-box;height:36px;">Approve All Sections</button>
         <button id="reading-mode-btn" onclick="toggleReadingMode()" style="padding:8px 18px;font-size:13px;font-weight:600;border:1px solid #bbb;color:#555;background:#fafafa;border-radius:var(--r);cursor:pointer;">Just the Facts</button>
         <button id="hide-approved-btn" onclick="toggleHideApproved()" style="padding:8px 18px;font-size:13px;font-weight:600;border:1px solid #bbb;color:#555;background:#fafafa;border-radius:var(--r);cursor:pointer;">Hide Approved</button>
         <button id="font-size-btn" onclick="cycleFontSize()" style="padding:8px 14px;font-size:13px;font-weight:700;border:1px solid #bbb;color:#555;background:#fafafa;border-radius:var(--r);cursor:pointer;" title="Increase text size for easier reading">A+ Text Size</button>
@@ -226,7 +226,7 @@ async function loadArticle() {
     var total = data.sections.length;
     data.sections.forEach(function (s) { if (s.myVote && s.myVote.vote) voted++; });
     document.getElementById('article-progress').textContent =
-      voted + ' of ' + total + ' sections voted in this article';
+      'Voted ' + voted + ' of ' + total;
 
     document.title = 'Art. ' + data.articleNumber + ' — ' + data.articleTitle + ' — Review';
 
@@ -412,7 +412,7 @@ function updateProgressCount() {
   });
   var totalCards = document.querySelectorAll('.section-card').length;
   document.getElementById('article-progress').textContent =
-    votedCount + ' of ' + totalCards + ' sections voted in this article';
+    'Voted ' + votedCount + ' of ' + totalCards;
   // Re-apply hide filter if active (a vote may have changed a section to approved)
   if (hideApproved) applyHideApproved();
 }
