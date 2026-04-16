@@ -295,8 +295,7 @@ async function loadArticle() {
       // Comment area (vote buttons are all on the title line now)
       html += '<div class="vote-controls">';
       html += '<textarea class="vote-notes" id="notes-' + secId + '" ' +
-              'placeholder="Type your comment here…" rows="2" ' +
-              'oninput="onNotesInput(\'' + secId + '\')">' + escHtml(currentNotes) + '</textarea>';
+              'placeholder="Type your comment here…" rows="2">' + escHtml(currentNotes) + '</textarea>';
       html += '<div style="display:flex;align-items:center;gap:10px;margin-top:4px;">';
       html += '<button class="submit-comment-btn" onclick="submitComment(\'' + secId + '\')" ' +
               'style="padding:6px 16px;font-size:12px;font-weight:600;background:#4285f4;color:#fff;border:none;border-radius:6px;cursor:pointer;">Submit Comment</button>';
