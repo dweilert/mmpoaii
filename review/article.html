@@ -540,6 +540,29 @@ function renderComments(secId, entries) {
 
   countEl.textContent = '(' + entries.length + ')';
 
+  // Detect new comments since last render
+  var prevCount = prevCommentCounts[secId] || 0;
+  var isNew = entries.length > prevCount && prevCount > 0;
+  prevCommentCounts[secId] = entries.length;
+
+  // Show or update the NEW indicator
+  var newEl = document.getElementById('rc-new-' + secId);
+  if (!newEl) {
+    // Create indicator span once — inserted after count element
+    newEl = document.createElement('span');
+    newEl.id = 'rc-new-' + secId;
+    newEl.style.cssText = 'font-size:11px;font-weight:700;color:#e53935;margin-left:6px;transition:opacity .5s;';
+    countEl.parentNode.insertBefore(newEl, countEl.nextSibling);
+  }
+  if (isNew) {
+    var diff = entries.length - prevCount;
+    newEl.textContent = diff === 1 ? '● NEW comment' : '● ' + diff + ' NEW comments';
+    newEl.style.opacity = '1';
+    // Fade out after 8 seconds
+    clearTimeout(newEl._fadeTimer);
+    newEl._fadeTimer = setTimeout(function () { newEl.style.opacity = '0'; }, 8000);
+  }
+
   // Style the banner — muted when empty, bright count badge when comments exist
   var headerEl = document.getElementById('rc-header-' + secId);
   if (headerEl) {
@@ -721,6 +744,7 @@ function applyHideApproved() {
 // ── Comment polling (30s, paused when tab hidden) ──
 var commentPollTimer = null;
 var lastArticleNum = null;
+var prevCommentCounts = {}; // track counts per section for "NEW" indicator
 
 function startCommentPolling(artNum) {
   lastArticleNum = artNum;
