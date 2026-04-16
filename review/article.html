@@ -494,26 +494,28 @@ function renderComments(secId, entries) {
 
   countEl.textContent = '(' + entries.length + ')';
 
-  // Style the banner based on whether there are comments
+  // Style the banner — muted when empty, bright count badge when comments exist
   var headerEl = document.getElementById('rc-header-' + secId);
   if (headerEl) {
+    // Banner always stays neutral/muted
+    headerEl.style.background = '#eef2f7';
+    headerEl.style.borderColor = '#d0d7e0';
+    headerEl.style.borderLeft = '1px solid #d0d7e0';
+
     if (entries.length > 0) {
-      headerEl.style.background = '#e8f0fe';
-      headerEl.style.borderColor = '#4285f4';
-      headerEl.style.borderLeft = '4px solid #4285f4';
-      countEl.style.background = '#4285f4';
+      // Bright badge draws the eye
+      countEl.style.background = '#e53935';
       countEl.style.color = '#fff';
       countEl.style.padding = '1px 8px';
       countEl.style.borderRadius = '10px';
       countEl.style.fontSize = '11px';
+      countEl.style.fontWeight = '700';
     } else {
-      headerEl.style.background = '#eef2f7';
-      headerEl.style.borderColor = '#d0d7e0';
-      headerEl.style.borderLeft = '1px solid #d0d7e0';
       countEl.style.background = '';
       countEl.style.color = '#5a6a7a';
       countEl.style.padding = '';
       countEl.style.borderRadius = '';
+      countEl.style.fontWeight = '';
     }
   }
 
