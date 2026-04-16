@@ -258,7 +258,7 @@ async function loadArticle() {
       html += '<span id="vote-status-' + secId + '" style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:10px;background:' + voteStatusBg + ';color:' + voteStatusColor + ';white-space:nowrap;">' + voteStatusLabel + '</span>';
       html += '<button class="vote-btn-sm approve' + (currentVote === 'approve' ? ' selected' : '') + '" data-sec-id="' + secId + '" data-vote="approve" onclick="onVoteClick(\'' + secId + '\', \'approve\', this)" title="Approve">✓</button>';
       html += '<button class="vote-btn-sm disapprove' + (currentVote === 'disapprove' ? ' selected' : '') + '" data-sec-id="' + secId + '" data-vote="disapprove" onclick="onVoteClick(\'' + secId + '\', \'disapprove\', this)" title="Disapprove">✗</button>';
-      html += '<button class="vote-btn-sm discuss' + (currentVote === 'discuss' ? ' selected' : '') + '" data-sec-id="' + secId + '" data-vote="discuss" onclick="onVoteClick(\'' + secId + '\', \'discuss\', this)" title="Discuss">💬</button>';
+      html += '<button class="vote-btn-sm discuss' + (currentVote === 'discuss' ? ' selected' : '') + '" data-sec-id="' + secId + '" data-vote="discuss" onclick="onVoteClick(\'' + secId + '\', \'discuss\', this)" title="Discuss">?</button>';
       html += '</div>';
       html += '</div>';
       html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:6px;">';
