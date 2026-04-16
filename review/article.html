@@ -305,7 +305,7 @@ async function loadArticle() {
       html += '</div>'; // /vote-controls
 
       // Reviewer Comments panel
-      html += '<div class="reviewer-comments" id="comments-' + secId + '" style="margin-top:8px;">';
+      html += '<div class="reviewer-comments" id="comments-' + secId + '" style="margin-top:0;">';
       html += '<div class="rc-header" id="rc-header-' + secId + '" onclick="toggleComments(\'' + secId + '\')" ' +
               'style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:10px 14px;' +
               'background:#eef2f7;border:1px solid #d0d7e0;border-radius:6px;transition:background .2s;">';
@@ -571,7 +571,7 @@ function renderComments(secId, entries) {
   }
 
   var html = '';
-  entries.forEach(function (c) {
+  entries.forEach(function (c, idx) {
     var voteBadge = '';
     if (c.vote) {
       var voteColors = { approve: '#1e7e34', disapprove: '#b71c1c', discuss: '#7a6100' };
@@ -582,8 +582,9 @@ function renderComments(secId, entries) {
         (voteLabels[c.vote] || c.vote) + '</span>';
     }
     var ts = c.updatedAt ? '<span style="font-size:11px;color:var(--text3);">' + formatTimestamp(c.updatedAt) + '</span>' : '';
+    var rowBg = (idx % 2 === 0) ? 'var(--surf)' : '#f0f4f8';
 
-    html += '<div style="padding:8px 10px;border-left:3px solid var(--border);margin:4px 0;background:var(--surf);border-radius:0 6px 6px 0;">';
+    html += '<div style="padding:8px 10px;border-left:3px solid var(--border);margin:4px 0;background:' + rowBg + ';border-radius:0 6px 6px 0;">';
     html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:' + (c.notes ? '4px' : '0') + ';">';
     var youTag = c.isYou ? ' <span style="font-size:10px;font-weight:400;color:var(--text3);">(You)</span>' : '';
     html += '<span style="font-size:12px;font-weight:600;color:var(--text);">' + escHtml(c.displayName) + youTag + '</span>';
