@@ -59,16 +59,45 @@ exports.handler = async (event) => {
     }));
 
     // Aggregate votes per section
-    const sectionVotes = {}; // "ART-01#SEC-01" -> { approve: N, disapprove: N, discuss: N, notes: [] }
+    const sectionVotes = {}; // "ART-01#SEC-01" -> { approve: N, disapprove: N, discuss: N, notes: [], comments: [] }
     for (const item of (voteResult.Items || [])) {
       const match = item.SK.match(/VOTE#(ART-\d+#SEC-[\dA-Za-z]+)#USER#/);
       if (!match) continue;
       const key = match[1];
       if (!sectionVotes[key]) {
-        sectionVotes[key] = { approve: 0, disapprove: 0, discuss: 0, notes: [] };
+        sectionVotes[key] = { approve: 0, disapprove: 0, discuss: 0, notes: [], comments: [] };
       }
       if (item.vote) sectionVotes[key][item.vote]++;
       if (item.notes) sectionVotes[key].notes.push(item.notes);
+
+      // Collect comments list entries (newer multi-comment format)
+      if (item.comments && item.comments.length > 0) {
+        for (const c of item.comments) {
+          sectionVotes[key].comments.push({
+            displayName: item.displayName || 'Reviewer',
+            text: c.text || '',
+            at: c.at || item.updatedAt || null,
+            vote: item.vote || null,
+          });
+        }
+      } else if (item.notes) {
+        // Legacy single-note as a comment entry
+        sectionVotes[key].comments.push({
+          displayName: item.displayName || 'Reviewer',
+          text: item.notes,
+          at: item.updatedAt || null,
+          vote: item.vote || null,
+        });
+      }
+    }
+
+    // Sort comments newest-first per section
+    for (const key of Object.keys(sectionVotes)) {
+      sectionVotes[key].comments.sort((a, b) => {
+        if (!a.at) return 1;
+        if (!b.at) return -1;
+        return b.at.localeCompare(a.at);
+      });
     }
 
     // Build article-grouped results
@@ -83,7 +112,7 @@ exports.handler = async (event) => {
         };
       }
       const secKey = `ART-${artNum}#SEC-${String(item.sectionNumber).padStart(2, '0')}`;
-      const votes = sectionVotes[secKey] || { approve: 0, disapprove: 0, discuss: 0, notes: [] };
+      const votes = sectionVotes[secKey] || { approve: 0, disapprove: 0, discuss: 0, notes: [], comments: [] };
       const section = {
         sectionNumber: item.sectionNumber,
         sectionTitle: item.sectionTitle,
@@ -93,8 +122,9 @@ exports.handler = async (event) => {
           disapprove: votes.disapprove,
           discuss: votes.discuss,
         },
+        comments: votes.comments,
       };
-      // Only admins see reviewer notes — protects reviewer anonymity
+      // Only admins see legacy reviewer notes
       if (isAdmin) {
         section.notes = votes.notes;
       }
