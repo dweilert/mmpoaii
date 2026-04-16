@@ -46,6 +46,7 @@
         <button class="btn-primary" onclick="approveAllSections()" id="approve-all-btn" style="background:#e6f4ea;color:#1e7e34;border:1px solid #a8d5b8;padding:8px 18px;font-size:13px;">Approve All Sections</button>
         <button id="reading-mode-btn" onclick="toggleReadingMode()" style="padding:8px 18px;font-size:13px;font-weight:600;border:1px solid #bbb;color:#555;background:#fafafa;border-radius:var(--r);cursor:pointer;">Just the Facts</button>
         <button id="hide-approved-btn" onclick="toggleHideApproved()" style="padding:8px 18px;font-size:13px;font-weight:600;border:1px solid #bbb;color:#555;background:#fafafa;border-radius:var(--r);cursor:pointer;">Hide Approved</button>
+        <button id="font-size-btn" onclick="cycleFontSize()" style="padding:8px 14px;font-size:13px;font-weight:700;border:1px solid #bbb;color:#555;background:#fafafa;border-radius:var(--r);cursor:pointer;" title="Increase text size for easier reading">A+ Text Size</button>
         <span id="approve-all-status" style="font-size:13px;color:var(--text3);"></span>
       </div>
       <div style="display:flex;align-items:center;gap:16px;margin-left:auto;">
@@ -314,6 +315,7 @@ async function loadArticle() {
       html += '<span class="rc-count" id="rc-count-' + secId + '" style="font-size:13px;font-weight:700;color:#5a6a7a;"></span>';
       html += '</div>';
       html += '<div class="rc-body" id="rc-body-' + secId + '" style="display:none;max-height:300px;overflow-y:auto;padding:4px 0 0;"></div>';
+      html += '<div class="rc-scroll-hint" id="rc-scroll-hint-' + secId + '" style="display:none;text-align:right;padding:2px 12px 4px;font-size:11px;color:#888;background:#eef2f7;border:1px solid #d0d7e0;border-top:none;border-radius:0 0 6px 6px;">&#8597; Scroll for more comments</div>';
       html += '</div>'; // /reviewer-comments
 
       html += '</div>'; // /section-card
@@ -494,10 +496,19 @@ function setStatus(secId, cls, text) {
 function toggleComments(secId) {
   var body = document.getElementById('rc-body-' + secId);
   var toggle = document.getElementById('rc-toggle-' + secId);
+  var hint = document.getElementById('rc-scroll-hint-' + secId);
   if (!body) return;
   var show = body.style.display === 'none';
   body.style.display = show ? 'block' : 'none';
   toggle.style.transform = show ? 'rotate(90deg)' : '';
+  // Show scroll hint only when content overflows
+  if (hint) {
+    if (show && body.scrollHeight > body.clientHeight) {
+      hint.style.display = 'block';
+    } else {
+      hint.style.display = 'none';
+    }
+  }
 }
 
 function formatTimestamp(iso) {
@@ -741,7 +752,36 @@ function applyHideApproved() {
   }
 }
 
-// ── Comment polling (30s, paused when tab hidden) ──
+// ── Font size toggle for accessibility ──
+var fontSizeLevel = 0; // 0 = normal, 1 = large, 2 = x-large
+var fontSizeLabels = ['A+ Text Size', 'A− Normal Size', 'A− Normal Size'];
+var fontSizeScales = [1, 1.25, 1.5];
+
+function cycleFontSize() {
+  fontSizeLevel = (fontSizeLevel + 1) % 3;
+  var scale = fontSizeScales[fontSizeLevel];
+  var btn = document.getElementById('font-size-btn');
+  var container = document.getElementById('sections-container');
+  if (!container) return;
+
+  if (fontSizeLevel === 0) {
+    // Reset to normal
+    container.style.fontSize = '';
+    btn.textContent = 'A+ Text Size';
+    btn.style.background = '#fafafa';
+    btn.style.color = '#555';
+    btn.style.borderColor = '#bbb';
+  } else {
+    container.style.fontSize = (scale * 100) + '%';
+    var label = fontSizeLevel === 1 ? 'A+ Larger Text' : 'A++ Largest Text';
+    btn.textContent = label;
+    btn.style.background = '#1565c0';
+    btn.style.color = '#fff';
+    btn.style.borderColor = '#1565c0';
+  }
+}
+
+// ── Comment polling (15s, paused when tab hidden) ──
 var commentPollTimer = null;
 var lastArticleNum = null;
 var prevCommentCounts = {}; // track counts per section for "NEW" indicator
