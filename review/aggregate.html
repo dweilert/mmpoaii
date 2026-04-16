@@ -233,6 +233,7 @@
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
       <button class="agg-btn" id="hide-passed-btn" onclick="toggleHidePassed()">Hide Passed</button>
+      <button class="agg-btn" id="font-size-btn" onclick="cycleFontSize()" title="Increase text size for easier reading">A+ Text Size</button>
       <button class="agg-btn" id="export-md-btn" style="display:none;" onclick="exportMarkdown()">Export Markdown</button>
       <button class="agg-btn" id="print-btn" onclick="window.print()">Print / Save PDF</button>
     </div>
@@ -360,6 +361,27 @@ function applyHidePassed() {
     msgEl.style.display = '';
   } else {
     msgEl.style.display = 'none';
+  }
+}
+
+// ── Font size toggle for accessibility ──
+var fontSizeLevel = 0;
+var fontSizeScales = [1, 1.25, 1.5];
+
+function cycleFontSize() {
+  fontSizeLevel = (fontSizeLevel + 1) % 3;
+  var btn = document.getElementById('font-size-btn');
+  var pageEl = document.getElementById('page-content') || document.body;
+
+  if (fontSizeLevel === 0) {
+    pageEl.style.zoom = '';
+    btn.textContent = 'A+ Text Size';
+    btn.classList.remove('active');
+  } else {
+    pageEl.style.zoom = fontSizeScales[fontSizeLevel];
+    var label = fontSizeLevel === 1 ? 'A+ Larger Text' : 'A++ Largest Text';
+    btn.textContent = label;
+    btn.classList.add('active');
   }
 }
 
