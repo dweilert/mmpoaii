@@ -588,12 +588,10 @@ function renderGraph() {
       ? '<div class="orphan-reason">⚠ ' + escHtml(orphanReason(node)) + '</div>'
       : '';
     return (
-      '<div class="' + classes.join(' ') + '" data-id="' + idAttr + '" ' +
-      'data-cycle="' + node.cycleId + '" data-sec="' + node.secId + '" ' +
-      (hidden ? 'style="display:none;"' : '') +
-      ' onclick="onNodeClick(\'' + idAttr + '\', event)">' +
-        '<button class="node-view-btn" title="View full text"' +
-        ' onclick="event.stopPropagation(); openModal(\'' + node.cycleId + '\',\'' + node.secId + '\')">📄</button>' +
+      '<div class="' + classes.join(' ') + '" data-id="' + escHtml(idAttr) + '" ' +
+      'data-cycle="' + escHtml(node.cycleId) + '" data-sec="' + escHtml(node.secId) + '"' +
+      (hidden ? ' style="display:none;"' : '') + '>' +
+        '<button class="node-view-btn" title="View full text" data-action="view">📄</button>' +
         '<span class="node-id">Art ' + node.articleNumber + ' §' + node.sectionNumber + '</span>' +
         '<span class="node-title">' + escHtml(node.sectionTitle) + '</span>' +
         reasonHtml +
@@ -716,17 +714,37 @@ window.addEventListener('resize', function () {
   if (GRAPH) drawConnections();
 });
 
-function onNodeClick(idAttr, event) {
-  // Click anywhere on the node body -> focus mode.
-  // The 📄 icon (separate button) opens the modal directly via stopPropagation.
-  if (SELECTED_NODE === idAttr) {
-    // Clicking the same selected node clears focus
-    SELECTED_NODE = null;
-  } else {
-    SELECTED_NODE = idAttr;
+// Event delegation — survives re-renders, no inline-onclick string-escape headaches.
+// Attached once to a stable parent (the page-content wrapper).
+document.getElementById('page-content').addEventListener('click', function (e) {
+  // 📄 view-text icon
+  var viewBtn = e.target.closest('.node-view-btn');
+  if (viewBtn) {
+    var node = viewBtn.closest('.node');
+    if (node) openModal(node.dataset.cycle, node.dataset.sec);
+    return; // do not bubble to focus toggle
   }
-  applyHighlight();
-}
+
+  // Click on a node body → toggle focus
+  var bodyNode = e.target.closest('.node');
+  if (bodyNode && bodyNode.dataset.id) {
+    var idAttr = bodyNode.dataset.id;
+    SELECTED_NODE = (SELECTED_NODE === idAttr) ? null : idAttr;
+    applyHighlight();
+    return;
+  }
+
+  // Click outside any node (and outside chrome) clears focus
+  if (!e.target.closest('.modal-card') &&
+      !e.target.closest('.report-toolbar') &&
+      !e.target.closest('.report-banner') &&
+      !e.target.closest('.legend')) {
+    if (SELECTED_NODE) {
+      SELECTED_NODE = null;
+      applyHighlight();
+    }
+  }
+});
 
 function applyHighlight() {
   var nodes = document.querySelectorAll('.node');
@@ -795,18 +813,6 @@ function clearFocus() {
   applyHighlight();
 }
 
-document.addEventListener('click', function (e) {
-  // Click outside any node clears highlight (but not when clicking toolbar buttons or the modal)
-  if (!e.target.closest('.node') &&
-      !e.target.closest('.modal-card') &&
-      !e.target.closest('.filter-btn') &&
-      !e.target.closest('.report-toolbar')) {
-    if (SELECTED_NODE) {
-      SELECTED_NODE = null;
-      applyHighlight();
-    }
-  }
-});
 
 // ── Modal ──
 async function openModal(cycle, secId) {
