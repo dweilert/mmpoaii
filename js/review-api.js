@@ -160,6 +160,26 @@ const ReviewApi = (function () {
     return apiFetch('PUT', '/cycles/' + encodeURIComponent(cycleId) + '/status', { status });
   }
 
+  /** GET /docs/search?q=... — full-text search across CC&Rs, Bylaws, Rules */
+  function searchDocs(q) {
+    return apiFetch('GET', '/docs/search?q=' + encodeURIComponent(q));
+  }
+
+  /** GET /docs/section?cycle=...&secId=... — single section text */
+  function getDocSection(cycle, secId) {
+    return apiFetch('GET', '/docs/section?cycle=' + encodeURIComponent(cycle) + '&secId=' + encodeURIComponent(secId));
+  }
+
+  /** GET /docs/links?cycle=...&secId=... — related sections in other docs */
+  function getDocLinks(cycle, secId) {
+    return apiFetch('GET', '/docs/links?cycle=' + encodeURIComponent(cycle) + '&secId=' + encodeURIComponent(secId));
+  }
+
+  /** POST /docs/links/rebuild — admin only */
+  function rebuildLinks() {
+    return apiFetch('POST', '/docs/links/rebuild', {});
+  }
+
   return {
     listCycles,
     createCycle,
@@ -178,6 +198,10 @@ const ReviewApi = (function () {
     deleteCycle,
     setThreshold,
     closeCycle,
+    searchDocs,
+    getDocSection,
+    getDocLinks,
+    rebuildLinks,
   };
 
 })();

@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search HOA Rules — MMPOAII HOA</title>
+<link rel="stylesheet" href="/css/site.css">
+<style>
+  :root {
+    --ccr-color:    #4a3878;
+    --ccr-bg:       #ede8f8;
+    --bylaw-color:  #1565c0;
+    --bylaw-bg:     #e3f2fd;
+    --rule-color:   #2e7d32;
+    --rule-bg:      #e8f5e9;
+  }
+
+  body { background:#f6f5fb; }
+
+  .search-wrap {
+    max-width: 1280px; margin: 24px auto; padding: 0 20px;
+  }
+
+  .search-banner {
+    background: var(--purple-800); color: #fff;
+    padding: 22px 26px; border-radius: var(--r2);
+    margin-bottom: 16px;
+  }
+  .search-banner h2 { font-family: var(--serif); margin: 0 0 4px; font-size: 22px; }
+  .search-banner p  { opacity: .85; font-size: 14px; margin: 0; }
+
+  .search-bar {
+    display: flex; gap: 8px; padding: 14px 16px;
+    background: #fff; border: 1px solid var(--border);
+    border-radius: var(--r2); margin-bottom: 16px;
+    align-items: center;
+  }
+  .search-bar input {
+    flex: 1; padding: 10px 14px; font-size: 16px;
+    border: 1px solid var(--border); border-radius: var(--r);
+    outline: none;
+  }
+  .search-bar input:focus { border-color: var(--purple-600); }
+  .search-bar button {
+    padding: 10px 20px; font-size: 14px; font-weight: 700;
+    background: var(--purple-800); color: #fff;
+    border: none; border-radius: var(--r); cursor: pointer;
+  }
+  .search-bar button:hover { background: var(--purple-600); }
+  .search-hint { font-size: 12px; color: var(--text3); padding: 0 4px 6px; }
+
+  .results-layout {
+    display: grid; grid-template-columns: minmax(320px, 420px) 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 880px) { .results-layout { grid-template-columns: 1fr; } }
+
+  .results-list {
+    background: #fff; border: 1px solid var(--border);
+    border-radius: var(--r2); padding: 8px;
+    max-height: 70vh; overflow-y: auto;
+  }
+  .results-summary {
+    font-size: 13px; color: var(--text3); padding: 6px 8px 10px;
+    border-bottom: 1px solid var(--border); margin-bottom: 6px;
+  }
+  .result-item {
+    padding: 10px 12px; border-radius: 6px; cursor: pointer;
+    margin-bottom: 4px; transition: background .12s;
+    border: 1px solid transparent;
+  }
+  .result-item:hover  { background: #f6f4fb; }
+  .result-item.active { background: #f0eaff; border-color: var(--purple-600); }
+  .result-doc-tag {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    padding: 2px 8px; border-radius: 10px; margin-right: 6px;
+    text-transform: uppercase; letter-spacing: .4px;
+    vertical-align: middle;
+  }
+  .doc-ccrs   { background: var(--ccr-bg);   color: var(--ccr-color); }
+  .doc-bylaws { background: var(--bylaw-bg); color: var(--bylaw-color); }
+  .doc-rules  { background: var(--rule-bg);  color: var(--rule-color); }
+  .result-title { font-weight: 600; font-size: 13px; color: var(--text); }
+  .result-snippet { font-size: 12px; color: var(--text2); margin-top: 4px; line-height: 1.4; }
+  .result-snippet mark { background: #fff3a0; padding: 0 1px; }
+
+  .detail-pane {
+    background: #fff; border: 1px solid var(--border);
+    border-radius: var(--r2); padding: 18px 22px;
+    min-height: 300px;
+  }
+  .detail-empty {
+    padding: 60px 20px; text-align: center; color: var(--text3); font-size: 14px;
+  }
+  .detail-header {
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+    padding-bottom: 10px; border-bottom: 1px solid var(--border); margin-bottom: 12px;
+  }
+  .detail-title  { font-size: 18px; font-weight: 700; color: var(--text); margin: 0; flex: 1 1 auto; min-width: 240px; }
+  .detail-text {
+    font-size: 14px; line-height: 1.65; color: var(--text); white-space: pre-wrap;
+  }
+  .show-linkage-btn {
+    margin-top: 16px; padding: 10px 18px; font-size: 13px; font-weight: 700;
+    background: var(--purple-800); color: #fff; border: none;
+    border-radius: var(--r); cursor: pointer;
+  }
+  .show-linkage-btn:hover { background: var(--purple-600); }
+  .show-linkage-btn[disabled] { opacity: .55; cursor: default; }
+
+  /* ── Linkage view ── */
+  .linkage-view {
+    background: #fff; border: 1px solid var(--border); border-radius: var(--r2);
+    padding: 18px 20px;
+  }
+  .linkage-header {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    margin-bottom: 14px;
+  }
+  .linkage-back-btn {
+    padding: 6px 14px; font-size: 12px; font-weight: 600;
+    background: #fafafa; color: var(--text); border: 1px solid var(--border);
+    border-radius: var(--r); cursor: pointer;
+  }
+  .linkage-back-btn:hover { background: #f0f0f0; }
+
+  .linkage-graph {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;
+    align-items: start;
+  }
+  @media (max-width: 720px) { .linkage-graph { grid-template-columns: 1fr; } }
+  .linkage-col {
+    padding: 12px; border-radius: var(--r2); min-height: 100px;
+  }
+  .linkage-col.ccrs   { background: var(--ccr-bg);   border: 1px solid var(--ccr-color); }
+  .linkage-col.bylaws { background: var(--bylaw-bg); border: 1px solid var(--bylaw-color); }
+  .linkage-col.rules  { background: var(--rule-bg);  border: 1px solid var(--rule-color); }
+  .linkage-col h4 {
+    margin: 0 0 8px; font-size: 13px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .5px;
+  }
+  .linkage-col.ccrs h4   { color: var(--ccr-color); }
+  .linkage-col.bylaws h4 { color: var(--bylaw-color); }
+  .linkage-col.rules h4  { color: var(--rule-color); }
+  .linkage-node {
+    background: #fff; border: 2px solid transparent;
+    border-radius: var(--r); padding: 8px 10px;
+    margin-bottom: 6px; cursor: pointer; font-size: 13px;
+    transition: all .12s;
+  }
+  .linkage-node:hover { box-shadow: 0 2px 8px rgba(0,0,0,.12); transform: translateY(-1px); }
+  .linkage-node.source { border-color: #d32f2f; box-shadow: 0 0 0 3px rgba(211, 47, 47, .15); }
+  .linkage-node .node-label { font-weight: 600; font-size: 12px; }
+  .linkage-node .node-title { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .linkage-node .node-score {
+    float: right; font-size: 10px; font-weight: 700; color: var(--text3);
+  }
+  .linkage-empty {
+    padding: 16px 4px; font-size: 13px; color: var(--text3); font-style: italic; text-align: center;
+  }
+  .linkage-key {
+    font-size: 11px; color: var(--text3); margin-top: 12px; text-align: center;
+  }
+  .linkage-key .key-source {
+    display: inline-block; width: 12px; height: 12px; vertical-align: middle;
+    background: #fff; border: 2px solid #d32f2f; border-radius: 3px;
+    margin: 0 4px -2px;
+  }
+
+  /* ── Modal popup ── */
+  .modal-backdrop {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0, 0, 0, .55); z-index: 9000;
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .modal-backdrop.show { display: flex; }
+  .modal-card {
+    background: #fff; border-radius: var(--r2);
+    max-width: 720px; width: 100%; max-height: 85vh;
+    display: flex; flex-direction: column; overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, .25);
+  }
+  .modal-head {
+    padding: 14px 18px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .modal-head h3 { margin: 0; font-size: 17px; flex: 1; }
+  .modal-close {
+    background: transparent; border: none; font-size: 24px;
+    color: var(--text3); cursor: pointer; padding: 0; line-height: 1;
+  }
+  .modal-close:hover { color: var(--text); }
+  .modal-body {
+    padding: 16px 18px; overflow-y: auto; font-size: 14px; line-height: 1.6;
+    white-space: pre-wrap;
+  }
+  .modal-meta { font-size: 12px; color: var(--text3); padding: 0 18px 12px; }
+
+  /* spinner */
+  .spinner {
+    display: inline-block; width: 16px; height: 16px;
+    border: 2px solid #ddd; border-top-color: var(--purple-800);
+    border-radius: 50%; animation: spin .8s linear infinite;
+    vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="inner">
+    <a href="/" class="site-logo">
+      <div class="logo-mark">🏡</div>
+      <div class="logo-text">
+        <div class="logo-name" data-hoa-name>MMPOAII HOA</div>
+        <div class="logo-sub">Search HOA Rules</div>
+      </div>
+    </a>
+    <nav class="site-nav">
+      <a href="#" id="back-link">← Back</a>
+      <div class="nav-user">
+        <div class="avatar" id="nav-avatar">?</div>
+        <div>
+          <div class="uname" data-user-name>Loading…</div>
+          <div class="urole" data-user-role></div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="HoaGuard.logout()">Sign Out</button>
+    </nav>
+  </div>
+</header>
+
+<div id="page-content">
+<div class="search-wrap">
+
+  <div class="search-banner">
+    <h2>Search HOA Rules</h2>
+    <p>Find a rule across the CC&amp;Rs, Bylaws, and Rules of Conduct — then see how the documents connect.</p>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" id="q" placeholder="Search for a topic, e.g. 'parking', 'assessments', 'architectural review'…" autocomplete="off">
+    <button id="search-btn" onclick="doSearch()">Search</button>
+  </div>
+  <div class="search-hint">Press Enter to search. Click any result to view it. Click "Show Linkage" to see related sections in the other documents.</div>
+
+  <div id="results-area"></div>
+
+</div>
+</div>
+
+<!-- Modal popup -->
+<div class="modal-backdrop" id="modal" onclick="if(event.target===this) closeModal()">
+  <div class="modal-card">
+    <div class="modal-head">
+      <span class="result-doc-tag" id="modal-tag"></span>
+      <h3 id="modal-title">Section Title</h3>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-meta" id="modal-meta"></div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div data-hoa-name>MMPOAII HOA</div>
+  <div>Community Portal</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6/dist/amazon-cognito-identity.min.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/guard.js"></script>
+<script src="/js/review-api.js"></script>
+<script>
+HoaGuard.protect(['homeowners', 'board', 'reviewers']);
+
+// Guess best back-link based on user's groups
+function setBackLink() {
+  var user = HoaGuard.getUser();
+  var link = document.getElementById('back-link');
+  if (!user || !user.groups) { link.href = '/'; return; }
+  if (user.groups.includes('board'))      link.href = '/board/index.html';
+  else if (user.groups.includes('homeowners')) link.href = '/homeowners/index.html';
+  else if (user.groups.includes('reviewers')) link.href = '/review/index.html';
+  else link.href = '/';
+}
+
+var guardCheck = setInterval(function () {
+  if (HoaGuard.getUser()) {
+    clearInterval(guardCheck);
+    setBackLink();
+    var uname = document.querySelector('[data-user-name]');
+    if (uname && uname.textContent !== 'Loading…') {
+      document.getElementById('nav-avatar').textContent = uname.textContent.charAt(0).toUpperCase();
+    }
+  }
+}, 100);
+
+function escHtml(s) {
+  var d = document.createElement('div');
+  d.textContent = s == null ? '' : String(s);
+  return d.innerHTML;
+}
+
+function highlightTerms(text, query) {
+  if (!query) return escHtml(text);
+  var safe = escHtml(text);
+  var terms = query.toLowerCase().replace(/[^\w\s]/g, ' ').split(/\s+/).filter(t => t.length >= 2);
+  if (terms.length === 0) return safe;
+  // Build regex that matches any term, case-insensitive
+  var escaped = terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  var re = new RegExp('(' + escaped.join('|') + ')', 'gi');
+  return safe.replace(re, '<mark>$1</mark>');
+}
+
+var lastQuery = '';
+var lastHits = [];
+var activeHit = null;
+
+document.getElementById('q').addEventListener('keydown', function (e) {
+  if (e.key === 'Enter') doSearch();
+});
+
+async function doSearch() {
+  var q = document.getElementById('q').value.trim();
+  if (q.length < 2) {
+    showStatus('Please enter at least 2 characters.');
+    return;
+  }
+  lastQuery = q;
+  showStatus('<span class="spinner"></span> Searching…');
+  try {
+    var data = await ReviewApi.searchDocs(q);
+    lastHits = data.hits || [];
+    renderResults(data);
+  } catch (err) {
+    showStatus('Search failed: ' + escHtml(err.message || 'unknown error'));
+  }
+}
+
+function showStatus(html) {
+  document.getElementById('results-area').innerHTML =
+    '<div class="detail-empty">' + html + '</div>';
+}
+
+function renderResults(data) {
+  var hits = data.hits || [];
+  var area = document.getElementById('results-area');
+  if (hits.length === 0) {
+    area.innerHTML = '<div class="detail-empty">No results found for "' + escHtml(data.query) + '".</div>';
+    return;
+  }
+  var html = '<div class="results-layout">';
+  html +=   '<div class="results-list">';
+  html +=     '<div class="results-summary">' + data.total + ' result' + (data.total !== 1 ? 's' : '') + ' for "' + escHtml(data.query) + '"</div>';
+  for (var i = 0; i < hits.length; i++) {
+    var h = hits[i];
+    var docCls = 'doc-' + h.cycle;
+    html += '<div class="result-item" data-idx="' + i + '" onclick="selectResult(' + i + ')">';
+    html +=   '<span class="result-doc-tag ' + docCls + '">' + escHtml(h.docLabel) + '</span>';
+    html +=   '<span class="result-title">Art. ' + h.articleNumber + ' §' + h.sectionNumber + ' — ' + escHtml(h.sectionTitle) + '</span>';
+    html +=   '<div class="result-snippet">' + highlightTerms(h.snippet, lastQuery) + '</div>';
+    html += '</div>';
+  }
+  html +=   '</div>';
+  html +=   '<div class="detail-pane" id="detail-pane"><div class="detail-empty">Select a result on the left to view the full text.</div></div>';
+  html += '</div>';
+  area.innerHTML = html;
+  // Auto-select first result
+  if (hits.length > 0) selectResult(0);
+}
+
+async function selectResult(idx) {
+  var h = lastHits[idx];
+  if (!h) return;
+  activeHit = h;
+  // Mark active in list
+  var items = document.querySelectorAll('.result-item');
+  items.forEach(function (el) {
+    el.classList.toggle('active', parseInt(el.dataset.idx, 10) === idx);
+  });
+  // Render detail pane (loading state)
+  var pane = document.getElementById('detail-pane');
+  var docCls = 'doc-' + h.cycle;
+  pane.innerHTML =
+    '<div class="detail-header">' +
+      '<span class="result-doc-tag ' + docCls + '">' + escHtml(h.docLabel) + '</span>' +
+      '<h3 class="detail-title">Art. ' + h.articleNumber + ' §' + h.sectionNumber + ' — ' + escHtml(h.sectionTitle) + '</h3>' +
+    '</div>' +
+    '<div class="detail-text"><span class="spinner"></span> Loading…</div>';
+  try {
+    var data = await ReviewApi.getDocSection(h.cycleId, h.secId);
+    pane.innerHTML =
+      '<div class="detail-header">' +
+        '<span class="result-doc-tag ' + docCls + '">' + escHtml(h.docLabel) + '</span>' +
+        '<h3 class="detail-title">Art. ' + data.articleNumber + ' §' + data.sectionNumber + ' — ' + escHtml(data.sectionTitle) + '</h3>' +
+      '</div>' +
+      '<div class="detail-text">' + highlightTerms(data.text, lastQuery) + '</div>' +
+      '<button class="show-linkage-btn" onclick="showLinkage()">Show Linkage</button>';
+  } catch (err) {
+    pane.innerHTML = '<div class="detail-empty">Could not load section: ' + escHtml(err.message || '') + '</div>';
+  }
+}
+
+async function showLinkage() {
+  if (!activeHit) return;
+  var h = activeHit;
+  var area = document.getElementById('results-area');
+  area.innerHTML = '<div class="linkage-view"><div class="detail-empty"><span class="spinner"></span> Loading linkage…</div></div>';
+  try {
+    var data = await ReviewApi.getDocLinks(h.cycleId, h.secId);
+    renderLinkage(h, data.links || []);
+  } catch (err) {
+    area.innerHTML = '<div class="linkage-view"><div class="detail-empty">Could not load linkage: ' + escHtml(err.message || '') + '</div></div>';
+  }
+}
+
+function renderLinkage(source, links) {
+  var docCls = 'doc-' + source.cycle;
+  // Group links by target document
+  var byKey = { ccrs: [], bylaws: [], rules: [] };
+  for (var i = 0; i < links.length; i++) {
+    var l = links[i];
+    var k = l.tgtCycleKey;
+    if (byKey[k]) byKey[k].push(l);
+  }
+
+  function colHtml(key, label, nodes, isSource) {
+    var html = '<div class="linkage-col ' + key + '">';
+    html +=   '<h4>' + label + '</h4>';
+    if (isSource) {
+      html += '<div class="linkage-node source" onclick="openModal(\'' + source.cycleId + '\',\'' + source.secId + '\')">';
+      html +=   '<div class="node-label">Art. ' + source.articleNumber + ' §' + source.sectionNumber + '</div>';
+      html +=   '<div class="node-title">' + escHtml(source.sectionTitle) + '</div>';
+      html += '</div>';
+    }
+    if (nodes.length === 0 && !isSource) {
+      html += '<div class="linkage-empty">No related sections found.</div>';
+    }
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      var pct = Math.round((n.score || 0) * 100);
+      html += '<div class="linkage-node" onclick="openModal(\'' + n.tgtCycle + '\',\'' + n.tgtSec + '\')">';
+      html +=   '<span class="node-score">' + pct + '%</span>';
+      html +=   '<div class="node-label">Art. ' + (n.articleNumber || '?') + ' §' + (n.sectionNumber || '?') + '</div>';
+      html +=   '<div class="node-title">' + escHtml(n.sectionTitle || '') + '</div>';
+      html += '</div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  var sourceKey = source.cycle; // 'ccrs', 'bylaws', or 'rules'
+
+  var html = '<div class="linkage-view">';
+  html +=   '<div class="linkage-header">';
+  html +=     '<div><strong>Linkage for:</strong> <span class="result-doc-tag ' + docCls + '">' + escHtml(source.docLabel) + '</span> Art. ' + source.articleNumber + ' §' + source.sectionNumber + ' — ' + escHtml(source.sectionTitle) + '</div>';
+  html +=     '<button class="linkage-back-btn" onclick="backToResults()">← Back to results</button>';
+  html +=   '</div>';
+  html +=   '<div class="linkage-graph">';
+  html +=     colHtml('ccrs',   'CC&Rs',            byKey.ccrs,   sourceKey === 'ccrs');
+  html +=     colHtml('bylaws', 'Bylaws',           byKey.bylaws, sourceKey === 'bylaws');
+  html +=     colHtml('rules',  'Rules of Conduct', byKey.rules,  sourceKey === 'rules');
+  html +=   '</div>';
+  html +=   '<div class="linkage-key"><span class="key-source"></span> Selected section &nbsp;·&nbsp; Other boxes are related sections (% = strength of match) &nbsp;·&nbsp; Click any box for the full text</div>';
+  html += '</div>';
+  document.getElementById('results-area').innerHTML = html;
+}
+
+function backToResults() {
+  if (lastHits.length > 0) {
+    renderResults({ query: lastQuery, total: lastHits.length, hits: lastHits });
+  } else {
+    document.getElementById('results-area').innerHTML = '';
+  }
+}
+
+async function openModal(cycle, secId) {
+  var modal = document.getElementById('modal');
+  document.getElementById('modal-title').textContent = 'Loading…';
+  document.getElementById('modal-meta').textContent  = '';
+  document.getElementById('modal-body').innerHTML    = '<span class="spinner"></span> Loading…';
+  document.getElementById('modal-tag').textContent   = '';
+  document.getElementById('modal-tag').className     = 'result-doc-tag';
+  modal.classList.add('show');
+  try {
+    var data = await ReviewApi.getDocSection(cycle, secId);
+    var cycleKey =
+      cycle === 'Cycle-02-CCRs' ? 'ccrs' :
+      cycle === 'Cycle-02-Bylaws' ? 'bylaws' :
+      cycle === 'Cycle-02-Rules' ? 'rules' : '';
+    var tag = document.getElementById('modal-tag');
+    tag.className = 'result-doc-tag doc-' + cycleKey;
+    tag.textContent = data.docLabel || '';
+    document.getElementById('modal-title').textContent =
+      'Art. ' + data.articleNumber + ' §' + data.sectionNumber + ' — ' + (data.sectionTitle || '');
+    var meta = data.articleTitle ? ('Article: ' + data.articleTitle) : '';
+    document.getElementById('modal-meta').textContent = meta;
+    document.getElementById('modal-body').textContent = data.text || '(no text available)';
+  } catch (err) {
+    document.getElementById('modal-body').textContent = 'Could not load section: ' + (err.message || '');
+  }
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('show');
+}
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') closeModal();
+});
+</script>
+</body>
+</html>

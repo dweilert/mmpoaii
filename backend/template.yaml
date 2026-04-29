@@ -432,6 +432,80 @@ Resources:
             Path: /seeds
             Method: GET
 
+  # GET /docs/search — full-text search across the three official docs
+  DocsSearchFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mmpoa-docs-search
+      Handler: docs-search.handler
+      CodeUri: lambdas/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref ReviewTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ReviewApi
+            Path: /docs/search
+            Method: GET
+
+  # GET /docs/section — fetch a single section's full text
+  DocsSectionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mmpoa-docs-section
+      Handler: docs-section.handler
+      CodeUri: lambdas/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref ReviewTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ReviewApi
+            Path: /docs/section
+            Method: GET
+
+  # GET /docs/links — return related sections in other documents
+  LinksGetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mmpoa-docs-links-get
+      Handler: links-get.handler
+      CodeUri: lambdas/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref ReviewTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ReviewApi
+            Path: /docs/links
+            Method: GET
+
+  # POST /docs/links/rebuild — admin-only, recompute auto-linkages
+  LinksBuildFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mmpoa-docs-links-build
+      Handler: links-build.handler
+      CodeUri: lambdas/
+      Timeout: 60
+      MemorySize: 512
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ReviewTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ReviewApi
+            Path: /docs/links/rebuild
+            Method: POST
+
   # GET /owner-report — returns pre-signed S3 URL to caller's most recent balance PDF
   OwnerReportGetFunction:
     Type: AWS::Serverless::Function
