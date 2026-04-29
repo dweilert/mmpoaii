@@ -104,9 +104,22 @@ async function fetchAccountBalanceReport(event) {
   }
   const apiUrl = baseUrl + '?address=' + encodeURIComponent(userAddress);
 
+  // Get Cognito ID token for API auth
+  let token = null;
+  try {
+    const user = await HoaAuth.getCurrentUser();
+    if (user && user.session) token = user.session.getIdToken().getJwtToken();
+  } catch (_) { /* fall through */ }
+  if (!token) {
+    showToast('Please sign in again — your session has expired.', 'error');
+    return;
+  }
+
   setReportBtnState(btn, 'loading');
   try {
-    const response = await fetch(apiUrl);
+    const response = await fetch(apiUrl, {
+      headers: { 'Authorization': token },
+    });
 
     if (!response.ok) {
       let errorMsg = 'API returned status ' + response.status;
