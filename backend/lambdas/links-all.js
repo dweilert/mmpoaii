@@ -30,12 +30,19 @@ async function queryAll(pk, prefix) {
   const items = [];
   let lastKey;
   do {
-    const result = await ddb.send(new QueryCommand({
+    const params = {
       TableName: TABLE_NAME,
-      KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
-      ExpressionAttributeValues: { ':pk': pk, ':sk': prefix },
       ExclusiveStartKey: lastKey,
-    }));
+    };
+    if (prefix && prefix.length > 0) {
+      params.KeyConditionExpression = 'PK = :pk AND begins_with(SK, :sk)';
+      params.ExpressionAttributeValues = { ':pk': pk, ':sk': prefix };
+    } else {
+      // Empty prefix means "all items under this PK"
+      params.KeyConditionExpression = 'PK = :pk';
+      params.ExpressionAttributeValues = { ':pk': pk };
+    }
+    const result = await ddb.send(new QueryCommand(params));
     items.push(...(result.Items || []));
     lastKey = result.LastEvaluatedKey;
   } while (lastKey);
