@@ -658,56 +658,80 @@ function renderGraph() {
 }
 
 function drawConnections() {
-  var svg = document.getElementById('graph-svg');
-  if (!svg) return;
-  var shell = svg.parentElement;
-  var rect = shell.getBoundingClientRect();
-  svg.setAttribute('viewBox', '0 0 ' + rect.width + ' ' + rect.height);
-  svg.setAttribute('width', rect.width);
-  svg.setAttribute('height', rect.height);
-  svg.innerHTML = '';
+  try {
+    var svg = document.getElementById('graph-svg');
+    if (!svg) { console.warn('[draw] no svg'); return; }
+    var shell = svg.parentElement;
+    var rect = shell.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) {
+      console.warn('[draw] shell has zero dims, retrying in 100ms');
+      setTimeout(drawConnections, 100);
+      return;
+    }
+    svg.setAttribute('viewBox', '0 0 ' + rect.width + ' ' + rect.height);
+    svg.setAttribute('width', rect.width);
+    svg.setAttribute('height', rect.height);
+    svg.innerHTML = '';
 
-  // Skip line drawing in orphan-only view (orphans have no links by definition)
-  if (MODE === 'orphans') return;
+    if (MODE === 'orphans') {
+      console.log('[draw] skip — orphans mode');
+      return;
+    }
 
-  var links = filterLinks(GRAPH.links);
+    var links = filterLinks(GRAPH.links);
 
-  function nodeRect(cycleKey, secId) {
-    var el = document.querySelector('.graph-col.' + cycleKey + ' .node[data-sec="' + secId + '"]');
-    if (!el || el.style.display === 'none') return null;
-    var r = el.getBoundingClientRect();
-    return {
-      x1: r.left  - rect.left,
-      x2: r.right - rect.left,
-      y:  r.top + r.height/2 - rect.top,
-    };
+    function nodeEl(cycleKey, secId) {
+      // querySelector with ALL nodes — pick the one that matches dataset
+      var all = document.querySelectorAll('.graph-col.' + cycleKey + ' .node');
+      for (var i = 0; i < all.length; i++) {
+        if (all[i].dataset.sec === secId) return all[i];
+      }
+      return null;
+    }
+
+    function nodeBox(cycleKey, secId) {
+      var el = nodeEl(cycleKey, secId);
+      if (!el) return null;
+      // Skip if hidden
+      if (el.offsetParent === null) return null;
+      var r = el.getBoundingClientRect();
+      return {
+        x1: r.left  - rect.left,
+        x2: r.right - rect.left,
+        y:  r.top + r.height / 2 - rect.top,
+      };
+    }
+
+    var ns = 'http://www.w3.org/2000/svg';
+    var drawn = 0;
+    links.forEach(function (l) {
+      var a = nodeBox(l.srcCycleKey, l.srcSec);
+      var b = nodeBox(l.tgtCycleKey, l.tgtSec);
+      if (!a || !b) return;
+      var sx, ex;
+      if (a.x1 < b.x1) { sx = a.x2; ex = b.x1; }
+      else             { sx = a.x1; ex = b.x2; }
+      var sy = a.y, ey = b.y;
+      var dx = (ex - sx) / 2;
+      var path = document.createElementNS(ns, 'path');
+      path.setAttribute('d',
+        'M ' + sx + ' ' + sy +
+        ' C ' + (sx + dx) + ' ' + sy + ', ' +
+                (ex - dx) + ' ' + ey + ', ' +
+                ex + ' ' + ey
+      );
+      path.setAttribute('data-src', l.srcCycleKey + ':' + l.srcSec);
+      path.setAttribute('data-tgt', l.tgtCycleKey + ':' + l.tgtSec);
+      svg.appendChild(path);
+      drawn++;
+    });
+    console.log('[draw] svg=' + Math.round(rect.width) + 'x' + Math.round(rect.height) +
+                ', links=' + links.length + ', drawn=' + drawn);
+
+    applyHighlight();
+  } catch (err) {
+    console.error('[draw] error:', err);
   }
-
-  var ns = 'http://www.w3.org/2000/svg';
-  links.forEach(function (l) {
-    var a = nodeRect(l.srcCycleKey, l.srcSec);
-    var b = nodeRect(l.tgtCycleKey, l.tgtSec);
-    if (!a || !b) return;
-    // Pick the inner edges of each node
-    var sx, ex;
-    if (a.x1 < b.x1) { sx = a.x2; ex = b.x1; }
-    else             { sx = a.x1; ex = b.x2; }
-    var sy = a.y, ey = b.y;
-    // Cubic bezier between the two
-    var dx = (ex - sx) / 2;
-    var path = document.createElementNS(ns, 'path');
-    path.setAttribute('d',
-      'M ' + sx + ' ' + sy +
-      ' C ' + (sx + dx) + ' ' + sy + ', ' +
-              (ex - dx) + ' ' + ey + ', ' +
-              ex + ' ' + ey
-    );
-    path.setAttribute('data-src', l.srcCycleKey + ':' + l.srcSec);
-    path.setAttribute('data-tgt', l.tgtCycleKey + ':' + l.tgtSec);
-    svg.appendChild(path);
-  });
-
-  applyHighlight();
 }
 
 window.addEventListener('resize', function () {
