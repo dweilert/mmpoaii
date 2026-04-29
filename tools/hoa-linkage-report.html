@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Document Relationship Report — MMPOAII HOA</title>
+<link rel="stylesheet" href="/css/site.css">
+<style>
+  :root {
+    --ccr-color:    #4a3878;
+    --ccr-bg:       #ede8f8;
+    --bylaw-color:  #1565c0;
+    --bylaw-bg:     #e3f2fd;
+    --rule-color:   #2e7d32;
+    --rule-bg:      #e8f5e9;
+    --orphan-color: #b71c1c;
+    --orphan-bg:    #ffebee;
+  }
+
+  body { background: #f6f5fb; }
+
+  .report-wrap { max-width: 1500px; margin: 24px auto; padding: 0 16px; }
+
+  .report-banner {
+    background: var(--purple-800); color: #fff;
+    padding: 18px 24px; border-radius: var(--r2);
+    margin-bottom: 14px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .report-banner h2 { font-family: var(--serif); margin: 0 0 4px; font-size: 22px; }
+  .report-banner p  { opacity: .85; font-size: 13px; margin: 0; }
+
+  .report-toolbar {
+    background: #fff; border: 1px solid var(--border); border-radius: var(--r2);
+    padding: 12px 14px; margin-bottom: 14px;
+    display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+  }
+  .filter-group { display: flex; gap: 6px; align-items: center; }
+  .filter-label { font-size: 12px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: .4px; }
+  .filter-btn {
+    padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer;
+    background: #fafafa; color: var(--text); border: 1px solid var(--border);
+    border-radius: var(--r);
+  }
+  .filter-btn:hover  { background: #f0f0f0; }
+  .filter-btn.active { background: var(--purple-800); color: #fff; border-color: var(--purple-800); }
+
+  .stats-row {
+    display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 14px;
+  }
+  .stat-card {
+    background: #fff; border: 1px solid var(--border); border-radius: var(--r2);
+    padding: 10px 16px; min-width: 130px; flex: 1 1 auto;
+  }
+  .stat-num { font-size: 20px; font-weight: 700; }
+  .stat-lbl { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: .5px; }
+  .stat-card.ccrs .stat-num   { color: var(--ccr-color); }
+  .stat-card.bylaws .stat-num { color: var(--bylaw-color); }
+  .stat-card.rules .stat-num  { color: var(--rule-color); }
+  .stat-card.orphans .stat-num { color: var(--orphan-color); }
+
+  /* ── Graph layout ── */
+  .graph-shell {
+    position: relative;
+    background: #fff; border: 1px solid var(--border); border-radius: var(--r2);
+    padding: 12px;
+  }
+
+  .graph-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 28px;
+    position: relative;
+    z-index: 2; /* above the SVG overlay */
+  }
+
+  .graph-col-header {
+    position: sticky; top: 0;
+    background: #fff;
+    padding: 10px 6px;
+    border-bottom: 2px solid var(--border);
+    z-index: 5;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .graph-col-header h3 {
+    margin: 0; font-size: 14px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .5px;
+  }
+  .graph-col.ccrs   .graph-col-header h3 { color: var(--ccr-color); }
+  .graph-col.bylaws .graph-col-header h3 { color: var(--bylaw-color); }
+  .graph-col.rules  .graph-col-header h3 { color: var(--rule-color); }
+  .col-count { font-size: 11px; color: var(--text3); }
+
+  .article-group { margin: 6px 0 12px; }
+  .article-label {
+    font-size: 11px; font-weight: 700; color: var(--text3);
+    padding: 4px 6px; text-transform: uppercase; letter-spacing: .4px;
+    border-bottom: 1px dashed var(--border); margin-bottom: 4px;
+  }
+
+  .node {
+    background: #fff; border: 2px solid transparent;
+    border-radius: 6px; padding: 6px 8px;
+    margin-bottom: 4px; cursor: pointer; font-size: 12px;
+    transition: all .12s;
+    position: relative;
+  }
+  .node:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,.12); transform: translateY(-1px);
+  }
+
+  .graph-col.ccrs   .node { background: var(--ccr-bg);   border-color: var(--ccr-color); }
+  .graph-col.bylaws .node { background: var(--bylaw-bg); border-color: var(--bylaw-color); }
+  .graph-col.rules  .node { background: var(--rule-bg);  border-color: var(--rule-color); }
+
+  .node.orphan {
+    background: var(--orphan-bg) !important;
+    border-color: var(--orphan-color) !important;
+  }
+
+  .node.dimmed { opacity: 0.25; }
+  .node.highlighted {
+    box-shadow: 0 0 0 3px #ff9800;
+    transform: translateY(-2px);
+    z-index: 10;
+  }
+  .node-id     { font-weight: 700; font-size: 11px; display: inline-block; }
+  .node-title  { color: var(--text2); margin-left: 4px; }
+  .node-meta   { font-size: 10px; color: var(--text3); margin-top: 2px; }
+
+  /* ── SVG connection overlay ── */
+  .graph-svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .graph-svg path {
+    fill: none;
+    stroke: rgba(74, 56, 120, 0.25);
+    stroke-width: 1;
+    transition: stroke .15s, stroke-width .15s;
+  }
+  .graph-svg path.highlight {
+    stroke: #ff6f00; stroke-width: 2.5;
+  }
+  .graph-svg path.dimmed { stroke: rgba(0,0,0,0.04); }
+
+  .legend {
+    margin-top: 12px; font-size: 11px; color: var(--text3);
+    display: flex; flex-wrap: wrap; gap: 14px; justify-content: center;
+    padding: 8px;
+  }
+  .legend-swatch { display: inline-block; width: 12px; height: 12px; vertical-align: middle; border-radius: 3px; margin: 0 4px -2px; }
+  .swatch-ccrs   { background: var(--ccr-bg);    border: 1px solid var(--ccr-color); }
+  .swatch-bylaws { background: var(--bylaw-bg);  border: 1px solid var(--bylaw-color); }
+  .swatch-rules  { background: var(--rule-bg);   border: 1px solid var(--rule-color); }
+  .swatch-orphan { background: var(--orphan-bg); border: 1px solid var(--orphan-color); }
+
+  .loading-state { padding: 60px; text-align: center; color: var(--text3); }
+  .spinner {
+    display: inline-block; width: 20px; height: 20px;
+    border: 3px solid #ddd; border-top-color: var(--purple-800);
+    border-radius: 50%; animation: spin .8s linear infinite;
+    vertical-align: middle; margin-right: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Modal popup ── */
+  .modal-backdrop {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.55); z-index: 9000;
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-backdrop.show { display: flex; }
+  .modal-card {
+    background: #fff; border-radius: var(--r2);
+    max-width: 720px; width: 100%; max-height: 85vh;
+    display: flex; flex-direction: column; overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,.25);
+  }
+  .modal-head {
+    padding: 14px 18px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .modal-head h3 { margin: 0; font-size: 17px; flex: 1; }
+  .modal-close {
+    background: transparent; border: none; font-size: 24px;
+    color: var(--text3); cursor: pointer; padding: 0; line-height: 1;
+  }
+  .modal-close:hover { color: var(--text); }
+  .modal-body {
+    padding: 16px 18px; overflow-y: auto; font-size: 14px; line-height: 1.6;
+    white-space: pre-wrap;
+  }
+  .modal-meta { font-size: 12px; color: var(--text3); padding: 0 18px 12px; }
+
+  .modal-tag {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    padding: 2px 8px; border-radius: 10px;
+    text-transform: uppercase; letter-spacing: .4px;
+  }
+  .tag-ccrs   { background: var(--ccr-bg);   color: var(--ccr-color); }
+  .tag-bylaws { background: var(--bylaw-bg); color: var(--bylaw-color); }
+  .tag-rules  { background: var(--rule-bg);  color: var(--rule-color); }
+
+  /* Print */
+  @media print {
+    body { background: #fff !important; }
+    .site-header, .site-footer, .report-toolbar, .modal-backdrop { display: none !important; }
+    .report-wrap { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+    .graph-cols { display: block; }
+    .graph-col { page-break-inside: avoid; margin-bottom: 24px; }
+    .graph-svg { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="inner">
+    <a href="/" class="site-logo">
+      <div class="logo-mark">🏡</div>
+      <div class="logo-text">
+        <div class="logo-name" data-hoa-name>MMPOAII HOA</div>
+        <div class="logo-sub">Document Relationship Report</div>
+      </div>
+    </a>
+    <nav class="site-nav">
+      <a href="#" id="back-link">← Back</a>
+      <div class="nav-user">
+        <div class="avatar" id="nav-avatar">?</div>
+        <div>
+          <div class="uname" data-user-name>Loading…</div>
+          <div class="urole" data-user-role></div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="HoaGuard.logout()">Sign Out</button>
+    </nav>
+  </div>
+</header>
+
+<div id="page-content">
+<div class="report-wrap">
+
+  <div class="report-banner">
+    <div>
+      <h2>Document Relationship Report</h2>
+      <p>How the CC&amp;Rs, Bylaws, and Rules of Conduct connect — and where the gaps are.</p>
+    </div>
+    <button class="filter-btn" onclick="window.print()">Print / Save PDF</button>
+  </div>
+
+  <div class="report-toolbar">
+    <div class="filter-group">
+      <span class="filter-label">View:</span>
+      <button class="filter-btn active" data-mode="all"     onclick="setMode('all')">All sections</button>
+      <button class="filter-btn"        data-mode="orphans" onclick="setMode('orphans')">Orphans only</button>
+      <button class="filter-btn"        data-mode="strong"  onclick="setMode('strong')">Strong matches (≥30%)</button>
+    </div>
+    <div class="filter-group" style="margin-left:auto;">
+      <span class="filter-label">Click any section to highlight its connections</span>
+    </div>
+  </div>
+
+  <div id="stats-row" class="stats-row"></div>
+
+  <div id="graph-area"><div class="loading-state"><span class="spinner"></span> Loading relationships…</div></div>
+
+  <div class="legend">
+    <span><span class="legend-swatch swatch-ccrs"></span>CC&Rs</span>
+    <span><span class="legend-swatch swatch-bylaws"></span>Bylaws</span>
+    <span><span class="legend-swatch swatch-rules"></span>Rules of Conduct</span>
+    <span><span class="legend-swatch swatch-orphan"></span>Orphan (no cross-document links)</span>
+  </div>
+
+</div>
+</div>
+
+<!-- Modal popup -->
+<div class="modal-backdrop" id="modal" onclick="if(event.target===this) closeModal()">
+  <div class="modal-card">
+    <div class="modal-head">
+      <span class="modal-tag" id="modal-tag"></span>
+      <h3 id="modal-title">Section Title</h3>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-meta" id="modal-meta"></div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div data-hoa-name>MMPOAII HOA</div>
+  <div>Community Portal</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6/dist/amazon-cognito-identity.min.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/guard.js"></script>
+<script src="/js/review-api.js"></script>
+<script>
+HoaGuard.protect(['board', 'reviewers']);
+
+function setBackLink() {
+  var user = HoaGuard.getUser();
+  var link = document.getElementById('back-link');
+  if (!user || !user.groups) { link.href = '/'; return; }
+  if (user.groups.includes('board'))      link.href = '/board/index.html';
+  else if (user.groups.includes('reviewers')) link.href = '/review/index.html';
+  else link.href = '/';
+}
+
+var guardCheck = setInterval(function () {
+  if (HoaGuard.getUser()) {
+    clearInterval(guardCheck);
+    setBackLink();
+    var uname = document.querySelector('[data-user-name]');
+    if (uname && uname.textContent !== 'Loading…') {
+      document.getElementById('nav-avatar').textContent = uname.textContent.charAt(0).toUpperCase();
+    }
+    loadGraph();
+  }
+}, 100);
+
+function escHtml(s) {
+  var d = document.createElement('div');
+  d.textContent = s == null ? '' : String(s);
+  return d.innerHTML;
+}
+
+var GRAPH = null;       // { sections: { ccrs, bylaws, rules }, links: [...], counts }
+var MODE = 'all';       // 'all' | 'orphans' | 'strong'
+var SELECTED_NODE = null; // {cycleKey, secId}
+
+async function loadGraph() {
+  try {
+    GRAPH = await ReviewApi.getAllLinks();
+    renderStats();
+    renderGraph();
+  } catch (err) {
+    document.getElementById('graph-area').innerHTML =
+      '<div class="loading-state">Could not load relationships: ' + escHtml(err.message || '') + '</div>';
+  }
+}
+
+function setMode(mode) {
+  MODE = mode;
+  SELECTED_NODE = null;
+  document.querySelectorAll('.filter-btn[data-mode]').forEach(function (btn) {
+    btn.classList.toggle('active', btn.dataset.mode === mode);
+  });
+  renderStats();
+  renderGraph();
+}
+
+// Compute outgoing-link sets for each section
+function computeLinkSets() {
+  var byKey = {}; // 'ccrs:ART-01#SEC-01' -> Set of 'bylaws:...' or 'rules:...' keys
+  GRAPH.links.forEach(function (l) {
+    var k = l.srcCycleKey + ':' + l.srcSec;
+    if (!byKey[k]) byKey[k] = new Set();
+    byKey[k].add(l.tgtCycleKey + ':' + l.tgtSec);
+  });
+  return byKey;
+}
+
+function isOrphan(node, links) {
+  // A section is an orphan if it has no outgoing links AND no incoming links
+  // from sections in *other* documents.
+  var k = node.cycleKey + ':' + node.secId;
+  var hasOut = false, hasIn = false;
+  for (var i = 0; i < GRAPH.links.length; i++) {
+    var l = GRAPH.links[i];
+    if (l.srcCycleKey === node.cycleKey && l.srcSec === node.secId &&
+        l.tgtCycleKey !== node.cycleKey) {
+      hasOut = true;
+    }
+    if (l.tgtCycleKey === node.cycleKey && l.tgtSec === node.secId &&
+        l.srcCycleKey !== node.cycleKey) {
+      hasIn = true;
+    }
+    if (hasOut && hasIn) break;
+  }
+  return !hasOut && !hasIn;
+}
+
+function filterLinks(links) {
+  if (MODE === 'strong') {
+    return links.filter(function (l) { return (l.score || 0) >= 0.30; });
+  }
+  return links;
+}
+
+function renderStats() {
+  var s = GRAPH.sections;
+  // Count orphans across all 3 docs in current mode
+  var orphans = 0;
+  ['ccrs', 'bylaws', 'rules'].forEach(function (k) {
+    s[k].forEach(function (n) { if (isOrphan(n)) orphans++; });
+  });
+  var totalLinks = filterLinks(GRAPH.links).length;
+  document.getElementById('stats-row').innerHTML =
+    '<div class="stat-card ccrs"><div class="stat-num">' + s.ccrs.length + '</div><div class="stat-lbl">CC&Rs sections</div></div>' +
+    '<div class="stat-card bylaws"><div class="stat-num">' + s.bylaws.length + '</div><div class="stat-lbl">Bylaws sections</div></div>' +
+    '<div class="stat-card rules"><div class="stat-num">' + s.rules.length + '</div><div class="stat-lbl">Rules sections</div></div>' +
+    '<div class="stat-card"><div class="stat-num">' + totalLinks + '</div><div class="stat-lbl">Total links</div></div>' +
+    '<div class="stat-card orphans"><div class="stat-num">' + orphans + '</div><div class="stat-lbl">Orphans (no cross-doc links)</div></div>';
+}
+
+function renderGraph() {
+  var s = GRAPH.sections;
+
+  function nodeHtml(node) {
+    var orphan = isOrphan(node);
+    var classes = ['node'];
+    if (MODE === 'orphans' && !orphan) classes.push('hidden-by-mode');
+    if (orphan) classes.push('orphan');
+    var idAttr = node.cycleKey + ':' + node.secId;
+    return (
+      '<div class="' + classes.join(' ') + '" data-id="' + idAttr + '" ' +
+      'data-cycle="' + node.cycleId + '" data-sec="' + node.secId + '" ' +
+      (classes.indexOf('hidden-by-mode') !== -1 ? 'style="display:none;"' : '') +
+      ' onclick="onNodeClick(\'' + idAttr + '\', event)">' +
+        '<span class="node-id">Art ' + node.articleNumber + ' §' + node.sectionNumber + '</span>' +
+        '<span class="node-title">' + escHtml(node.sectionTitle) + '</span>' +
+      '</div>'
+    );
+  }
+
+  function colHtml(key, label, nodes) {
+    // Group by article
+    var byArt = {};
+    nodes.forEach(function (n) {
+      var artKey = n.articleNumber + '|' + (n.articleTitle || '');
+      if (!byArt[artKey]) byArt[artKey] = [];
+      byArt[artKey].push(n);
+    });
+    var artKeys = Object.keys(byArt).sort(function (a, b) {
+      return parseInt(a, 10) - parseInt(b, 10);
+    });
+
+    var inner = '';
+    artKeys.forEach(function (ak) {
+      var parts = ak.split('|');
+      var num = parts[0];
+      var title = parts.slice(1).join('|');
+      inner += '<div class="article-group">';
+      inner +=   '<div class="article-label">Art ' + num + (title ? ' — ' + escHtml(title) : '') + '</div>';
+      byArt[ak].forEach(function (n) { inner += nodeHtml(n); });
+      inner += '</div>';
+    });
+
+    return (
+      '<div class="graph-col ' + key + '" id="col-' + key + '">' +
+        '<div class="graph-col-header"><h3>' + label + '</h3>' +
+          '<span class="col-count">' + nodes.length + ' sections</span>' +
+        '</div>' + inner +
+      '</div>'
+    );
+  }
+
+  var html =
+    '<div class="graph-shell">' +
+      '<svg class="graph-svg" id="graph-svg"></svg>' +
+      '<div class="graph-cols" id="graph-cols">' +
+        colHtml('ccrs',   'CC&Rs',            s.ccrs)   +
+        colHtml('bylaws', 'Bylaws',           s.bylaws) +
+        colHtml('rules',  'Rules of Conduct', s.rules)  +
+      '</div>' +
+    '</div>';
+
+  document.getElementById('graph-area').innerHTML = html;
+
+  // Allow layout to settle, then draw connections
+  requestAnimationFrame(drawConnections);
+}
+
+function drawConnections() {
+  var svg = document.getElementById('graph-svg');
+  if (!svg) return;
+  var shell = svg.parentElement;
+  var rect = shell.getBoundingClientRect();
+  svg.setAttribute('viewBox', '0 0 ' + rect.width + ' ' + rect.height);
+  svg.setAttribute('width', rect.width);
+  svg.setAttribute('height', rect.height);
+  svg.innerHTML = '';
+
+  // Skip line drawing in orphan-only view (orphans have no links by definition)
+  if (MODE === 'orphans') return;
+
+  var links = filterLinks(GRAPH.links);
+
+  function nodeRect(cycleKey, secId) {
+    var el = document.querySelector('.graph-col.' + cycleKey + ' .node[data-sec="' + secId + '"]');
+    if (!el || el.style.display === 'none') return null;
+    var r = el.getBoundingClientRect();
+    return {
+      x1: r.left  - rect.left,
+      x2: r.right - rect.left,
+      y:  r.top + r.height/2 - rect.top,
+    };
+  }
+
+  var ns = 'http://www.w3.org/2000/svg';
+  links.forEach(function (l) {
+    var a = nodeRect(l.srcCycleKey, l.srcSec);
+    var b = nodeRect(l.tgtCycleKey, l.tgtSec);
+    if (!a || !b) return;
+    // Pick the inner edges of each node
+    var sx, ex;
+    if (a.x1 < b.x1) { sx = a.x2; ex = b.x1; }
+    else             { sx = a.x1; ex = b.x2; }
+    var sy = a.y, ey = b.y;
+    // Cubic bezier between the two
+    var dx = (ex - sx) / 2;
+    var path = document.createElementNS(ns, 'path');
+    path.setAttribute('d',
+      'M ' + sx + ' ' + sy +
+      ' C ' + (sx + dx) + ' ' + sy + ', ' +
+              (ex - dx) + ' ' + ey + ', ' +
+              ex + ' ' + ey
+    );
+    path.setAttribute('data-src', l.srcCycleKey + ':' + l.srcSec);
+    path.setAttribute('data-tgt', l.tgtCycleKey + ':' + l.tgtSec);
+    svg.appendChild(path);
+  });
+
+  applyHighlight();
+}
+
+window.addEventListener('resize', function () {
+  if (GRAPH) drawConnections();
+});
+
+function onNodeClick(idAttr, event) {
+  // Toggle highlight; if already selected, open modal
+  if (SELECTED_NODE === idAttr) {
+    var parts = idAttr.split(':');
+    var cycleId =
+      parts[0] === 'ccrs'   ? 'Cycle-02-CCRs' :
+      parts[0] === 'bylaws' ? 'Cycle-02-Bylaws' :
+      parts[0] === 'rules'  ? 'Cycle-02-Rules' : '';
+    openModal(cycleId, parts[1]);
+    return;
+  }
+  SELECTED_NODE = idAttr;
+  applyHighlight();
+}
+
+function applyHighlight() {
+  var nodes = document.querySelectorAll('.node');
+  var svg = document.getElementById('graph-svg');
+  if (!SELECTED_NODE) {
+    nodes.forEach(function (n) { n.classList.remove('highlighted'); n.classList.remove('dimmed'); });
+    if (svg) svg.querySelectorAll('path').forEach(function (p) { p.classList.remove('highlight'); p.classList.remove('dimmed'); });
+    return;
+  }
+  // Find connected node ids (both directions)
+  var connected = new Set();
+  connected.add(SELECTED_NODE);
+  GRAPH.links.forEach(function (l) {
+    var src = l.srcCycleKey + ':' + l.srcSec;
+    var tgt = l.tgtCycleKey + ':' + l.tgtSec;
+    if (src === SELECTED_NODE) connected.add(tgt);
+    if (tgt === SELECTED_NODE) connected.add(src);
+  });
+  nodes.forEach(function (n) {
+    var id = n.dataset.id;
+    if (id === SELECTED_NODE) {
+      n.classList.add('highlighted'); n.classList.remove('dimmed');
+    } else if (connected.has(id)) {
+      n.classList.remove('highlighted'); n.classList.remove('dimmed');
+    } else {
+      n.classList.remove('highlighted'); n.classList.add('dimmed');
+    }
+  });
+  if (svg) {
+    svg.querySelectorAll('path').forEach(function (p) {
+      var src = p.getAttribute('data-src');
+      var tgt = p.getAttribute('data-tgt');
+      if (src === SELECTED_NODE || tgt === SELECTED_NODE) {
+        p.classList.add('highlight'); p.classList.remove('dimmed');
+      } else {
+        p.classList.remove('highlight'); p.classList.add('dimmed');
+      }
+    });
+  }
+}
+
+document.addEventListener('click', function (e) {
+  // Click outside any node clears highlight
+  if (!e.target.closest('.node') && !e.target.closest('.modal-card')) {
+    if (SELECTED_NODE && !e.target.closest('.filter-btn')) {
+      SELECTED_NODE = null;
+      applyHighlight();
+    }
+  }
+});
+
+// ── Modal ──
+async function openModal(cycle, secId) {
+  var modal = document.getElementById('modal');
+  document.getElementById('modal-title').textContent = 'Loading…';
+  document.getElementById('modal-meta').textContent  = '';
+  document.getElementById('modal-body').innerHTML    = '<span class="spinner"></span> Loading…';
+  document.getElementById('modal-tag').textContent   = '';
+  document.getElementById('modal-tag').className     = 'modal-tag';
+  modal.classList.add('show');
+  try {
+    var data = await ReviewApi.getDocSection(cycle, secId);
+    var cycleKey =
+      cycle === 'Cycle-02-CCRs' ? 'ccrs' :
+      cycle === 'Cycle-02-Bylaws' ? 'bylaws' :
+      cycle === 'Cycle-02-Rules' ? 'rules' : '';
+    var tag = document.getElementById('modal-tag');
+    tag.className = 'modal-tag tag-' + cycleKey;
+    tag.textContent = data.docLabel || '';
+    document.getElementById('modal-title').textContent =
+      'Art. ' + data.articleNumber + ' §' + data.sectionNumber + ' — ' + (data.sectionTitle || '');
+    var meta = data.articleTitle ? ('Article: ' + data.articleTitle) : '';
+    document.getElementById('modal-meta').textContent = meta;
+    document.getElementById('modal-body').textContent = data.text || '(no text available)';
+  } catch (err) {
+    document.getElementById('modal-body').textContent = 'Could not load section: ' + (err.message || '');
+  }
+}
+function closeModal() { document.getElementById('modal').classList.remove('show'); }
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>

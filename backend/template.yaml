@@ -486,6 +486,26 @@ Resources:
             Path: /docs/links
             Method: GET
 
+  # GET /docs/links/all — complete graph for audit report (board/reviewers)
+  LinksAllFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mmpoa-docs-links-all
+      Handler: links-all.handler
+      CodeUri: lambdas/
+      Timeout: 30
+      MemorySize: 512
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref ReviewTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ReviewApi
+            Path: /docs/links/all
+            Method: GET
+
   # POST /docs/links/rebuild — admin-only, recompute auto-linkages
   LinksBuildFunction:
     Type: AWS::Serverless::Function

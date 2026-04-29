@@ -180,6 +180,11 @@ const ReviewApi = (function () {
     return apiFetch('POST', '/docs/links/rebuild', {});
   }
 
+  /** GET /docs/links/all — complete relationship graph (board/reviewers) */
+  function getAllLinks() {
+    return apiFetch('GET', '/docs/links/all');
+  }
+
   return {
     listCycles,
     createCycle,
@@ -202,6 +207,7 @@ const ReviewApi = (function () {
     getDocSection,
     getDocLinks,
     rebuildLinks,
+    getAllLinks,
   };
 
 })();
