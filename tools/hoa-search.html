@@ -124,9 +124,28 @@
   }
   .linkage-back-btn:hover { background: #f0f0f0; }
 
+  .linkage-graph-shell {
+    position: relative;
+  }
+  .linkage-svg {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .linkage-svg path {
+    fill: none;
+    stroke: rgba(74, 56, 120, 0.7);
+    stroke-width: 2;
+  }
+  .linkage-svg path.source-edge {
+    stroke: #ff6f00; stroke-width: 3;
+  }
   .linkage-graph {
-    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 28px;
     align-items: start;
+    position: relative;
+    z-index: 2;
   }
   @media (max-width: 720px) { .linkage-graph { grid-template-columns: 1fr; } }
   .linkage-col {
@@ -418,6 +437,8 @@ async function showLinkage() {
   }
 }
 
+var LAST_LINKAGE = null; // {source, byKey} for resize redraws
+
 function renderLinkage(source, links) {
   var docCls = 'doc-' + source.cycle;
   // Group links by target document
@@ -427,12 +448,18 @@ function renderLinkage(source, links) {
     var k = l.tgtCycleKey;
     if (byKey[k]) byKey[k].push(l);
   }
+  LAST_LINKAGE = { source: source, byKey: byKey };
+
+  function nodeAttrs(cycleId, secId, isSource) {
+    return ' data-cycle="' + escHtml(cycleId) + '" data-sec="' + escHtml(secId) +
+           '" data-action="open"' + (isSource ? ' data-source="1"' : '');
+  }
 
   function colHtml(key, label, nodes, isSource) {
     var html = '<div class="linkage-col ' + key + '">';
     html +=   '<h4>' + label + '</h4>';
     if (isSource) {
-      html += '<div class="linkage-node source" onclick="openModal(\'' + source.cycleId + '\',\'' + source.secId + '\')">';
+      html += '<div class="linkage-node source"' + nodeAttrs(source.cycleId, source.secId, true) + '>';
       html +=   '<div class="node-label">Art. ' + source.articleNumber + ' §' + source.sectionNumber + '</div>';
       html +=   '<div class="node-title">' + escHtml(source.sectionTitle) + '</div>';
       html += '</div>';
@@ -443,7 +470,7 @@ function renderLinkage(source, links) {
     for (var i = 0; i < nodes.length; i++) {
       var n = nodes[i];
       var pct = Math.round((n.score || 0) * 100);
-      html += '<div class="linkage-node" onclick="openModal(\'' + n.tgtCycle + '\',\'' + n.tgtSec + '\')">';
+      html += '<div class="linkage-node"' + nodeAttrs(n.tgtCycle, n.tgtSec, false) + '>';
       html +=   '<span class="node-score">' + pct + '%</span>';
       html +=   '<div class="node-label">Art. ' + (n.articleNumber || '?') + ' §' + (n.sectionNumber || '?') + '</div>';
       html +=   '<div class="node-title">' + escHtml(n.sectionTitle || '') + '</div>';
@@ -460,15 +487,84 @@ function renderLinkage(source, links) {
   html +=     '<div><strong>Linkage for:</strong> <span class="result-doc-tag ' + docCls + '">' + escHtml(source.docLabel) + '</span> Art. ' + source.articleNumber + ' §' + source.sectionNumber + ' — ' + escHtml(source.sectionTitle) + '</div>';
   html +=     '<button class="linkage-back-btn" onclick="backToResults()">← Back to results</button>';
   html +=   '</div>';
-  html +=   '<div class="linkage-graph">';
-  html +=     colHtml('ccrs',   'CC&Rs',            byKey.ccrs,   sourceKey === 'ccrs');
-  html +=     colHtml('bylaws', 'Bylaws',           byKey.bylaws, sourceKey === 'bylaws');
-  html +=     colHtml('rules',  'Rules of Conduct', byKey.rules,  sourceKey === 'rules');
+  html +=   '<div class="linkage-graph-shell">';
+  html +=     '<svg class="linkage-svg" id="linkage-svg"></svg>';
+  html +=     '<div class="linkage-graph" id="linkage-graph">';
+  html +=       colHtml('ccrs',   'CC&Rs',            byKey.ccrs,   sourceKey === 'ccrs');
+  html +=       colHtml('bylaws', 'Bylaws',           byKey.bylaws, sourceKey === 'bylaws');
+  html +=       colHtml('rules',  'Rules of Conduct', byKey.rules,  sourceKey === 'rules');
+  html +=     '</div>';
   html +=   '</div>';
   html +=   '<div class="linkage-key"><span class="key-source"></span> Selected section &nbsp;·&nbsp; Other boxes are related sections (% = strength of match) &nbsp;·&nbsp; Click any box for the full text</div>';
   html += '</div>';
   document.getElementById('results-area').innerHTML = html;
+
+  // Draw lines once layout is settled
+  requestAnimationFrame(drawLinkageLines);
 }
+
+function drawLinkageLines() {
+  try {
+    var svg = document.getElementById('linkage-svg');
+    if (!svg) return;
+    var shell = svg.parentElement;
+    var rect = shell.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) {
+      setTimeout(drawLinkageLines, 100);
+      return;
+    }
+    svg.setAttribute('viewBox', '0 0 ' + rect.width + ' ' + rect.height);
+    svg.setAttribute('width', rect.width);
+    svg.setAttribute('height', rect.height);
+    svg.innerHTML = '';
+
+    var sourceEl = svg.parentElement.querySelector('.linkage-node.source');
+    if (!sourceEl) return;
+    var srcRect = sourceEl.getBoundingClientRect();
+    var srcMid = {
+      x1: srcRect.left  - rect.left,
+      x2: srcRect.right - rect.left,
+      y:  srcRect.top + srcRect.height / 2 - rect.top,
+    };
+
+    var ns = 'http://www.w3.org/2000/svg';
+    var targets = svg.parentElement.querySelectorAll('.linkage-node:not(.source)');
+    targets.forEach(function (el) {
+      var r = el.getBoundingClientRect();
+      var tgt = {
+        x1: r.left  - rect.left,
+        x2: r.right - rect.left,
+        y:  r.top + r.height / 2 - rect.top,
+      };
+      var sx, ex;
+      if (srcMid.x1 < tgt.x1) { sx = srcMid.x2; ex = tgt.x1; }
+      else                    { sx = srcMid.x1; ex = tgt.x2; }
+      var sy = srcMid.y, ey = tgt.y;
+      var dx = (ex - sx) / 2;
+      var path = document.createElementNS(ns, 'path');
+      path.setAttribute('d',
+        'M ' + sx + ' ' + sy +
+        ' C ' + (sx + dx) + ' ' + sy + ', ' +
+                (ex - dx) + ' ' + ey + ', ' +
+                ex + ' ' + ey
+      );
+      path.setAttribute('class', 'source-edge');
+      svg.appendChild(path);
+    });
+  } catch (err) {
+    console.error('[linkage-draw] error:', err);
+  }
+}
+
+window.addEventListener('resize', function () {
+  if (LAST_LINKAGE && document.getElementById('linkage-svg')) drawLinkageLines();
+});
+
+// Delegated click handler for linkage nodes (opens modal)
+document.addEventListener('click', function (e) {
+  var node = e.target.closest('.linkage-node[data-action="open"]');
+  if (node) openModal(node.dataset.cycle, node.dataset.sec);
+});
 
 function backToResults() {
   if (lastHits.length > 0) {
