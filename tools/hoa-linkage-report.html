@@ -261,7 +261,8 @@
       <button class="filter-btn"        data-mode="strong"  onclick="setMode('strong')">Strong matches (≥30%)</button>
     </div>
     <div class="filter-group" style="margin-left:auto;">
-      <span class="filter-label">Click any section to highlight its connections</span>
+      <span class="filter-label" id="focus-hint">Click any section to focus on its connections</span>
+      <button class="filter-btn" id="clear-focus-btn" style="display:none;" onclick="clearFocus()">✕ Clear focus</button>
     </div>
   </div>
 
@@ -553,12 +554,27 @@ function onNodeClick(idAttr, event) {
 
 function applyHighlight() {
   var nodes = document.querySelectorAll('.node');
+  var groups = document.querySelectorAll('.article-group');
   var svg = document.getElementById('graph-svg');
+  var clearBtn = document.getElementById('clear-focus-btn');
+  var hint = document.getElementById('focus-hint');
+
   if (!SELECTED_NODE) {
-    nodes.forEach(function (n) { n.classList.remove('highlighted'); n.classList.remove('dimmed'); });
-    if (svg) svg.querySelectorAll('path').forEach(function (p) { p.classList.remove('highlight'); p.classList.remove('dimmed'); });
+    // Restore everything (respect orphans-only mode)
+    nodes.forEach(function (n) {
+      n.classList.remove('highlighted');
+      // Show all nodes unless they were hidden by orphans-only mode
+      var orphanHidden = (MODE === 'orphans' && !n.classList.contains('orphan'));
+      n.style.display = orphanHidden ? 'none' : '';
+    });
+    groups.forEach(function (g) { g.style.display = ''; });
+    hideEmptyGroups();
+    if (clearBtn) clearBtn.style.display = 'none';
+    if (hint) hint.textContent = 'Click any section to focus on its connections';
+    requestAnimationFrame(drawConnections);
     return;
   }
+
   // Find connected node ids (both directions)
   var connected = new Set();
   connected.add(SELECTED_NODE);
@@ -568,33 +584,56 @@ function applyHighlight() {
     if (src === SELECTED_NODE) connected.add(tgt);
     if (tgt === SELECTED_NODE) connected.add(src);
   });
+
+  // Hide unrelated nodes; highlight selected
   nodes.forEach(function (n) {
     var id = n.dataset.id;
     if (id === SELECTED_NODE) {
-      n.classList.add('highlighted'); n.classList.remove('dimmed');
+      n.classList.add('highlighted');
+      n.style.display = '';
     } else if (connected.has(id)) {
-      n.classList.remove('highlighted'); n.classList.remove('dimmed');
+      n.classList.remove('highlighted');
+      n.style.display = '';
     } else {
-      n.classList.remove('highlighted'); n.classList.add('dimmed');
+      n.classList.remove('highlighted');
+      n.style.display = 'none';
     }
   });
-  if (svg) {
-    svg.querySelectorAll('path').forEach(function (p) {
-      var src = p.getAttribute('data-src');
-      var tgt = p.getAttribute('data-tgt');
-      if (src === SELECTED_NODE || tgt === SELECTED_NODE) {
-        p.classList.add('highlight'); p.classList.remove('dimmed');
-      } else {
-        p.classList.remove('highlight'); p.classList.add('dimmed');
-      }
-    });
+
+  // Hide article groups that have no visible nodes
+  hideEmptyGroups();
+
+  if (clearBtn) clearBtn.style.display = '';
+  if (hint) {
+    var connectedCount = connected.size - 1;
+    hint.textContent = connectedCount === 0
+      ? 'This section has no cross-document connections (orphan).'
+      : 'Showing ' + connectedCount + ' connected section' + (connectedCount === 1 ? '' : 's') + '.';
   }
+
+  // Lines need to be redrawn after the layout shrinks
+  requestAnimationFrame(drawConnections);
+}
+
+function hideEmptyGroups() {
+  document.querySelectorAll('.article-group').forEach(function (g) {
+    var visibleNodes = g.querySelectorAll('.node:not([style*="display: none"])');
+    g.style.display = visibleNodes.length === 0 ? 'none' : '';
+  });
+}
+
+function clearFocus() {
+  SELECTED_NODE = null;
+  applyHighlight();
 }
 
 document.addEventListener('click', function (e) {
-  // Click outside any node clears highlight
-  if (!e.target.closest('.node') && !e.target.closest('.modal-card')) {
-    if (SELECTED_NODE && !e.target.closest('.filter-btn')) {
+  // Click outside any node clears highlight (but not when clicking toolbar buttons or the modal)
+  if (!e.target.closest('.node') &&
+      !e.target.closest('.modal-card') &&
+      !e.target.closest('.filter-btn') &&
+      !e.target.closest('.report-toolbar')) {
+    if (SELECTED_NODE) {
       SELECTED_NODE = null;
       applyHighlight();
     }
