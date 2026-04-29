@@ -70,32 +70,49 @@ function jaccard(setA, setB) {
 }
 
 async function fetchSections(cycleId) {
-  const items = [];
-  let lastKey;
-  do {
-    const params = {
-      TableName: TABLE_NAME,
-      KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
-      ExpressionAttributeValues: {
-        ':pk': `CYCLE#${cycleId}`,
-        ':sk': 'CONTENT#',
-      },
-      ExclusiveStartKey: lastKey,
-    };
-    const result = await ddb.send(new QueryCommand(params));
-    items.push(...(result.Items || []));
-    lastKey = result.LastEvaluatedKey;
-  } while (lastKey);
+  async function queryByPrefix(prefix) {
+    const items = [];
+    let lastKey;
+    do {
+      const result = await ddb.send(new QueryCommand({
+        TableName: TABLE_NAME,
+        KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
+        ExpressionAttributeValues: {
+          ':pk': `CYCLE#${cycleId}`,
+          ':sk': prefix,
+        },
+        ExclusiveStartKey: lastKey,
+      }));
+      items.push(...(result.Items || []));
+      lastKey = result.LastEvaluatedKey;
+    } while (lastKey);
+    return items;
+  }
 
-  return items.map(it => ({
-    cycleId,
-    secId: `ART-${String(it.articleNumber).padStart(2, '0')}#SEC-${String(it.sectionNumber).padStart(2, '0')}`,
-    articleNumber: it.articleNumber,
-    sectionNumber: it.sectionNumber,
-    sectionTitle: it.sectionTitle || '',
-    text: it.text || '',
-    tokens: tokenize((it.sectionTitle || '') + ' ' + (it.text || '')),
-  }));
+  const [contentItems, textItems] = await Promise.all([
+    queryByPrefix('CONTENT#'),
+    queryByPrefix('DOCTEXT#'),
+  ]);
+
+  const textBy = {};
+  for (const t of textItems) {
+    const m = (t.SK || '').match(/^DOCTEXT#(ART-\d+#SEC-[\dA-Za-z]+)$/);
+    if (m) textBy[m[1]] = t.text || '';
+  }
+
+  return contentItems.map(it => {
+    const secId = `ART-${String(it.articleNumber).padStart(2, '0')}#SEC-${String(it.sectionNumber).padStart(2, '0')}`;
+    const text = it.text || textBy[secId] || '';
+    return {
+      cycleId,
+      secId,
+      articleNumber: it.articleNumber,
+      sectionNumber: it.sectionNumber,
+      sectionTitle: it.sectionTitle || '',
+      text,
+      tokens: tokenize((it.sectionTitle || '') + ' ' + text),
+    };
+  });
 }
 
 async function deleteAutoLinks(srcCycle) {

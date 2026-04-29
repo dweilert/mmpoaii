@@ -26,22 +26,43 @@ const MAX_RESULTS = 50;
 const SNIPPET_RADIUS = 80;
 
 async function fetchSections(cycleId) {
-  const items = [];
-  let lastKey;
-  do {
-    const result = await ddb.send(new QueryCommand({
-      TableName: TABLE_NAME,
-      KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
-      ExpressionAttributeValues: {
-        ':pk': `CYCLE#${cycleId}`,
-        ':sk': 'CONTENT#',
-      },
-      ExclusiveStartKey: lastKey,
-    }));
-    items.push(...(result.Items || []));
-    lastKey = result.LastEvaluatedKey;
-  } while (lastKey);
-  return items;
+  // Fetch CONTENT (titles, classification) and DOCTEXT (legal text) and merge.
+  async function queryByPrefix(prefix) {
+    const items = [];
+    let lastKey;
+    do {
+      const result = await ddb.send(new QueryCommand({
+        TableName: TABLE_NAME,
+        KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
+        ExpressionAttributeValues: {
+          ':pk': `CYCLE#${cycleId}`,
+          ':sk': prefix,
+        },
+        ExclusiveStartKey: lastKey,
+      }));
+      items.push(...(result.Items || []));
+      lastKey = result.LastEvaluatedKey;
+    } while (lastKey);
+    return items;
+  }
+
+  const [contentItems, textItems] = await Promise.all([
+    queryByPrefix('CONTENT#'),
+    queryByPrefix('DOCTEXT#'),
+  ]);
+
+  // Build a lookup of text by ART#SEC key
+  const textBy = {};
+  for (const t of textItems) {
+    const m = (t.SK || '').match(/^DOCTEXT#(ART-\d+#SEC-[\dA-Za-z]+)$/);
+    if (m) textBy[m[1]] = t.text || '';
+  }
+
+  // Merge text into content items
+  return contentItems.map(c => {
+    const key = `ART-${String(c.articleNumber).padStart(2, '0')}#SEC-${String(c.sectionNumber).padStart(2, '0')}`;
+    return Object.assign({}, c, { text: c.text || textBy[key] || '' });
+  });
 }
 
 function makeSnippet(text, queryTerms) {

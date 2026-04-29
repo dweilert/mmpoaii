@@ -7,7 +7,7 @@
  * Any signed-in user.
  */
 
-const { GetCommand, QueryCommand } = require('@aws-sdk/lib-dynamodb');
+const { GetCommand, QueryCommand, BatchGetCommand } = require('@aws-sdk/lib-dynamodb');
 const { ddb, TABLE_NAME } = require('./shared/dynamo');
 const { ok, badRequest, notFound, serverError, getClaims, forbidden } = require('./shared/auth');
 
@@ -58,6 +58,19 @@ exports.handler = async (event) => {
     const match = items.find(it => String(it.sectionNumber) === String(parseInt(secNum, 10)));
     if (!match) return notFound('Section not found');
 
+    // The legal text is stored separately under SK: DOCTEXT#ART-NN#SEC-NN
+    let text = match.text || '';
+    if (!text) {
+      const textKey = `DOCTEXT#ART-${String(match.articleNumber).padStart(2, '0')}#SEC-${String(match.sectionNumber).padStart(2, '0')}`;
+      const textResult = await ddb.send(new GetCommand({
+        TableName: TABLE_NAME,
+        Key: { PK: `CYCLE#${cycleId}`, SK: textKey },
+      }));
+      if (textResult.Item && textResult.Item.text) {
+        text = textResult.Item.text;
+      }
+    }
+
     return ok({
       cycle: cycleId,
       docLabel: CYCLE_LABELS[cycleId] || cycleId,
@@ -67,7 +80,7 @@ exports.handler = async (event) => {
       sectionNumber: match.sectionNumber,
       sectionTitle:  match.sectionTitle || '',
       classification: match.classification || null,
-      text: match.text || '',
+      text,
       whyItsHere: match.whyItsHere || null,
       whatYouCanDo: match.whatYouCanDo || null,
     });
