@@ -375,6 +375,11 @@ var guardCheck = setInterval(function () {
     if (uname && uname.textContent !== 'Loading…') {
       document.getElementById('nav-avatar').textContent = uname.textContent.charAt(0).toUpperCase();
     }
+    // Defensive: ensure page-content is interactive even if guard's _hideLoading didn't fire
+    var pc = document.getElementById('page-content');
+    if (pc) pc.style.visibility = 'visible';
+    var gl = document.getElementById('guard-loading');
+    if (gl) gl.style.display = 'none';
     loadGraph();
   }
 }, 100);
