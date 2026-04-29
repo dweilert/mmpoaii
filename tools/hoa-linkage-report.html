@@ -326,6 +326,7 @@
       A <strong>Bylaw</strong> is an orphan if no CC&R authorizes it.
       A <strong>Rule of Conduct</strong> is an orphan if no Bylaw or CC&R backs it.
       A <strong>CC&R</strong> is an orphan if no Bylaw or Rule implements it.
+      CC&R sections in the <strong>Definitions</strong> article are exempt — they're glossary entries, not enforceable covenants.
     </div>
   </div>
 
@@ -510,11 +511,17 @@ function connectedDocs(node) {
   return docs;
 }
 
+// CC&R "Definitions" sections are glossary entries — exempt from orphan check.
+function isDefinitionSection(node) {
+  return (node.articleTitle || '').toLowerCase().indexOf('definition') !== -1;
+}
+
 // Hierarchy-based orphan definition:
-//   - CC&R orphan: no Bylaws or Rules implement it
+//   - CC&R orphan: no Bylaws or Rules implement it (Definitions exempt)
 //   - Bylaw orphan: no CC&R covenant authorizes it
 //   - Rule orphan: no Bylaw AND no CC&R supports it
 function isOrphan(node) {
+  if (node.cycleKey === 'ccrs' && isDefinitionSection(node)) return false;
   var docs = connectedDocs(node);
   if (node.cycleKey === 'ccrs')   return !docs.has('bylaws') && !docs.has('rules');
   if (node.cycleKey === 'bylaws') return !docs.has('ccrs');

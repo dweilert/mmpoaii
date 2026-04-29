@@ -29,8 +29,9 @@ const OFFICIAL_CYCLES = {
   rules: 'Cycle-02-Rules',
 };
 
-const MIN_SCORE = 0.10;
-const MAX_LINKS_PER_SECTION = 5;
+const MIN_SCORE = 0.05;          // base threshold for auto-suggested matches
+const MAX_LINKS_PER_SECTION = 8;  // cap per source section
+const MIN_FALLBACK_SCORE = 0.01;  // when forcing a guarantee link, require at least this much
 
 // Words to drop because they appear nearly everywhere in HOA docs and add noise.
 const STOP_WORDS = new Set([
@@ -107,12 +108,20 @@ async function fetchSections(cycleId) {
       cycleId,
       secId,
       articleNumber: it.articleNumber,
+      articleTitle: it.articleTitle || '',
       sectionNumber: it.sectionNumber,
       sectionTitle: it.sectionTitle || '',
       text,
       tokens: tokenize((it.sectionTitle || '') + ' ' + text),
     };
   });
+}
+
+// CC&R Definitions sections (Article 1 in standard CC&Rs) are excluded from
+// linkage requirements — they're glossary entries, not enforceable covenants.
+function isDefinitionSection(s) {
+  const t = (s.articleTitle || '').toLowerCase();
+  return t.includes('definition');
 }
 
 async function deleteAutoLinks(srcCycle) {
@@ -189,39 +198,144 @@ exports.handler = async (event) => {
 
     console.log(`[links-build] CC&Rs=${ccrs.length} Bylaws=${bylaws.length} Rules=${rules.length}`);
 
-    // Pairs to consider:
-    //   CC&Rs <-> Bylaws  (bidirectional)
-    //   Bylaws <-> Rules  (bidirectional)
-    //   CC&Rs <-> Rules   (bidirectional, optional but useful)
-    function buildLinks(srcDocs, tgtDocs, srcCycle, tgtCycle) {
+    // For each source section, score every target and return them sorted desc.
+    // Skip CC&R definition sections from being potential targets — they're
+    // glossary entries, not enforceable covenants.
+    function scoreAll(src, tgtDocs, isCcrTarget) {
+      const matches = [];
+      for (const tgt of tgtDocs) {
+        if (isCcrTarget && isDefinitionSection(tgt)) continue;
+        const score = jaccard(src.tokens, tgt.tokens);
+        if (score > 0) matches.push({ tgtSec: tgt.secId, score });
+      }
+      matches.sort((a, b) => b.score - a.score);
+      return matches;
+    }
+
+    function buildLinks(srcDocs, tgtDocs, srcCycle, tgtCycle, options) {
+      const opts = options || {};
       const links = [];
       for (const src of srcDocs) {
-        const matches = [];
-        for (const tgt of tgtDocs) {
-          const score = jaccard(src.tokens, tgt.tokens);
-          if (score >= MIN_SCORE) {
-            matches.push({ tgtSec: tgt.secId, score });
-          }
-        }
-        matches.sort((a, b) => b.score - a.score);
-        const top = matches.slice(0, MAX_LINKS_PER_SECTION);
-        for (const m of top) {
+        if (opts.skipDefinitionSrc && isDefinitionSection(src)) continue;
+        const all = scoreAll(src, tgtDocs, opts.skipDefinitionTargetIfCcrs);
+        const above = all.filter(m => m.score >= MIN_SCORE).slice(0, MAX_LINKS_PER_SECTION);
+        for (const m of above) {
           links.push({ srcSec: src.secId, tgtCycle, tgtSec: m.tgtSec, score: parseFloat(m.score.toFixed(4)) });
         }
       }
       return links;
     }
 
-    const ccrToBylaws = buildLinks(ccrs, bylaws, OFFICIAL_CYCLES.ccrs, OFFICIAL_CYCLES.bylaws);
-    const bylawToCcr  = buildLinks(bylaws, ccrs, OFFICIAL_CYCLES.bylaws, OFFICIAL_CYCLES.ccrs);
-    const bylawToRule = buildLinks(bylaws, rules, OFFICIAL_CYCLES.bylaws, OFFICIAL_CYCLES.rules);
-    const ruleToBylaw = buildLinks(rules, bylaws, OFFICIAL_CYCLES.rules, OFFICIAL_CYCLES.bylaws);
-    const ccrToRule   = buildLinks(ccrs, rules, OFFICIAL_CYCLES.ccrs, OFFICIAL_CYCLES.rules);
-    const ruleToCcr   = buildLinks(rules, ccrs, OFFICIAL_CYCLES.rules, OFFICIAL_CYCLES.ccrs);
+    const ccrToBylaws = buildLinks(ccrs,   bylaws, OFFICIAL_CYCLES.ccrs,   OFFICIAL_CYCLES.bylaws, { skipDefinitionSrc: true });
+    const bylawToCcr  = buildLinks(bylaws, ccrs,   OFFICIAL_CYCLES.bylaws, OFFICIAL_CYCLES.ccrs,   { skipDefinitionTargetIfCcrs: true });
+    const bylawToRule = buildLinks(bylaws, rules,  OFFICIAL_CYCLES.bylaws, OFFICIAL_CYCLES.rules);
+    const ruleToBylaw = buildLinks(rules,  bylaws, OFFICIAL_CYCLES.rules,  OFFICIAL_CYCLES.bylaws);
+    const ccrToRule   = buildLinks(ccrs,   rules,  OFFICIAL_CYCLES.ccrs,   OFFICIAL_CYCLES.rules,  { skipDefinitionSrc: true });
+    const ruleToCcr   = buildLinks(rules,  ccrs,   OFFICIAL_CYCLES.rules,  OFFICIAL_CYCLES.ccrs,   { skipDefinitionTargetIfCcrs: true });
+
+    // ── Guarantee parent linkage where the hierarchy demands it ───────────────
+    // Every Bylaw should have at least one CC&R parent (excluding Definitions).
+    // Every Rule should have at least one Bylaw OR CC&R parent.
+    // If the threshold-based scan didn't produce one, force the best match
+    // (still requires MIN_FALLBACK_SCORE so we don't connect totally unrelated text).
+
+    function hasLinkBetween(srcCycleKey, srcSec, tgtCycleKey, allLinkLists) {
+      for (const list of allLinkLists) {
+        for (const l of list) {
+          if (l._src === srcCycleKey && l.srcSec === srcSec && l._tgt === tgtCycleKey) return true;
+          if (l._src === tgtCycleKey && l.srcSec === l.srcSec && l._tgt === srcCycleKey && l.tgtSec === srcSec) return true;
+        }
+      }
+      return false;
+    }
+
+    // Tag with src/tgt cycle keys so the helper above can match in any direction
+    function tagKey(arr, srcKey, tgtKey) {
+      arr.forEach(l => { l._src = srcKey; l._tgt = tgtKey; });
+      return arr;
+    }
+    tagKey(ccrToBylaws, 'ccrs',   'bylaws');
+    tagKey(bylawToCcr,  'bylaws', 'ccrs');
+    tagKey(bylawToRule, 'bylaws', 'rules');
+    tagKey(ruleToBylaw, 'rules',  'bylaws');
+    tagKey(ccrToRule,   'ccrs',   'rules');
+    tagKey(ruleToCcr,   'rules',  'ccrs');
+
+    // Build a quick lookup of "section X has a link to any Y in cycle Z" (either direction)
+    function hasCrossLink(node, otherCycleKey, allLinks) {
+      const myCycle = node.cycleKey;
+      const mySec   = node.secId;
+      for (const l of allLinks) {
+        if (l._src === myCycle && l.srcSec === mySec && l._tgt === otherCycleKey) return true;
+        if (l._tgt === myCycle && l.tgtSec === mySec && l._src === otherCycleKey) return true;
+      }
+      return false;
+    }
+
+    function withCycleKey(arr, key) {
+      return arr.map(s => Object.assign({}, s, { cycleKey: key }));
+    }
+    const allCcrs   = withCycleKey(ccrs,   'ccrs');
+    const allBylaws = withCycleKey(bylaws, 'bylaws');
+    const allRules  = withCycleKey(rules,  'rules');
+
+    const everyLink = [].concat(ccrToBylaws, bylawToCcr, bylawToRule, ruleToBylaw, ccrToRule, ruleToCcr);
+
+    // Fallback for Bylaws with no CC&R link
+    let forcedBylawCcr = 0;
+    for (const b of allBylaws) {
+      if (hasCrossLink(b, 'ccrs', everyLink)) continue;
+      const all = scoreAll(b, ccrs, true /* skip definition CC&Rs */);
+      if (all.length === 0) continue;
+      const best = all[0];
+      if (best.score < MIN_FALLBACK_SCORE) continue;
+      const fallback = {
+        srcSec: b.secId, tgtCycle: OFFICIAL_CYCLES.ccrs, tgtSec: best.tgtSec,
+        score: parseFloat(best.score.toFixed(4)),
+        _src: 'bylaws', _tgt: 'ccrs',
+      };
+      bylawToCcr.push(fallback);
+      everyLink.push(fallback);
+      forcedBylawCcr++;
+    }
+
+    // Fallback for Rules with no Bylaw OR CC&R link
+    let forcedRuleParent = 0;
+    for (const r of allRules) {
+      if (hasCrossLink(r, 'bylaws', everyLink)) continue;
+      if (hasCrossLink(r, 'ccrs',   everyLink)) continue;
+      // Choose best between Bylaw and CC&R candidates
+      const bylawMatches = scoreAll(r, bylaws, false);
+      const ccrMatches   = scoreAll(r, ccrs,   true /* skip definitions */);
+      let best = null;
+      let target = null;
+      if (bylawMatches.length > 0) { best = bylawMatches[0]; target = 'bylaws'; }
+      if (ccrMatches.length > 0 && (!best || ccrMatches[0].score > best.score)) {
+        best = ccrMatches[0]; target = 'ccrs';
+      }
+      if (!best || best.score < MIN_FALLBACK_SCORE) continue;
+      const fallback = {
+        srcSec: r.secId,
+        tgtCycle: target === 'bylaws' ? OFFICIAL_CYCLES.bylaws : OFFICIAL_CYCLES.ccrs,
+        tgtSec: best.tgtSec,
+        score: parseFloat(best.score.toFixed(4)),
+        _src: 'rules', _tgt: target,
+      };
+      if (target === 'bylaws') ruleToBylaw.push(fallback);
+      else                     ruleToCcr.push(fallback);
+      everyLink.push(fallback);
+      forcedRuleParent++;
+    }
+
+    // Strip helper props before writing
+    [ccrToBylaws, bylawToCcr, bylawToRule, ruleToBylaw, ccrToRule, ruleToCcr].forEach(arr => {
+      arr.forEach(l => { delete l._src; delete l._tgt; });
+    });
 
     console.log(`[links-build] CCR->Bylaws=${ccrToBylaws.length} Bylaws->CCR=${bylawToCcr.length}`);
     console.log(`[links-build] Bylaws->Rules=${bylawToRule.length} Rules->Bylaws=${ruleToBylaw.length}`);
     console.log(`[links-build] CCR->Rules=${ccrToRule.length} Rules->CCR=${ruleToCcr.length}`);
+    console.log(`[links-build] forced Bylaw->CCR fallbacks=${forcedBylawCcr}, Rule->parent fallbacks=${forcedRuleParent}`);
 
     // Clear existing auto links per source cycle
     await deleteAutoLinks(OFFICIAL_CYCLES.ccrs);
@@ -246,6 +360,10 @@ exports.handler = async (event) => {
         ruleToBylaw: ruleToBylaw.length,
         ccrToRule:   ccrToRule.length,
         ruleToCcr:   ruleToCcr.length,
+      },
+      forced: {
+        bylawToCcr: forcedBylawCcr,
+        ruleToParent: forcedRuleParent,
       },
     });
   } catch (err) {
