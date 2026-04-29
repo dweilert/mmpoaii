@@ -733,10 +733,34 @@ function drawConnections() {
     console.log('[draw] svg=' + Math.round(rect.width) + 'x' + Math.round(rect.height) +
                 ', links=' + links.length + ', drawn=' + drawn);
 
-    applyHighlight();
+    // Apply highlight ONLY if a node is currently selected (otherwise we'd
+    // re-trigger renderGraph -> drawConnections in an infinite loop).
+    if (SELECTED_NODE) updatePathHighlights();
   } catch (err) {
     console.error('[draw] error:', err);
   }
+}
+
+// Just toggles the .highlight/.dimmed classes on existing SVG paths
+// without re-rendering the graph. Safe to call from anywhere.
+function updatePathHighlights() {
+  var svg = document.getElementById('graph-svg');
+  if (!svg) return;
+  if (!SELECTED_NODE) {
+    svg.querySelectorAll('path').forEach(function (p) {
+      p.classList.remove('highlight'); p.classList.remove('dimmed');
+    });
+    return;
+  }
+  svg.querySelectorAll('path').forEach(function (p) {
+    var src = p.getAttribute('data-src');
+    var tgt = p.getAttribute('data-tgt');
+    if (src === SELECTED_NODE || tgt === SELECTED_NODE) {
+      p.classList.add('highlight'); p.classList.remove('dimmed');
+    } else {
+      p.classList.remove('highlight'); p.classList.add('dimmed');
+    }
+  });
 }
 
 window.addEventListener('resize', function () {
