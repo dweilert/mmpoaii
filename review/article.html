@@ -270,8 +270,8 @@ async function loadArticle() {
       html += '</div>';
       // Right side: View Key Questions, View Field Notes
       html += '<div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">';
-      html += '<button onclick="showKeyQuestions(\'' + cls + '\')" style="white-space:nowrap;padding:7px 16px;font-size:13px;border:1px solid #bbb;color:#555;background:#fafafa;border-radius:var(--r);cursor:pointer;font-weight:600;">View Key Questions</button>';
-      html += '<button onclick="showFieldNotes(\'' + secId + '\', ' + artNum + ', \'' + escHtml(s.sectionTitle).replace(/'/g, "\\'") + '\', ' + s.sectionNumber + ')" style="white-space:nowrap;padding:7px 16px;font-size:13px;border:1px solid #bbb;color:#555;background:#fafafa;border-radius:var(--r);cursor:pointer;font-weight:600;">View Field Notes</button>';
+      html += '<button data-action="key-questions" data-classification="' + escAttr(cls) + '" style="white-space:nowrap;padding:7px 16px;font-size:13px;border:1px solid #bbb;color:#555;background:#fafafa;border-radius:var(--r);cursor:pointer;font-weight:600;">View Key Questions</button>';
+      html += '<button data-action="field-notes" data-sec-id="' + escAttr(secId) + '" data-art-num="' + artNum + '" data-section-number="' + s.sectionNumber + '" data-section-title="' + escAttr(s.sectionTitle) + '" style="white-space:nowrap;padding:7px 16px;font-size:13px;border:1px solid #bbb;color:#555;background:#fafafa;border-radius:var(--r);cursor:pointer;font-weight:600;">View Field Notes</button>';
       html += '</div>';
       html += '</div></div>';
 
@@ -624,6 +624,39 @@ function escHtml(s) {
   d.textContent = s || '';
   return d.innerHTML;
 }
+
+// Escape for HTML attribute context — handles & " < > and ' (textContent->innerHTML
+// alone leaves " and ' unescaped, which breaks attribute parsing for titles
+// like "Association" or "Owner's Easements").
+function escAttr(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+// Delegated click handler for section header buttons.
+// Inline onclick="" was breaking when section titles contained quote chars
+// (e.g., the Definitions sections "Association", "Owner"). Data attributes
+// avoid the escaping minefield entirely.
+document.addEventListener('click', function (e) {
+  var btn = e.target.closest('button[data-action]');
+  if (!btn) return;
+  var action = btn.dataset.action;
+  if (action === 'key-questions') {
+    showKeyQuestions(btn.dataset.classification);
+  } else if (action === 'field-notes') {
+    showFieldNotes(
+      btn.dataset.secId,
+      parseInt(btn.dataset.artNum, 10),
+      btn.dataset.sectionTitle,
+      parseInt(btn.dataset.sectionNumber, 10)
+    );
+  }
+});
 
 // ── "Just the Facts" reading mode toggle ──
 var readingMode = false;
