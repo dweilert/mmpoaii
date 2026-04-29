@@ -253,16 +253,39 @@
     <button class="filter-btn" onclick="window.print()">Print / Save PDF</button>
   </div>
 
-  <div class="report-toolbar">
-    <div class="filter-group">
-      <span class="filter-label">View:</span>
-      <button class="filter-btn active" data-mode="all"     onclick="setMode('all')">All sections</button>
-      <button class="filter-btn"        data-mode="orphans" onclick="setMode('orphans')">Orphans only</button>
-      <button class="filter-btn"        data-mode="strong"  onclick="setMode('strong')">Strong matches (≥30%)</button>
+  <div class="report-toolbar" style="flex-direction:column;align-items:stretch;gap:10px;">
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+      <div class="filter-group">
+        <span class="filter-label">View:</span>
+        <button class="filter-btn active" data-mode="all"     onclick="setMode('all')">All sections</button>
+        <button class="filter-btn"        data-mode="orphans" onclick="setMode('orphans')">Orphans only</button>
+        <button class="filter-btn"        data-mode="strong"  onclick="setMode('strong')">Strong matches (≥30%)</button>
+      </div>
+      <div class="filter-group" style="margin-left:auto;">
+        <span class="filter-label" id="focus-hint">Click any section to focus on its connections</span>
+        <button class="filter-btn" id="clear-focus-btn" style="display:none;" onclick="clearFocus()">✕ Clear focus</button>
+      </div>
     </div>
-    <div class="filter-group" style="margin-left:auto;">
-      <span class="filter-label" id="focus-hint">Click any section to focus on its connections</span>
-      <button class="filter-btn" id="clear-focus-btn" style="display:none;" onclick="clearFocus()">✕ Clear focus</button>
+    <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;border-top:1px solid var(--border);padding-top:10px;">
+      <div class="filter-group">
+        <span class="filter-label">Documents:</span>
+        <button class="filter-btn active" data-doc="ccrs"   onclick="toggleDoc('ccrs')">CC&Rs</button>
+        <button class="filter-btn active" data-doc="bylaws" onclick="toggleDoc('bylaws')">Bylaws</button>
+        <button class="filter-btn active" data-doc="rules"  onclick="toggleDoc('rules')">Rules</button>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Articles:</span>
+        <input type="text" id="article-filter" placeholder="e.g. 4 or 1-3 or 2,5,7"
+               style="padding:6px 10px;font-size:12px;border:1px solid var(--border);border-radius:var(--r);width:160px;"
+               oninput="onFilterChange()">
+      </div>
+      <div class="filter-group" style="flex:1;min-width:200px;">
+        <span class="filter-label">Keyword:</span>
+        <input type="text" id="keyword-filter" placeholder="e.g. parking, assessment, voting…"
+               style="padding:6px 10px;font-size:12px;border:1px solid var(--border);border-radius:var(--r);flex:1;min-width:160px;"
+               oninput="onFilterChange()">
+      </div>
+      <button class="filter-btn" onclick="clearFilters()" id="clear-filters-btn">Clear filters</button>
     </div>
   </div>
 
@@ -336,6 +359,9 @@ function escHtml(s) {
 var GRAPH = null;       // { sections: { ccrs, bylaws, rules }, links: [...], counts }
 var MODE = 'all';       // 'all' | 'orphans' | 'strong'
 var SELECTED_NODE = null; // {cycleKey, secId}
+var DOC_VISIBLE = { ccrs: true, bylaws: true, rules: true };
+var ARTICLE_FILTER = ''; // raw string, e.g. "4" or "1-3" or "2,5,7"
+var KEYWORD_FILTER = ''; // case-insensitive substring
 
 async function loadGraph() {
   try {
@@ -356,6 +382,69 @@ function setMode(mode) {
   });
   renderStats();
   renderGraph();
+}
+
+function toggleDoc(key) {
+  DOC_VISIBLE[key] = !DOC_VISIBLE[key];
+  // Don't allow all three to be off — re-enable if user just turned off the last one
+  if (!DOC_VISIBLE.ccrs && !DOC_VISIBLE.bylaws && !DOC_VISIBLE.rules) {
+    DOC_VISIBLE[key] = true;
+  }
+  document.querySelector('.filter-btn[data-doc="' + key + '"]').classList.toggle('active', DOC_VISIBLE[key]);
+  SELECTED_NODE = null;
+  renderStats();
+  renderGraph();
+}
+
+function onFilterChange() {
+  ARTICLE_FILTER = document.getElementById('article-filter').value.trim();
+  KEYWORD_FILTER = document.getElementById('keyword-filter').value.trim();
+  SELECTED_NODE = null;
+  renderStats();
+  renderGraph();
+}
+
+function clearFilters() {
+  ARTICLE_FILTER = '';
+  KEYWORD_FILTER = '';
+  document.getElementById('article-filter').value = '';
+  document.getElementById('keyword-filter').value = '';
+  DOC_VISIBLE = { ccrs: true, bylaws: true, rules: true };
+  document.querySelectorAll('.filter-btn[data-doc]').forEach(function (b) { b.classList.add('active'); });
+  SELECTED_NODE = null;
+  renderStats();
+  renderGraph();
+}
+
+// Parse an article filter like "4" or "1-3" or "2,5,7" — returns null = "no filter"
+function parseArticleFilter(str) {
+  if (!str) return null;
+  var allowed = new Set();
+  var parts = str.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+  for (var i = 0; i < parts.length; i++) {
+    var p = parts[i];
+    var m = p.match(/^(\d+)\s*-\s*(\d+)$/);
+    if (m) {
+      var lo = parseInt(m[1], 10);
+      var hi = parseInt(m[2], 10);
+      if (lo <= hi) for (var n = lo; n <= hi; n++) allowed.add(n);
+    } else if (/^\d+$/.test(p)) {
+      allowed.add(parseInt(p, 10));
+    }
+  }
+  return allowed.size === 0 ? null : allowed;
+}
+
+// Returns true if the section passes the article + keyword + doc filters.
+function passesUserFilters(node) {
+  if (!DOC_VISIBLE[node.cycleKey]) return false;
+  var artSet = parseArticleFilter(ARTICLE_FILTER);
+  if (artSet && !artSet.has(parseInt(node.articleNumber, 10))) return false;
+  if (KEYWORD_FILTER) {
+    var hay = ((node.sectionTitle || '') + ' ' + (node.articleTitle || '')).toLowerCase();
+    if (hay.indexOf(KEYWORD_FILTER.toLowerCase()) === -1) return false;
+  }
+  return true;
 }
 
 // Compute outgoing-link sets for each section
@@ -398,18 +487,43 @@ function filterLinks(links) {
 
 function renderStats() {
   var s = GRAPH.sections;
-  // Count orphans across all 3 docs in current mode
-  var orphans = 0;
-  ['ccrs', 'bylaws', 'rules'].forEach(function (k) {
-    s[k].forEach(function (n) { if (isOrphan(n)) orphans++; });
+  // Apply user filters first
+  var visible = {
+    ccrs:   s.ccrs.filter(passesUserFilters),
+    bylaws: s.bylaws.filter(passesUserFilters),
+    rules:  s.rules.filter(passesUserFilters),
+  };
+  // Apply mode filter (orphans-only narrows further)
+  if (MODE === 'orphans') {
+    visible.ccrs   = visible.ccrs.filter(isOrphan);
+    visible.bylaws = visible.bylaws.filter(isOrphan);
+    visible.rules  = visible.rules.filter(isOrphan);
+  }
+  var orphans = visible.ccrs.filter(isOrphan).length +
+                visible.bylaws.filter(isOrphan).length +
+                visible.rules.filter(isOrphan).length;
+
+  // Count visible links: must be between visible nodes and pass strong filter if active
+  var visibleIds = new Set();
+  ['ccrs','bylaws','rules'].forEach(function (k) {
+    visible[k].forEach(function (n) { visibleIds.add(n.cycleKey + ':' + n.secId); });
   });
-  var totalLinks = filterLinks(GRAPH.links).length;
+  var totalLinks = filterLinks(GRAPH.links).filter(function (l) {
+    return visibleIds.has(l.srcCycleKey + ':' + l.srcSec) &&
+           visibleIds.has(l.tgtCycleKey + ':' + l.tgtSec);
+  }).length;
+
+  function statCard(key, count, total, label) {
+    var cls = key ? ' ' + key : '';
+    var num = total != null && total !== count ? count + ' / ' + total : count;
+    return '<div class="stat-card' + cls + '"><div class="stat-num">' + num + '</div><div class="stat-lbl">' + label + '</div></div>';
+  }
   document.getElementById('stats-row').innerHTML =
-    '<div class="stat-card ccrs"><div class="stat-num">' + s.ccrs.length + '</div><div class="stat-lbl">CC&Rs sections</div></div>' +
-    '<div class="stat-card bylaws"><div class="stat-num">' + s.bylaws.length + '</div><div class="stat-lbl">Bylaws sections</div></div>' +
-    '<div class="stat-card rules"><div class="stat-num">' + s.rules.length + '</div><div class="stat-lbl">Rules sections</div></div>' +
-    '<div class="stat-card"><div class="stat-num">' + totalLinks + '</div><div class="stat-lbl">Total links</div></div>' +
-    '<div class="stat-card orphans"><div class="stat-num">' + orphans + '</div><div class="stat-lbl">Orphans (no cross-doc links)</div></div>';
+    statCard('ccrs',    visible.ccrs.length,   s.ccrs.length,   'CC&Rs sections') +
+    statCard('bylaws',  visible.bylaws.length, s.bylaws.length, 'Bylaws sections') +
+    statCard('rules',   visible.rules.length,  s.rules.length,  'Rules sections') +
+    statCard('',        totalLinks,            null,            'Visible links') +
+    statCard('orphans', orphans,               null,            'Orphans (no cross-doc links)');
 }
 
 function renderGraph() {
@@ -417,14 +531,15 @@ function renderGraph() {
 
   function nodeHtml(node) {
     var orphan = isOrphan(node);
+    var passesUser = passesUserFilters(node);
+    var hidden = !passesUser || (MODE === 'orphans' && !orphan);
     var classes = ['node'];
-    if (MODE === 'orphans' && !orphan) classes.push('hidden-by-mode');
     if (orphan) classes.push('orphan');
     var idAttr = node.cycleKey + ':' + node.secId;
     return (
       '<div class="' + classes.join(' ') + '" data-id="' + idAttr + '" ' +
       'data-cycle="' + node.cycleId + '" data-sec="' + node.secId + '" ' +
-      (classes.indexOf('hidden-by-mode') !== -1 ? 'style="display:none;"' : '') +
+      (hidden ? 'style="display:none;"' : '') +
       ' onclick="onNodeClick(\'' + idAttr + '\', event)">' +
         '<span class="node-id">Art ' + node.articleNumber + ' §' + node.sectionNumber + '</span>' +
         '<span class="node-title">' + escHtml(node.sectionTitle) + '</span>' +
@@ -455,19 +570,29 @@ function renderGraph() {
       inner += '</div>';
     });
 
+    var visibleCount = nodes.filter(function (n) {
+      var passesUser = passesUserFilters(n);
+      var orphanHidden = (MODE === 'orphans' && !isOrphan(n));
+      return passesUser && !orphanHidden;
+    }).length;
+
+    var colHidden = !DOC_VISIBLE[key];
     return (
-      '<div class="graph-col ' + key + '" id="col-' + key + '">' +
+      '<div class="graph-col ' + key + '" id="col-' + key + '"' +
+      (colHidden ? ' style="display:none;"' : '') + '>' +
         '<div class="graph-col-header"><h3>' + label + '</h3>' +
-          '<span class="col-count">' + nodes.length + ' sections</span>' +
+          '<span class="col-count">' + visibleCount + ' / ' + nodes.length + ' sections</span>' +
         '</div>' + inner +
       '</div>'
     );
   }
 
+  var visibleCols = ['ccrs','bylaws','rules'].filter(function (k) { return DOC_VISIBLE[k]; }).length;
+  var gridStyle = 'grid-template-columns: repeat(' + visibleCols + ', 1fr);';
   var html =
     '<div class="graph-shell">' +
       '<svg class="graph-svg" id="graph-svg"></svg>' +
-      '<div class="graph-cols" id="graph-cols">' +
+      '<div class="graph-cols" id="graph-cols" style="' + gridStyle + '">' +
         colHtml('ccrs',   'CC&Rs',            s.ccrs)   +
         colHtml('bylaws', 'Bylaws',           s.bylaws) +
         colHtml('rules',  'Rules of Conduct', s.rules)  +
@@ -560,18 +685,10 @@ function applyHighlight() {
   var hint = document.getElementById('focus-hint');
 
   if (!SELECTED_NODE) {
-    // Restore everything (respect orphans-only mode)
-    nodes.forEach(function (n) {
-      n.classList.remove('highlighted');
-      // Show all nodes unless they were hidden by orphans-only mode
-      var orphanHidden = (MODE === 'orphans' && !n.classList.contains('orphan'));
-      n.style.display = orphanHidden ? 'none' : '';
-    });
-    groups.forEach(function (g) { g.style.display = ''; });
-    hideEmptyGroups();
+    // Re-render to fully respect mode + user filters
+    renderGraph();
     if (clearBtn) clearBtn.style.display = 'none';
     if (hint) hint.textContent = 'Click any section to focus on its connections';
-    requestAnimationFrame(drawConnections);
     return;
   }
 
