@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Board Financial Reports — MMPOAII HOA</title>
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/documents.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="inner">
+    <a href="/" class="site-logo">
+      <div class="logo-mark">🏡</div>
+      <div class="logo-text">
+        <div class="logo-name" data-hoa-name>MMPOAII HOA</div>
+        <div class="logo-sub">Board Financial Reports</div>
+      </div>
+    </a>
+    <nav class="site-nav">
+      <div class="nav-user">
+        <div class="avatar" id="nav-avatar">?</div>
+        <div>
+          <div class="uname" data-user-name>Loading…</div>
+          <div class="urole" data-user-role></div>
+        </div>
+      </div>
+      <a href="/board/index.html" id="back-link" class="back-btn">← Back to Portal</a>
+    </nav>
+  </div>
+</header>
+
+<div id="page-content">
+<div class="page-wrap">
+
+  <div class="welcome-banner">
+    <div class="wb-left">
+      <h2>📊 Board Financial Reports</h2>
+      <p>Generated financial reports published from the HOA accounting system. Board members only.</p>
+    </div>
+  </div>
+
+  <!-- FILE LIST -->
+  <div class="files-section">
+    <div class="files-head">
+      <h2>Reports <span class="file-count" id="file-count"></span></h2>
+      <button class="refresh-btn" onclick="loadFiles()">↺ Refresh</button>
+    </div>
+    <div class="file-list" id="file-list">
+      <div class="state-box">
+        <p><span class="spinner-sm"></span>Loading…</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<footer class="site-footer">
+  <div data-hoa-name>MMPOAII HOA</div>
+  <div class="footer-disclaimer">Financial reports — board members only. Generated from the HOA accounting system.</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6/dist/amazon-cognito-identity.min.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/guard.js"></script>
+<script>
+const FOLDER = 'budget';
+
+// Known report name prefixes — only these show on this page.
+// Manually uploaded documents remain on the Budget & Financials page.
+const REPORT_PREFIXES = [
+  'expense-vs-budget-',
+  'expense-detail-',
+  'expense-summary-',
+  'budget-summary-',
+];
+
+// Human-friendly labels keyed by prefix
+const REPORT_LABELS = {
+  'expense-vs-budget-': 'Expense vs Budget',
+  'expense-detail-':    'Expense Detail',
+  'expense-summary-':   'Expense Summary',
+  'budget-summary-':    'Budget Summary',
+};
+
+HoaGuard.protect(['board']);
+
+const guardCheck = setInterval(function () {
+  const user = HoaGuard.getUser();
+  if (!user) return;
+  clearInterval(guardCheck);
+
+  const c = typeof HOA_CONFIG !== 'undefined' ? HOA_CONFIG : {};
+  document.getElementById('nav-avatar').textContent = user.username.charAt(0).toUpperCase();
+  document.title = 'Board Financial Reports — ' + (c.hoaName || 'MMPOAII HOA');
+  loadFiles();
+}, 100);
+
+function s3BaseUrl() {
+  const c = HOA_CONFIG;
+  return 'https://' + c.s3BucketName + '.s3.' + c.s3Region + '.amazonaws.com';
+}
+
+function fmtDate(iso) {
+  try {
+    return new Date(iso).toLocaleDateString('en-US', {
+      month: 'short', day: 'numeric', year: 'numeric'
+    });
+  } catch (e) { return iso.slice(0, 10); }
+}
+
+function fmtSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1048576).toFixed(1) + ' MB';
+}
+
+function reportLabel(filename) {
+  for (const prefix of REPORT_PREFIXES) {
+    if (filename.startsWith(prefix)) {
+      // Extract year from filename, e.g. "expense-vs-budget-2026.pdf" → "2026"
+      const year = filename.replace(prefix, '').replace('.pdf', '');
+      return REPORT_LABELS[prefix] + (year ? ' · ' + year : '');
+    }
+  }
+  return filename;
+}
+
+async function loadFiles() {
+  const list = document.getElementById('file-list');
+  list.innerHTML = '<div class="state-box"><p><span class="spinner-sm"></span>Loading…</p></div>';
+
+  try {
+    const url = s3BaseUrl() + '/?list-type=2&prefix=' + FOLDER + '/&delimiter=/';
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const text = await res.text();
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(text, 'application/xml');
+
+    const items = Array.from(xml.querySelectorAll('Contents')).map(function (el) {
+      return {
+        key:      el.querySelector('Key').textContent,
+        size:     parseInt(el.querySelector('Size').textContent),
+        modified: el.querySelector('LastModified').textContent,
+      };
+    }).filter(function (f) {
+      if (f.key === FOLDER + '/' || f.size === 0) return false;
+      const filename = f.key.replace(FOLDER + '/', '');
+      return REPORT_PREFIXES.some(function (p) { return filename.startsWith(p); });
+    }).sort(function (a, b) {
+      // Sort by report prefix order, then by filename descending (newest year first)
+      const aName = a.key.replace(FOLDER + '/', '');
+      const bName = b.key.replace(FOLDER + '/', '');
+      const aIdx = REPORT_PREFIXES.findIndex(function (p) { return aName.startsWith(p); });
+      const bIdx = REPORT_PREFIXES.findIndex(function (p) { return bName.startsWith(p); });
+      if (aIdx !== bIdx) return aIdx - bIdx;
+      return bName.localeCompare(aName);
+    });
+
+    document.getElementById('file-count').textContent =
+      '(' + items.length + ' report' + (items.length !== 1 ? 's' : '') + ')';
+
+    if (items.length === 0) {
+      list.innerHTML =
+        '<div class="state-box"><div class="sb-icon">📂</div>' +
+        '<p>No financial reports published yet.<br>' +
+        '<small style="color:var(--text3)">Use the HOA accounting app to generate and publish reports.</small></p></div>';
+      return;
+    }
+
+    list.innerHTML = items.map(function (f) {
+      const filename = f.key.replace(FOLDER + '/', '');
+      const label    = reportLabel(filename);
+      const dlUrl    = s3BaseUrl() + '/' + f.key;
+      return '<div class="file-item">' +
+        '<div class="fi-icon">📄</div>' +
+        '<div class="fi-body">' +
+          '<div class="fi-name">' + label + '</div>' +
+          '<div class="fi-meta">' + fmtDate(f.modified) + ' &nbsp;·&nbsp; ' + fmtSize(f.size) + '</div>' +
+        '</div>' +
+        '<div class="fi-actions">' +
+          '<a href="' + dlUrl + '" download="' + filename + '" class="dl-btn" target="_blank">⬇ Download</a>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+  } catch (err) {
+    list.innerHTML =
+      '<div class="state-box"><div class="sb-icon">⚠</div>' +
+      '<p>Could not load reports.<br><small style="color:var(--text3)">' + err.message + '</small></p></div>';
+  }
+}
+</script>
+</body>
+</html>
