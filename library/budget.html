@@ -104,8 +104,8 @@ const FOLDER = 'budget';
 let isBoard = false;
 let uploadQueue = [];
 
-// ── Guard — allow board AND homeowners ────────────────────────────────────────
-HoaGuard.protect(['board', 'homeowners']);
+// ── Guard — board members only ────────────────────────────────────────────────
+HoaGuard.protect(['board']);
 
 // ── Init after guard confirms auth ────────────────────────────────────────────
 const guardCheck = setInterval(function () {
