@@ -63,37 +63,43 @@
 
   <div id="ae-message"></div>
 
-  <!-- Article list view -->
+  <!-- Level 1: Article list -->
   <div id="ae-list-view">
     <div class="ae-note">
-      Select an article to edit. Saving creates a <strong>new version</strong>. The
-      previous version is retained and remains viewable by reviewers. <strong>No votes
-      are changed or reset.</strong> Section count cannot change.
+      Pick an article, then edit one subsection at a time. Each subsection is
+      versioned on its own — a change to one leaves the others untouched.
+      <strong>No votes are changed or reset.</strong>
     </div>
     <div id="ae-article-list">
       <div class="empty-state"><div class="es-icon">⏳</div><div class="es-text">Loading articles…</div></div>
     </div>
   </div>
 
-  <!-- Editor view -->
+  <!-- Level 2: Section list for one article -->
+  <div id="ae-sections-view" style="display:none;">
+    <div style="margin-bottom:12px;">
+      <a href="#" onclick="backToArticles();return false;" style="font-size:14px;color:var(--purple-800);text-decoration:none;font-weight:600;">← All articles</a>
+    </div>
+    <h3 id="ae-sections-heading" style="font-family:var(--serif);margin:0 0 4px;"></h3>
+    <p style="opacity:.8;font-size:13px;margin:0 0 16px;">Click a subsection to edit it. Only the subsection you edit gets a new version.</p>
+    <div id="ae-section-list"></div>
+  </div>
+
+  <!-- Level 3: Single-subsection editor -->
   <div id="ae-edit-view" style="display:none;">
+    <div style="margin-bottom:12px;">
+      <a href="#" onclick="backToSections();return false;" style="font-size:14px;color:var(--purple-800);text-decoration:none;font-weight:600;">← Back to subsections</a>
+    </div>
+    <h3 id="ae-edit-heading" style="font-family:var(--serif);margin:0 0 4px;"></h3>
     <div class="ae-note">
-      On save, <strong>only the sections you actually change get a new version</strong> —
-      a one-line edit to one section versions that section alone. Section count is locked
-      at <span id="ae-sec-count">?</span> to protect existing votes. Prior versions stay
-      viewable by reviewers, and <strong>no votes are changed or reset.</strong>
+      Editing <strong>one subsection</strong>. Saving versions this subsection only;
+      every other subsection and all votes are untouched. The subsection number is
+      locked. Prior versions stay viewable by reviewers.
     </div>
-
-    <div class="ae-field">
-      <label for="ae-article-title">Article Title</label>
-      <input type="text" id="ae-article-title" />
-    </div>
-
-    <div id="ae-sections"></div>
-
+    <div id="ae-edit-fields"></div>
     <div style="display:flex;gap:10px;margin-top:18px;">
-      <button class="ae-btn ae-btn-primary" id="ae-save-btn" onclick="saveNewVersion()">Save New Version</button>
-      <button class="ae-btn ae-btn-secondary" onclick="backToList()">Cancel</button>
+      <button class="ae-btn ae-btn-primary" id="ae-save-btn" onclick="saveSection()">Save This Subsection</button>
+      <button class="ae-btn ae-btn-secondary" onclick="backToSections()">Cancel</button>
     </div>
   </div>
 
@@ -174,7 +180,7 @@ async function loadArticles() {
           '<div class="title">' + escHtml(a.articleTitle) + ' ' + badge + '</div>' +
           '<div style="font-size:12px;color:var(--text3);">' + a.totalSections + ' sections</div>' +
           '<button class="ae-btn ae-btn-secondary" style="padding:6px 14px;font-size:13px;" ' +
-            'onclick="openEditor(' + a.articleNumber + ')">Edit</button>' +
+            'onclick="openArticle(' + a.articleNumber + ')">Edit sections →</button>' +
         '</div>';
     }
     document.getElementById('ae-article-list').innerHTML = html;
@@ -183,8 +189,8 @@ async function loadArticles() {
   }
 }
 
-// ── Editor ──────────────────────────────────────────────────────────────────
-async function openEditor(articleNumber) {
+// ── Level 2: load one article's sections ────────────────────────────────────
+async function openArticle(articleNumber) {
   clearMsg();
   showMsg('info', 'Loading article ' + articleNumber + '…');
   try {
@@ -208,115 +214,160 @@ async function openEditor(articleNumber) {
       sections[i].currentVersion = verByNum[sections[i].sectionNumber] || 1;
     }
 
-    editState = { articleId: articleNumber, sections: sections };
-
-    renderEditor(article.articleTitle, sections);
+    editState = { articleNumber: articleNumber, articleTitle: article.articleTitle, sections: sections };
     clearMsg();
+    renderSectionList();
   } catch (err) {
-    showMsg('err', 'Failed to open editor: ' + err.message);
+    showMsg('err', 'Failed to open article: ' + err.message);
   }
 }
 
-function renderEditor(articleTitle, sections) {
+function renderSectionList() {
   document.getElementById('ae-list-view').style.display = 'none';
-  document.getElementById('ae-edit-view').style.display = 'block';
-  document.getElementById('ae-sec-count').textContent = sections.length;
-  document.getElementById('ae-article-title').value = articleTitle || '';
+  document.getElementById('ae-edit-view').style.display = 'none';
+  document.getElementById('ae-sections-view').style.display = 'block';
+  document.getElementById('ae-sections-heading').textContent =
+    'Article ' + editState.articleNumber + ' — ' + editState.articleTitle;
 
   var html = '';
-  for (var i = 0; i < sections.length; i++) {
-    var s = sections[i];
-    var opts = '';
-    for (var key in classLabels) {
-      opts += '<option value="' + key + '"' +
-        (s.classification === key ? ' selected' : '') + '>' +
-        escHtml(classLabels[key]) + '</option>';
-    }
+  editState.sections.forEach(function (s) {
+    var badge = (s.currentVersion || 1) > 1 ? '<span class="ae-badge">v' + s.currentVersion + '</span>' : '';
     html +=
-      '<div class="ae-sec-card" data-secnum="' + s.sectionNumber + '">' +
-        '<h4>Section ' + s.sectionNumber +
-          ((s.currentVersion || 1) > 1 ? ' <span class="ae-badge">v' + s.currentVersion + '</span>' : '') +
-          ' <span style="font-weight:400;color:var(--text3);font-size:13px;">(number locked)</span></h4>' +
-        '<div class="ae-field"><label>Section Title</label>' +
-          '<input type="text" class="f-title" value="' + escHtml(s.sectionTitle) + '" /></div>' +
-        '<div class="ae-field"><label>Classification</label>' +
-          '<select class="f-class">' + opts + '</select></div>' +
-        '<div class="ae-field"><label>Why It’s Here</label>' +
-          '<textarea class="f-why" rows="3">' + escHtml(s.whyItsHere) + '</textarea></div>' +
-        '<div class="ae-field"><label>What You Can Do</label>' +
-          '<textarea class="f-what" rows="3">' + escHtml(s.whatYouCanDo) + '</textarea></div>' +
-        '<div class="ae-field"><label>Community Impact (optional)</label>' +
-          '<textarea class="f-impact" rows="2">' + escHtml(s.communityImpact || '') + '</textarea></div>' +
-        '<div class="ae-field"><label>Governing Document Text</label>' +
-          '<textarea class="f-text mono" rows="8">' + escHtml(s.text || '') + '</textarea></div>' +
+      '<div class="ae-art-row">' +
+        '<div class="num">' + s.sectionNumber + '</div>' +
+        '<div class="title">' + escHtml(s.sectionTitle || '(untitled)') + ' ' + badge + '</div>' +
+        '<div style="font-size:12px;color:var(--text3);">' + escHtml(classLabels[s.classification] || s.classification || '') + '</div>' +
+        '<button class="ae-btn ae-btn-secondary" style="padding:6px 14px;font-size:13px;" ' +
+          'onclick="openSection(' + s.sectionNumber + ')">Edit §' + s.sectionNumber + '</button>' +
       '</div>';
-  }
-  document.getElementById('ae-sections').innerHTML = html;
+  });
+  document.getElementById('ae-section-list').innerHTML = html;
   window.scrollTo(0, 0);
 }
 
-function backToList() {
+// ── Level 3: edit one subsection ────────────────────────────────────────────
+function openSection(sectionNumber) {
+  var s = editState.sections.find(function (x) { return x.sectionNumber === sectionNumber; });
+  if (!s) return;
+  editState.editingSection = sectionNumber;
+
+  document.getElementById('ae-sections-view').style.display = 'none';
+  document.getElementById('ae-list-view').style.display = 'none';
+  document.getElementById('ae-edit-view').style.display = 'block';
+  document.getElementById('ae-edit-heading').textContent =
+    'Article ' + editState.articleNumber + ', §' + sectionNumber +
+    ((s.currentVersion || 1) > 1 ? '  (currently v' + s.currentVersion + ')' : '');
+
+  var opts = '';
+  for (var key in classLabels) {
+    opts += '<option value="' + key + '"' +
+      (s.classification === key ? ' selected' : '') + '>' + escHtml(classLabels[key]) + '</option>';
+  }
+  document.getElementById('ae-edit-fields').innerHTML =
+    '<div class="ae-sec-card">' +
+      '<div class="ae-field"><label>Subsection Title</label>' +
+        '<input type="text" class="f-title" value="' + escHtml(s.sectionTitle) + '" /></div>' +
+      '<div class="ae-field"><label>Classification</label>' +
+        '<select class="f-class">' + opts + '</select></div>' +
+      '<div class="ae-field"><label>Why It’s Here</label>' +
+        '<textarea class="f-why" rows="3">' + escHtml(s.whyItsHere) + '</textarea></div>' +
+      '<div class="ae-field"><label>What You Can Do</label>' +
+        '<textarea class="f-what" rows="3">' + escHtml(s.whatYouCanDo) + '</textarea></div>' +
+      '<div class="ae-field"><label>Community Impact (optional)</label>' +
+        '<textarea class="f-impact" rows="2">' + escHtml(s.communityImpact || '') + '</textarea></div>' +
+      '<div class="ae-field"><label>Governing Document Text</label>' +
+        '<textarea class="f-text mono" rows="10">' + escHtml(s.text || '') + '</textarea></div>' +
+    '</div>';
+  window.scrollTo(0, 0);
+}
+
+function backToArticles() {
   editState = null;
+  document.getElementById('ae-sections-view').style.display = 'none';
   document.getElementById('ae-edit-view').style.display = 'none';
   document.getElementById('ae-list-view').style.display = 'block';
   clearMsg();
   loadArticles();
 }
 
-async function saveNewVersion() {
-  if (!editState) return;
+function backToSections() {
+  document.getElementById('ae-edit-view').style.display = 'none';
+  renderSectionList();
+}
+
+async function saveSection() {
+  if (!editState || editState.editingSection == null) return;
   var btn = document.getElementById('ae-save-btn');
   btn.disabled = true;
   btn.textContent = 'Saving…';
   clearMsg();
 
-  var articleTitle = document.getElementById('ae-article-title').value.trim();
-  if (!articleTitle) {
-    showMsg('err', 'Article title is required.');
-    btn.disabled = false; btn.textContent = 'Save New Version';
-    return;
-  }
+  var card = document.getElementById('ae-edit-fields');
+  var edited = {
+    sectionTitle: card.querySelector('.f-title').value.trim(),
+    classification: card.querySelector('.f-class').value,
+    whyItsHere: card.querySelector('.f-why').value.trim(),
+    whatYouCanDo: card.querySelector('.f-what').value.trim(),
+    communityImpact: card.querySelector('.f-impact').value.trim() || null,
+    text: card.querySelector('.f-text').value
+  };
 
-  var cards = document.querySelectorAll('.ae-sec-card');
-  var sections = [];
-  for (var i = 0; i < cards.length; i++) {
-    var c = cards[i];
-    sections.push({
-      sectionNumber: parseInt(c.getAttribute('data-secnum'), 10),
-      sectionTitle: c.querySelector('.f-title').value.trim(),
-      classification: c.querySelector('.f-class').value,
-      whyItsHere: c.querySelector('.f-why').value.trim(),
-      whatYouCanDo: c.querySelector('.f-what').value.trim(),
-      communityImpact: c.querySelector('.f-impact').value.trim() || null,
-      text: c.querySelector('.f-text').value
-    });
-  }
+  // Build the full section set (cardinality lock), with ONLY the edited one changed.
+  var sections = editState.sections.map(function (s) {
+    if (s.sectionNumber === editState.editingSection) {
+      return {
+        sectionNumber: s.sectionNumber,
+        sectionTitle: edited.sectionTitle,
+        classification: edited.classification,
+        whyItsHere: edited.whyItsHere,
+        whatYouCanDo: edited.whatYouCanDo,
+        communityImpact: edited.communityImpact,
+        text: edited.text
+      };
+    }
+    return {
+      sectionNumber: s.sectionNumber,
+      sectionTitle: s.sectionTitle,
+      classification: s.classification,
+      whyItsHere: s.whyItsHere,
+      whatYouCanDo: s.whatYouCanDo,
+      communityImpact: s.communityImpact || null,
+      text: s.text || ''
+    };
+  });
 
   try {
-    var result = await ReviewApi.createArticleVersion(cycleId, editState.articleId, {
-      articleTitle: articleTitle,
+    var result = await ReviewApi.createArticleVersion(cycleId, editState.articleNumber, {
+      articleTitle: editState.articleTitle,
       sections: sections
     });
     var changed = result.changedSections || [];
+    var mine = changed.find(function (c) { return c.sectionNumber === editState.editingSection; });
     var msg;
-    if (changed.length === 0 && !result.titleChanged) {
-      msg = 'No changes detected — nothing was versioned.';
-    } else if (changed.length === 0 && result.titleChanged) {
-      msg = 'Article title updated. No section content changed, so no section was versioned.';
+    if (mine) {
+      msg = '§' + mine.sectionNumber + ' saved as v' + mine.newVersion + '. Votes preserved; other subsections untouched.';
+      // Reflect new local state so the section list shows the bumped version
+      var local = editState.sections.find(function (x) { return x.sectionNumber === editState.editingSection; });
+      if (local) {
+        local.sectionTitle = edited.sectionTitle;
+        local.classification = edited.classification;
+        local.whyItsHere = edited.whyItsHere;
+        local.whatYouCanDo = edited.whatYouCanDo;
+        local.communityImpact = edited.communityImpact;
+        local.text = edited.text;
+        local.currentVersion = mine.newVersion;
+      }
     } else {
-      var parts = changed.map(function (c) { return '§' + c.sectionNumber + ' → v' + c.newVersion; });
-      msg = 'Saved. Versioned ' + changed.length + ' section' + (changed.length > 1 ? 's' : '') +
-        ' (' + parts.join(', ') + '). Votes preserved.';
+      msg = 'No changes detected in §' + editState.editingSection + ' — nothing was versioned.';
     }
     showMsg('ok', msg);
-    editState = null;
+    editState.editingSection = null;
     document.getElementById('ae-edit-view').style.display = 'none';
-    document.getElementById('ae-list-view').style.display = 'block';
-    loadArticles();
+    renderSectionList();
   } catch (err) {
     showMsg('err', 'Save failed: ' + err.message);
     btn.disabled = false;
-    btn.textContent = 'Save New Version';
+    btn.textContent = 'Save This Subsection';
   }
 }
 
