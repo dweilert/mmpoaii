@@ -35,21 +35,27 @@
 <div id="page-content">
 <div class="review-wrap">
 
+  <div style="margin-bottom:8px;">
+    <a href="#" id="back-to-articles" style="font-size:14px;color:var(--purple-800);text-decoration:none;font-weight:600;">← Back to Articles</a>
+  </div>
+
   <div class="article-header">
-    <div style="margin-bottom:8px;">
-      <a href="#" id="back-to-articles" style="font-size:14px;color:var(--purple-800);text-decoration:none;font-weight:600;">← Back to Articles</a>
-    </div>
-    <div class="ah-nav" id="art-nav">
-      <a href="#" id="prev-link" style="display:none;">← Previous Article</a>
-      <span style="flex:1"></span>
-      <a href="#" id="next-link" style="display:none;">Next Article →</a>
-    </div>
-    <h2 id="article-title">Loading…</h2>
-    <p id="article-progress" style="font-size:13px;color:var(--text3);margin-top:4px;"></p>
-    <p style="font-size:13px;color:var(--text3);margin-top:4px;">For each section below, click <strong>Approve</strong>, <strong>Disapprove</strong>, or <strong>Discuss</strong> to cast your vote. You can also add optional notes.</p>
-    <div id="approve-all-bar" style="display:none;margin-top:12px;">
-      <button class="btn-primary" onclick="approveAllSections()" id="approve-all-btn" style="background:var(--green-600);">Approve All Sections</button>
-      <span id="approve-all-status" style="margin-left:12px;font-size:13px;color:var(--text3);"></span>
+    <h2 id="article-title" style="margin:0 0 8px;">Loading…</h2>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+      <div id="approve-all-bar" style="display:none;align-items:center;gap:10px;flex-shrink:0;">
+        <button onclick="approveAllSections()" id="approve-all-btn" style="background:#e6f4ea;color:#1e7e34;border:1px solid #a8d5b8;padding:8px 18px;font-size:13px;font-weight:600;line-height:1;border-radius:var(--r);cursor:pointer;">Approve All Sections</button>
+        <button id="reading-mode-btn" onclick="toggleReadingMode()" style="padding:8px 18px;font-size:13px;font-weight:600;border:1px solid #bbb;color:#555;background:#fafafa;border-radius:var(--r);cursor:pointer;">Just the Facts</button>
+        <button id="hide-approved-btn" onclick="toggleHideApproved()" style="padding:8px 18px;font-size:13px;font-weight:600;border:1px solid #bbb;color:#555;background:#fafafa;border-radius:var(--r);cursor:pointer;">Hide Approved</button>
+        <button id="font-size-btn" onclick="cycleFontSize()" style="padding:8px 14px;font-size:13px;font-weight:700;border:1px solid #bbb;color:#555;background:#fafafa;border-radius:var(--r);cursor:pointer;" title="Increase text size for easier reading">A+ Text Size</button>
+        <span id="approve-all-status" style="font-size:13px;color:var(--text3);"></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;margin-left:auto;">
+        <p id="article-progress" style="font-size:13px;color:var(--text3);margin:0;white-space:nowrap;"></p>
+        <div class="ah-nav" id="art-nav" style="margin:0;gap:16px;">
+          <a href="#" id="prev-link" style="display:none;">← Previous</a>
+          <a href="#" id="next-link" style="display:none;">Next →</a>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -97,17 +103,32 @@
   </div>
 </div>
 
+<!-- Key Questions Modal -->
+<div id="kq-modal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.5);overflow-y:auto;" onclick="if(event.target===this)closeKqModal()">
+  <div style="max-width:640px;margin:60px auto;background:#fff;border-radius:var(--r2);box-shadow:0 8px 32px rgba(0,0,0,.2);overflow:hidden;">
+    <div id="kq-modal-header" style="color:#fff;padding:16px 24px;display:flex;align-items:flex-start;justify-content:space-between;">
+      <div>
+        <div id="kq-modal-title" style="font-family:Arial,Helvetica,sans-serif;font-size:17px;font-weight:700;"></div>
+        <div id="kq-modal-category" style="margin-top:8px;"></div>
+        <div id="kq-modal-subtitle" style="font-size:13px;opacity:.85;margin-top:4px;"></div>
+      </div>
+      <button onclick="closeKqModal()" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer;padding:0 4px;line-height:1;">&times;</button>
+    </div>
+    <div id="kq-modal-body" style="padding:24px;font-size:16px;line-height:1.7;color:var(--text);font-family:Arial,Helvetica,sans-serif;"></div>
+  </div>
+</div>
+
 <!-- Document Text Modal -->
 <div id="doctext-modal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.5);overflow-y:auto;" onclick="if(event.target===this)closeDocTextModal()">
   <div style="max-width:720px;margin:40px auto;background:#fff;border-radius:var(--r2);box-shadow:0 8px 32px rgba(0,0,0,.2);overflow:hidden;">
     <div style="background:var(--purple-800);color:#fff;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;">
       <div>
-        <div id="modal-title" style="font-family:var(--serif);font-size:17px;font-weight:700;"></div>
+        <div id="modal-title" style="font-family:Arial,Helvetica,sans-serif;font-size:17px;font-weight:700;"></div>
         <div id="modal-subtitle" style="font-size:13px;opacity:.7;margin-top:2px;"></div>
       </div>
       <button onclick="closeDocTextModal()" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer;padding:0 4px;line-height:1;">&times;</button>
     </div>
-    <div id="modal-body" style="padding:24px;font-size:18px;line-height:1.75;color:var(--text);white-space:pre-wrap;font-family:var(--serif);"></div>
+    <div id="modal-body" style="padding:24px;font-size:18px;line-height:1.75;color:var(--text);white-space:pre-wrap;font-family:Arial,Helvetica,sans-serif;"></div>
   </div>
 </div>
 
@@ -133,8 +154,6 @@ document.getElementById('back-link').href = articlesUrl;
 document.getElementById('back-to-articles').href = articlesUrl;
 document.getElementById('back-to-articles-bottom').href = articlesUrl;
 
-// Debounce timers for notes autosave
-var noteTimers = {};
 
 // Classification labels
 var classLabels = {
@@ -144,19 +163,68 @@ var classLabels = {
   community_choice: 'Community Choice'
 };
 
+// Key Questions per classification (from MMPOA Key Questions V2)
+var keyQuestions = {
+  required_by_law: [
+    'Is the legal citation correct? Verify that the Texas Property Code section referenced actually requires what the provision says. Laws change \u2014 confirm the reference is current.',
+    'Does the language match the statute? Some provisions paraphrase the law. Check that the paraphrase is accurate and doesn\u2019t accidentally weaken or overstate the legal requirement.',
+    'Are the timelines compliant? Texas law specifies minimum notice periods (e.g., 30 days for lien notice). Confirm our documents meet or exceed \u2014 never fall below \u2014 statutory minimums.',
+    'Is this implemented correctly elsewhere? A required provision may depend on procedures in the Bylaws or Rules. Verify the cross-references work and the procedures are actually in place.',
+    'Are there any gaps? Texas Property Code Chapter 209 has many requirements. If you notice something the law requires that isn\u2019t addressed in our documents, flag it.'
+  ],
+  required_by_city: [
+    'Is the legal citation correct? Verify that the City of Austin ordinance referenced actually requires what the provision says. Laws change \u2014 confirm the reference is current.',
+    'Does the language match the statute? Some provisions paraphrase the law. Check that the paraphrase is accurate and doesn\u2019t accidentally weaken or overstate the legal requirement.',
+    'Are the timelines compliant? City ordinances may specify minimum notice periods. Confirm our documents meet or exceed \u2014 never fall below \u2014 statutory minimums.',
+    'Is this implemented correctly elsewhere? A required provision may depend on procedures in the Bylaws or Rules. Verify the cross-references work and the procedures are actually in place.',
+    'Are there any gaps? If you notice something the City of Austin requires that isn\u2019t addressed in our documents, flag it.'
+  ],
+  best_practice: [
+    'What risk does this provision reduce? The Field Guide explains the risk for each recommended provision. Before voting to remove one, make sure you understand what could go wrong without it.',
+    'Do other Texas HOAs include this? If a provision is standard across well-managed HOAs, there\u2019s usually a good reason. Removing something everyone else keeps should require strong justification.',
+    'Can we adjust it instead of removing it? Many provisions have tunable values (dollar thresholds, time periods, percentages). You may be able to keep the protection while adjusting the specifics to fit our community.',
+    'What\u2019s the financial exposure? Some best practices protect against lawsuits, special assessments, or uninsured losses. Ask: what\u2019s the worst-case cost if we remove this provision?',
+    'Does our community have a history here? If the community has experienced problems in an area (e.g., delinquent assessments, contractor disputes), keeping the related best practice is especially important.'
+  ],
+  community_choice: [
+    'Does this reflect how we actually live? Community choice provisions should match reality. If a rule is routinely ignored, it may need to be updated, relaxed, or better enforced \u2014 not just left on paper.',
+    'Is this the right threshold or limit? Many community choices involve specific numbers: fine amounts, pet limits, parking rules, noise hours. Ask whether the current values are reasonable and enforceable.',
+    'Would this affect property values? Some provisions (exterior standards, short-term rental restrictions) directly affect home values. Consider whether a change helps or hurts the neighborhood\u2019s appeal.',
+    'Is this enforceable and fair? A rule that can\u2019t be enforced consistently is worse than no rule. Consider whether the Board can realistically monitor and enforce what\u2019s written.',
+    'What do the neighbors think? Community choice means community input. If you feel strongly about a provision, talk to your neighbors. The final vote will reflect the majority\u2019s preferences.'
+  ]
+};
+
+// Short document type labels
+var docTypeLabels = {
+  'CC&Rs': 'CC&Rs',
+  'Bylaws': 'Bylaws',
+  'Rules of Conduct': 'Rules'
+};
+
 async function loadArticle() {
   try {
     var data = await ReviewApi.getArticle(cycleId, articleId);
     var artNum = parseInt(articleId, 10);
 
+    // Fetch document type from cycle metadata
+    var docPrefix = '';
+    try {
+      var cyclesData = await ReviewApi.listCycles();
+      var cycle = (cyclesData.cycles || []).find(function (c) { return c.cycleId === cycleId; });
+      if (cycle && cycle.document) {
+        docPrefix = (docTypeLabels[cycle.document] || cycle.document) + ' — ';
+      }
+    } catch (e) { /* non-critical, skip */ }
+
     document.getElementById('article-title').textContent =
-      'Article ' + data.articleNumber + ' — ' + data.articleTitle;
+      docPrefix + 'Article ' + data.articleNumber + ' — ' + data.articleTitle;
 
     var voted = 0;
     var total = data.sections.length;
     data.sections.forEach(function (s) { if (s.myVote && s.myVote.vote) voted++; });
     document.getElementById('article-progress').textContent =
-      voted + ' of ' + total + ' sections voted in this article';
+      'Voted ' + voted + ' of ' + total;
 
     document.title = 'Art. ' + data.articleNumber + ' — ' + data.articleTitle + ' — Review';
 
@@ -170,70 +238,100 @@ async function loadArticle() {
       var secId = 'ART-' + pad(artNum) + '#SEC-' + pad(s.sectionNumber);
       var cls = s.classification || 'best_practice';
       var currentVote = (s.myVote && s.myVote.vote) || '';
-      var currentNotes = (s.myVote && s.myVote.notes) || '';
+      var currentNotes = ''; // comments append to list; always start empty
 
       html += '<div class="section-card" id="sec-' + s.sectionNumber + '">';
 
-      // Header
-      html += '<div class="sc-header">';
-      html += '<div class="sc-title-group" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">';
-      html += '<div>';
-      html += '<div class="sc-title">Art. ' + artNum + ', §' + s.sectionNumber + ' — ' + escHtml(s.sectionTitle) + '</div>';
-      html += '<span class="sc-classification cls-' + cls + '">' + escHtml(classLabels[cls] || cls) + '</span>';
-      html += '</div>';
+      // Header — line 1: title + vote status, line 2: category left, buttons right
       var voteStatusLabel = 'Waiting for Vote';
       var voteStatusColor = '#888';
       var voteStatusBg = '#f0f0f0';
       if (currentVote === 'approve') { voteStatusLabel = 'Approved'; voteStatusColor = '#1e7e34'; voteStatusBg = '#e6f4ea'; }
       else if (currentVote === 'disapprove') { voteStatusLabel = 'Disapproved'; voteStatusColor = '#b71c1c'; voteStatusBg = '#fde8e8'; }
       else if (currentVote === 'discuss') { voteStatusLabel = 'Discuss'; voteStatusColor = '#7a6100'; voteStatusBg = '#fff8e1'; }
+
+      html += '<div class="sc-header">';
+      html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">';
+      html += '<div class="sc-title" style="margin:0;min-width:0;overflow:hidden;text-overflow:ellipsis;">Art. ' + artNum + ', §' + s.sectionNumber + ' — ' + escHtml(s.sectionTitle) + '</div>';
+      html += '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">';
+      html += '<span id="vote-status-' + secId + '" style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:10px;background:' + voteStatusBg + ';color:' + voteStatusColor + ';white-space:nowrap;">' + voteStatusLabel + '</span>';
+      html += '<button class="vote-btn-sm approve' + (currentVote === 'approve' ? ' selected' : '') + '" data-sec-id="' + secId + '" data-vote="approve" onclick="onVoteClick(\'' + secId + '\', \'approve\', this)" title="Approve">✓</button>';
+      html += '<button class="vote-btn-sm disapprove' + (currentVote === 'disapprove' ? ' selected' : '') + '" data-sec-id="' + secId + '" data-vote="disapprove" onclick="onVoteClick(\'' + secId + '\', \'disapprove\', this)" title="Disapprove">✗</button>';
+      html += '<button class="vote-btn-sm discuss' + (currentVote === 'discuss' ? ' selected' : '') + '" data-sec-id="' + secId + '" data-vote="discuss" onclick="onVoteClick(\'' + secId + '\', \'discuss\', this)" title="Discuss">?</button>';
+      html += '</div>';
+      html += '</div>';
+      html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:6px;">';
+      // Left side: classification badge + impact indicator
+      html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">';
+      html += '<span class="sc-classification cls-' + cls + '">' + escHtml(classLabels[cls] || cls) + '</span>';
+      if (s.communityImpact) {
+        html += '<span title="This section has Community Impact notes — click View Field Notes to read them" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;background:#FFF3E0;color:#E65100;font-size:11px;font-weight:700;cursor:help;flex-shrink:0;border:1px solid #FFE0B2;letter-spacing:.2px;"><span style="font-size:14px;line-height:1;">&#9733;</span> Impact</span>';
+      }
+      html += '</div>';
+      // Right side: View Key Questions, View Field Notes
       html += '<div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">';
-      html += '<span id="vote-status-' + secId + '" style="font-size:12px;font-weight:700;padding:4px 10px;border-radius:12px;background:' + voteStatusBg + ';color:' + voteStatusColor + ';">' + voteStatusLabel + '</span>';
-      html += '<button onclick="showDocText(\'' + secId + '\', ' + artNum + ', \'' + escHtml(s.sectionTitle).replace(/'/g, "\\'") + '\', ' + s.sectionNumber + ')" style="white-space:nowrap;padding:6px 14px;font-size:13px;border:1px solid var(--purple-600);color:var(--purple-700);background:#fff;border-radius:var(--r1);cursor:pointer;font-weight:600;">View Text</button>';
+      html += '<button data-action="key-questions" data-classification="' + escAttr(cls) + '" style="white-space:nowrap;padding:7px 16px;font-size:13px;border:1px solid #bbb;color:#555;background:#fafafa;border-radius:var(--r);cursor:pointer;font-weight:600;">View Key Questions</button>';
+      html += '<button data-action="field-notes" data-sec-id="' + escAttr(secId) + '" data-art-num="' + artNum + '" data-section-number="' + s.sectionNumber + '" data-section-title="' + escAttr(s.sectionTitle) + '" style="white-space:nowrap;padding:7px 16px;font-size:13px;border:1px solid #bbb;color:#555;background:#fafafa;border-radius:var(--r);cursor:pointer;font-weight:600;">View Field Notes</button>';
       html += '</div>';
       html += '</div></div>';
 
-      // Body
+      // Store field guide data for the modal
+      sectionFieldData[secId] = {
+        whyItsHere: s.whyItsHere,
+        whatYouCanDo: s.whatYouCanDo,
+        communityImpact: s.communityImpact,
+        classification: s.classification
+      };
+
+      // Body — show governing document text (loaded async)
       html += '<div class="sc-body">';
-
       html += '<div class="sc-field">';
-      html += '<div class="sc-label">Why It\'s Here</div>';
-      html += '<div class="sc-text">' + escHtml(s.whyItsHere) + '</div>';
+      html += '<div class="sc-label doctext-label">Governing Document Text</div>';
+      html += '<div class="sc-text" id="doctext-' + secId + '" style="white-space:pre-wrap;font-family:var(--serif);font-size:16px;line-height:1.7;color:var(--text2);">Loading document text…</div>';
       html += '</div>';
-
-      html += '<div class="sc-field">';
-      html += '<div class="sc-label">What You Can Do</div>';
-      html += '<div class="sc-text">' + escHtml(s.whatYouCanDo) + '</div>';
-      html += '</div>';
-
-      if (s.communityImpact) {
-        html += '<div class="sc-impact">';
-        html += '<div class="sc-label">Community Impact</div>';
-        html += '<div class="sc-text">' + escHtml(s.communityImpact) + '</div>';
-        html += '</div>';
-      }
-
       html += '</div>'; // /sc-body
 
-      // Vote controls
+      // Comment area (vote buttons are all on the title line now)
       html += '<div class="vote-controls">';
-      html += '<div class="vote-buttons">';
-      html += voteButton(secId, 'approve', 'Approve', currentVote);
-      html += voteButton(secId, 'disapprove', 'Disapprove', currentVote);
-      html += voteButton(secId, 'discuss', 'Discuss', currentVote);
-      html += '</div>';
       html += '<textarea class="vote-notes" id="notes-' + secId + '" ' +
-              'placeholder="Optional notes or comments…" ' +
-              'oninput="onNotesInput(\'' + secId + '\')">' + escHtml(currentNotes) + '</textarea>';
-      html += '<div class="save-indicator" id="status-' + secId + '"></div>';
+              'placeholder="Type your comment here…" rows="2">' + escHtml(currentNotes) + '</textarea>';
+      html += '<div style="display:flex;align-items:center;gap:10px;margin-top:4px;">';
+      html += '<button class="submit-comment-btn" onclick="submitComment(\'' + secId + '\')" ' +
+              'style="padding:6px 16px;font-size:12px;font-weight:600;background:#4285f4;color:#fff;border:none;border-radius:6px;cursor:pointer;">Submit Comment</button>';
+      html += '<span style="font-size:11px;color:var(--text3);">Press to post your comment to the discussion</span>';
+      html += '<span class="save-indicator" id="status-' + secId + '" style="margin-left:auto;"></span>';
+      html += '</div>';
       html += '</div>'; // /vote-controls
+
+      // Reviewer Comments panel
+      html += '<div class="reviewer-comments" id="comments-' + secId + '" style="margin-top:0;">';
+      html += '<div class="rc-header" id="rc-header-' + secId + '" onclick="toggleComments(\'' + secId + '\')" ' +
+              'style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:10px 14px;' +
+              'background:#eef2f7;border:1px solid #d0d7e0;border-radius:6px;transition:background .2s;">';
+      html += '<span class="rc-toggle" id="rc-toggle-' + secId + '" style="font-size:10px;color:#5a6a7a;transition:transform .2s;">&#9654;</span>';
+      html += '<span style="font-size:12px;font-weight:700;color:#5a6a7a;text-transform:uppercase;letter-spacing:.5px;">Reviewer Comments</span>';
+      html += '<span class="rc-count" id="rc-count-' + secId + '" style="font-size:13px;font-weight:700;color:#5a6a7a;"></span>';
+      html += '</div>';
+      html += '<div class="rc-body" id="rc-body-' + secId + '" style="display:none;max-height:300px;overflow-y:auto;padding:4px 0 0;"></div>';
+      html += '<div class="rc-scroll-hint" id="rc-scroll-hint-' + secId + '" style="display:none;text-align:right;padding:4px 12px 6px;font-size:14px;font-weight:700;color:#d32f2f;background:#eef2f7;border:1px solid #d0d7e0;border-top:none;border-radius:0 0 6px 6px;">&#8597; Scroll down for more comments</div>';
+      html += '</div>'; // /reviewer-comments
 
       html += '</div>'; // /section-card
     }
     html += '</div>';
     document.getElementById('sections-container').innerHTML = html;
     document.getElementById('nav-bottom').style.display = 'flex';
-    document.getElementById('approve-all-bar').style.display = '';
+    document.getElementById('approve-all-bar').style.display = 'flex';
+
+    // Fetch governing document text — 3 at a time to avoid overwhelming the API
+    var secIds = data.sections.map(function (s) {
+      return 'ART-' + pad(artNum) + '#SEC-' + pad(s.sectionNumber);
+    });
+    loadDocTextBatch(secIds, 0);
+
+    // Load other reviewers' comments + start polling
+    loadReviewerComments(artNum);
+    startCommentPolling(artNum);
 
   } catch (err) {
     document.getElementById('sections-container').innerHTML =
@@ -270,10 +368,12 @@ function setupNav(artNum) {
 
 // ── Vote click handler (immediate save) ──
 async function onVoteClick(secId, vote, btn) {
-  // Update button states
-  var buttons = btn.parentElement.querySelectorAll('.vote-btn');
-  buttons.forEach(function (b) { b.classList.remove('selected'); });
-  btn.classList.add('selected');
+  // Update all vote buttons (both full-size and compact) for this section
+  var allBtns = document.querySelectorAll('[data-sec-id="' + secId + '"]');
+  allBtns.forEach(function (b) { b.classList.remove('selected'); });
+  allBtns.forEach(function (b) {
+    if (b.dataset.vote === vote) b.classList.add('selected');
+  });
 
   // Update vote status badge
   var statusEl = document.getElementById('vote-status-' + secId);
@@ -286,43 +386,67 @@ async function onVoteClick(secId, vote, btn) {
     statusEl.style.background = bgs[vote] || '#f0f0f0';
   }
 
-  // Get current notes
-  var notesEl = document.getElementById('notes-' + secId);
-  var notes = notesEl ? notesEl.value : undefined;
-
   setStatus(secId, 'saving', 'Saving…');
   try {
-    await ReviewApi.saveVote(cycleId, secId, vote, notes);
-    setStatus(secId, 'saved', 'Saved ✓');
+    var result = await ReviewApi.saveVote(cycleId, secId, vote, undefined);
+    var ts = result.updatedAt ? ' — ' + formatTimestamp(result.updatedAt) : '';
+    setStatus(secId, 'saved', 'Saved ✓' + ts);
+    updateProgressCount();
+    // Refresh comments panel so others see latest
+    refreshSectionComments(secId);
   } catch (err) {
     setStatus(secId, 'error', 'Save failed: ' + err.message);
   }
 }
 
+function updateProgressCount() {
+  var votedCount = 0;
+  document.querySelectorAll('.section-card').forEach(function (c) {
+    if (c.querySelector('.vote-btn-sm.selected') || c.querySelector('.vote-btn.selected')) votedCount++;
+  });
+  var totalCards = document.querySelectorAll('.section-card').length;
+  document.getElementById('article-progress').textContent =
+    'Voted ' + votedCount + ' of ' + totalCards;
+  // Re-apply hide filter if active (a vote may have changed a section to approved)
+  if (hideApproved) applyHideApproved();
+}
+
 // ── Notes input handler (debounced 500ms) ──
-function onNotesInput(secId) {
-  if (noteTimers[secId]) clearTimeout(noteTimers[secId]);
+// ── Submit Comment (explicit post + clear) ──
+async function submitComment(secId) {
+  var notesEl = document.getElementById('notes-' + secId);
+  if (!notesEl) return;
+  var notes = notesEl.value.trim();
+  if (!notes) {
+    setStatus(secId, 'error', 'Type a comment before submitting.');
+    return;
+  }
 
-  setStatus(secId, 'saving', 'Typing…');
+  // Find current vote (does not auto-set discuss — reviewer must choose)
+  var card = notesEl.closest('.section-card');
+  var selectedBtn = card ? (card.querySelector('.vote-btn-sm.selected') || card.querySelector('.vote-btn.selected')) : null;
+  var vote = selectedBtn ? selectedBtn.dataset.vote : undefined;
 
-  noteTimers[secId] = setTimeout(async function () {
-    var notesEl = document.getElementById('notes-' + secId);
-    if (!notesEl) return;
-    var notes = notesEl.value;
-
-    // Find current vote from data attribute
-    var container = notesEl.closest('.vote-controls');
-    var selectedBtn = container ? container.querySelector('.vote-btn.selected') : null;
-    var vote = selectedBtn ? selectedBtn.dataset.vote : undefined;
-
-    setStatus(secId, 'saving', 'Saving notes…');
-    try {
-      await ReviewApi.saveVote(cycleId, secId, vote, notes);
-      setStatus(secId, 'saved', 'Saved ✓');
-    } catch (err) {
-      setStatus(secId, 'error', 'Save failed: ' + err.message);
+  setStatus(secId, 'saving', 'Posting comment…');
+  try {
+    var result = await ReviewApi.saveVote(cycleId, secId, vote, notes);
+    var ts = result.updatedAt ? ' — ' + formatTimestamp(result.updatedAt) : '';
+    setStatus(secId, 'saved', 'Comment posted ✓' + ts);
+    // Clear the textarea
+    notesEl.value = '';
+    updateProgressCount();
+    // Refresh comments panel to show the new comment
+    refreshSectionComments(secId);
+    // Auto-expand the comments panel so they see their post
+    var bodyEl = document.getElementById('rc-body-' + secId);
+    var toggleEl = document.getElementById('rc-toggle-' + secId);
+    if (bodyEl && bodyEl.style.display === 'none') {
+      bodyEl.style.display = 'block';
+      if (toggleEl) toggleEl.style.transform = 'rotate(90deg)';
     }
-  }, 500);
+  } catch (err) {
+    setStatus(secId, 'error', 'Post failed: ' + err.message);
+  }
 }
 
 function setStatus(secId, cls, text) {
@@ -330,6 +454,166 @@ function setStatus(secId, cls, text) {
   if (el) {
     el.className = 'save-indicator ' + cls;
     el.textContent = text;
+  }
+}
+
+// ── Reviewer Comments ────────────────────────────────────────────────────────
+function toggleComments(secId) {
+  var body = document.getElementById('rc-body-' + secId);
+  var toggle = document.getElementById('rc-toggle-' + secId);
+  var hint = document.getElementById('rc-scroll-hint-' + secId);
+  if (!body) return;
+  var show = body.style.display === 'none';
+  body.style.display = show ? 'block' : 'none';
+  toggle.style.transform = show ? 'rotate(90deg)' : '';
+  // Show scroll hint only when content overflows
+  if (hint) {
+    if (show && body.scrollHeight > body.clientHeight) {
+      hint.style.display = 'block';
+    } else {
+      hint.style.display = 'none';
+    }
+  }
+}
+
+function formatTimestamp(iso) {
+  if (!iso) return '';
+  var d = new Date(iso);
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var mo = months[d.getMonth()];
+  var day = d.getDate();
+  var h = d.getHours();
+  var m = String(d.getMinutes()).padStart(2, '0');
+  var ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  return mo + ' ' + day + ' at ' + h + ':' + m + ' ' + ampm;
+}
+
+async function loadReviewerComments(artNum) {
+  try {
+    var result = await ReviewApi.getArticleComments(cycleId, artNum);
+    var comments = result.comments || {};
+    // Update each section's comment panel
+    Object.keys(comments).forEach(function (secKey) {
+      renderComments(secKey, comments[secKey]);
+    });
+    // Sections with no comments get styled as empty
+    document.querySelectorAll('.reviewer-comments').forEach(function (panel) {
+      var secId = panel.id.replace('comments-', '');
+      if (!comments[secId]) {
+        renderComments(secId, []);
+      }
+    });
+  } catch (err) {
+    console.warn('Could not load reviewer comments:', err.message);
+  }
+}
+
+function renderComments(secId, entries) {
+  var countEl = document.getElementById('rc-count-' + secId);
+  var bodyEl = document.getElementById('rc-body-' + secId);
+  if (!countEl || !bodyEl) return;
+
+  countEl.textContent = '(' + entries.length + ')';
+
+  // Detect new comments since last render
+  var prevCount = prevCommentCounts[secId] || 0;
+  var isNew = entries.length > prevCount && prevCount > 0;
+  prevCommentCounts[secId] = entries.length;
+
+  // Show or update the NEW indicator
+  var newEl = document.getElementById('rc-new-' + secId);
+  if (!newEl) {
+    // Create indicator span once — inserted after count element
+    newEl = document.createElement('span');
+    newEl.id = 'rc-new-' + secId;
+    newEl.style.cssText = 'font-size:11px;font-weight:700;color:#e53935;margin-left:6px;transition:opacity .5s;';
+    countEl.parentNode.insertBefore(newEl, countEl.nextSibling);
+  }
+  if (isNew) {
+    var diff = entries.length - prevCount;
+    newEl.textContent = diff === 1 ? '● NEW comment' : '● ' + diff + ' NEW comments';
+    newEl.style.opacity = '1';
+    // Fade out after 8 seconds
+    clearTimeout(newEl._fadeTimer);
+    newEl._fadeTimer = setTimeout(function () { newEl.style.opacity = '0'; }, 8000);
+  }
+
+  // Style the banner — muted when empty, bright count badge when comments exist
+  var headerEl = document.getElementById('rc-header-' + secId);
+  if (headerEl) {
+    // Banner always stays neutral/muted
+    headerEl.style.background = '#eef2f7';
+    headerEl.style.borderColor = '#d0d7e0';
+    headerEl.style.borderLeft = '1px solid #d0d7e0';
+
+    if (entries.length > 0) {
+      // Bright badge draws the eye
+      countEl.style.background = '#e53935';
+      countEl.style.color = '#fff';
+      countEl.style.padding = '1px 8px';
+      countEl.style.borderRadius = '10px';
+      countEl.style.fontSize = '13px';
+      countEl.style.fontWeight = '700';
+    } else {
+      countEl.style.background = '';
+      countEl.style.color = '#5a6a7a';
+      countEl.style.padding = '';
+      countEl.style.borderRadius = '';
+      countEl.style.fontWeight = '';
+    }
+  }
+
+  if (entries.length === 0) {
+    bodyEl.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:4px 0;">No comments yet.</div>';
+    return;
+  }
+
+  var html = '';
+  entries.forEach(function (c, idx) {
+    var voteBadge = '';
+    if (c.vote) {
+      var voteColors = { approve: '#1e7e34', disapprove: '#b71c1c', discuss: '#7a6100' };
+      var voteBgs = { approve: '#e6f4ea', disapprove: '#fde8e8', discuss: '#fff8e1' };
+      var voteLabels = { approve: 'Approve', disapprove: 'Disapprove', discuss: 'Discuss' };
+      voteBadge = '<span style="display:inline-block;font-size:10px;font-weight:600;padding:1px 8px;border-radius:10px;' +
+        'background:' + (voteBgs[c.vote] || '#f0f0f0') + ';color:' + (voteColors[c.vote] || '#888') + ';">' +
+        (voteLabels[c.vote] || c.vote) + '</span>';
+    }
+    var ts = c.updatedAt ? '<span style="font-size:11px;color:var(--text3);">' + formatTimestamp(c.updatedAt) + '</span>' : '';
+    var rowBg = (idx % 2 === 0) ? 'var(--surf)' : '#f0f4f8';
+
+    html += '<div style="padding:8px 10px;border-left:3px solid var(--border);margin:4px 0;background:' + rowBg + ';border-radius:0 6px 6px 0;">';
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:' + (c.notes ? '4px' : '0') + ';">';
+    var youTag = c.isYou ? ' <span style="font-size:10px;font-weight:400;color:var(--text3);">(You)</span>' : '';
+    html += '<span style="font-size:12px;font-weight:600;color:var(--text);">' + escHtml(c.displayName) + youTag + '</span>';
+    html += voteBadge;
+    html += '<span style="flex:1;"></span>';
+    html += ts;
+    html += '</div>';
+    if (c.notes) {
+      html += '<div style="font-size:13px;color:var(--text2);line-height:1.4;white-space:pre-wrap;">' + escHtml(c.notes) + '</div>';
+    }
+    html += '</div>';
+  });
+
+  bodyEl.innerHTML = html;
+}
+
+async function refreshSectionComments(secId) {
+  // Extract article number from secId like "ART-01#SEC-03"
+  var artMatch = secId.match(/ART-(\d+)/);
+  if (!artMatch) return;
+  var artNum = parseInt(artMatch[1], 10);
+  try {
+    var result = await ReviewApi.getArticleComments(cycleId, artNum);
+    var comments = result.comments || {};
+    // Re-render just this section's comments
+    if (comments[secId]) {
+      renderComments(secId, comments[secId]);
+    }
+  } catch (err) {
+    console.warn('Could not refresh comments:', err.message);
   }
 }
 
@@ -341,25 +625,322 @@ function escHtml(s) {
   return d.innerHTML;
 }
 
-// ── Document Text Modal ──
-async function showDocText(secId, artNum, sectionTitle, sectionNumber) {
-  var modal = document.getElementById('doctext-modal');
-  document.getElementById('modal-title').textContent = 'Art. ' + artNum + ', §' + sectionNumber + ' — ' + sectionTitle;
-  document.getElementById('modal-subtitle').textContent = 'Original Document Text';
-  document.getElementById('modal-body').textContent = 'Loading…';
+// Escape for HTML attribute context — handles & " < > and ' (textContent->innerHTML
+// alone leaves " and ' unescaped, which breaks attribute parsing for titles
+// like "Association" or "Owner's Easements").
+function escAttr(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+// Delegated click handler for section header buttons.
+// Inline onclick="" was breaking when section titles contained quote chars
+// (e.g., the Definitions sections "Association", "Owner"). Data attributes
+// avoid the escaping minefield entirely.
+document.addEventListener('click', function (e) {
+  var btn = e.target.closest('button[data-action]');
+  if (!btn) return;
+  var action = btn.dataset.action;
+  if (action === 'key-questions') {
+    showKeyQuestions(btn.dataset.classification);
+  } else if (action === 'field-notes') {
+    showFieldNotes(
+      btn.dataset.secId,
+      parseInt(btn.dataset.artNum, 10),
+      btn.dataset.sectionTitle,
+      parseInt(btn.dataset.sectionNumber, 10)
+    );
+  }
+});
+
+// ── "Just the Facts" reading mode toggle ──
+var readingMode = false;
+
+function toggleReadingMode() {
+  readingMode = !readingMode;
+  var btn = document.getElementById('reading-mode-btn');
+  var approveBtn = document.getElementById('approve-all-btn');
+
+  if (readingMode) {
+    btn.textContent = 'Show All Controls';
+    btn.style.background = '#555';
+    btn.style.color = '#fff';
+    btn.style.borderColor = '#555';
+  } else {
+    btn.textContent = 'Just the Facts';
+    btn.style.background = '#fafafa';
+    btn.style.color = '#555';
+    btn.style.borderColor = '#bbb';
+  }
+
+  // Toggle visibility of controls row and vote controls in each card
+  var cards = document.querySelectorAll('.section-card');
+  cards.forEach(function (card) {
+    // The controls row is the second child of sc-header (the flex row with category/buttons)
+    var header = card.querySelector('.sc-header');
+    if (header) {
+      var controlsRow = header.children[1]; // second child = controls row
+      if (controlsRow) controlsRow.style.display = readingMode ? 'none' : 'flex';
+    }
+    // Hide vote controls
+    var voteControls = card.querySelector('.vote-controls');
+    if (voteControls) voteControls.style.display = readingMode ? 'none' : '';
+    // Hide reviewer comments panel
+    var commentsPanel = card.querySelector('.reviewer-comments');
+    if (commentsPanel) commentsPanel.style.display = readingMode ? 'none' : '';
+    // Hide "GOVERNING DOCUMENT TEXT" label
+    var docLabel = card.querySelector('.doctext-label');
+    if (docLabel) docLabel.style.display = readingMode ? 'none' : '';
+  });
+}
+
+// ── Hide Approved toggle ──
+var hideApproved = false;
+
+function toggleHideApproved() {
+  hideApproved = !hideApproved;
+  var btn = document.getElementById('hide-approved-btn');
+
+  if (hideApproved) {
+    btn.textContent = 'Show All Sections';
+    btn.style.background = '#1e7e34';
+    btn.style.color = '#fff';
+    btn.style.borderColor = '#1e7e34';
+  } else {
+    btn.textContent = 'Hide Approved';
+    btn.style.background = '#fafafa';
+    btn.style.color = '#555';
+    btn.style.borderColor = '#bbb';
+  }
+
+  applyHideApproved();
+}
+
+function applyHideApproved() {
+  var hiddenCount = 0;
+  document.querySelectorAll('.section-card').forEach(function (card) {
+    var isApproved = !!card.querySelector('.vote-btn-sm.approve.selected');
+    if (hideApproved && isApproved) {
+      card.style.display = 'none';
+      hiddenCount++;
+    } else {
+      card.style.display = '';
+    }
+  });
+
+  // Show/hide a message about hidden sections
+  var msgEl = document.getElementById('hide-approved-msg');
+  if (!msgEl) {
+    msgEl = document.createElement('div');
+    msgEl.id = 'hide-approved-msg';
+    msgEl.style.cssText = 'font-size:13px;color:#1e7e34;font-weight:600;padding:10px 16px;background:#e6f4ea;border:1px solid #a8d5b8;border-radius:6px;margin-bottom:10px;';
+    var container = document.getElementById('sections-container');
+    if (container) container.parentNode.insertBefore(msgEl, container);
+  }
+  if (hideApproved && hiddenCount > 0) {
+    msgEl.textContent = hiddenCount + ' approved section' + (hiddenCount !== 1 ? 's' : '') + ' hidden — showing sections that still need attention.';
+    msgEl.style.display = '';
+  } else {
+    msgEl.style.display = 'none';
+  }
+}
+
+// ── Font size toggle for accessibility ──
+var fontSizeLevel = 0; // 0 = normal, 1 = large, 2 = x-large
+var fontSizeLabels = ['A+ Text Size', 'A− Normal Size', 'A− Normal Size'];
+var fontSizeScales = [1, 1.25, 1.5];
+
+function cycleFontSize() {
+  fontSizeLevel = (fontSizeLevel + 1) % 3;
+  var scale = fontSizeScales[fontSizeLevel];
+  var btn = document.getElementById('font-size-btn');
+  // Use CSS zoom to scale everything including hard-coded px sizes
+  var pageEl = document.getElementById('page-content') || document.body;
+
+  if (fontSizeLevel === 0) {
+    pageEl.style.zoom = '';
+    btn.textContent = 'A+ Text Size';
+    btn.style.background = '#fafafa';
+    btn.style.color = '#555';
+    btn.style.borderColor = '#bbb';
+  } else {
+    pageEl.style.zoom = scale;
+    var label = fontSizeLevel === 1 ? 'A+ Larger Text' : 'A++ Largest Text';
+    btn.textContent = label;
+    btn.style.background = '#1565c0';
+    btn.style.color = '#fff';
+    btn.style.borderColor = '#1565c0';
+  }
+}
+
+// ── Comment polling (15s, paused when tab hidden) ──
+var commentPollTimer = null;
+var lastArticleNum = null;
+var prevCommentCounts = {}; // track counts per section for "NEW" indicator
+
+function startCommentPolling(artNum) {
+  lastArticleNum = artNum;
+  stopCommentPolling();
+  commentPollTimer = setInterval(function () {
+    if (!document.hidden && lastArticleNum) {
+      console.log('[poll] refreshing comments for article', lastArticleNum);
+      loadReviewerComments(lastArticleNum);
+    }
+  }, 15000);
+}
+
+function stopCommentPolling() {
+  if (commentPollTimer) {
+    clearInterval(commentPollTimer);
+    commentPollTimer = null;
+  }
+}
+
+// Pause/resume polling on tab visibility
+document.addEventListener('visibilitychange', function () {
+  if (!document.hidden && lastArticleNum) {
+    // Immediately refresh when tab becomes visible again
+    loadReviewerComments(lastArticleNum);
+  }
+});
+
+// ── Load document text with auto-retry and batching ──
+var DOC_TEXT_BATCH_SIZE = 3;   // concurrent requests at a time
+var DOC_TEXT_MAX_RETRIES = 2;  // auto-retry up to 2 times before showing button
+
+// Process secIds in batches of DOC_TEXT_BATCH_SIZE
+function loadDocTextBatch(secIds, startIdx) {
+  if (startIdx >= secIds.length) return;
+  var batch = secIds.slice(startIdx, startIdx + DOC_TEXT_BATCH_SIZE);
+  var promises = batch.map(function (secId) { return loadDocText(secId, 0); });
+  Promise.all(promises).then(function () {
+    loadDocTextBatch(secIds, startIdx + DOC_TEXT_BATCH_SIZE);
+  });
+}
+
+// Load a single section's doc text with auto-retry
+function loadDocText(secId, attempt) {
+  if (attempt === undefined) attempt = 0;
+  var el = document.getElementById('doctext-' + secId);
+  if (!el) return Promise.resolve();
+
+  el.textContent = attempt > 0 ? 'Retrying\u2026 (attempt ' + (attempt + 1) + ')' : 'Loading document text\u2026';
+  el.style.color = 'var(--text2)';
+  el.style.fontStyle = 'normal';
+  // Remove any existing retry button
+  var existing = document.getElementById('retry-' + secId);
+  if (existing) existing.remove();
+
+  return ReviewApi.getDocText(cycleId, secId).then(function (d) {
+    el.textContent = d.text;
+    el.style.color = 'var(--text)';
+  }).catch(function (err) {
+    if (err.status === 404) {
+      el.textContent = 'Document text not yet available for this section.';
+      el.style.color = 'var(--text3)';
+      el.style.fontStyle = 'italic';
+      return;
+    }
+    // Auto-retry if we haven't exhausted attempts
+    if (attempt < DOC_TEXT_MAX_RETRIES) {
+      var delay = (attempt + 1) * 1500; // 1.5s, 3s
+      return new Promise(function (resolve) {
+        setTimeout(function () { resolve(loadDocText(secId, attempt + 1)); }, delay);
+      });
+    }
+    // All retries exhausted — show error with manual retry button
+    el.textContent = 'Could not load document text after ' + (DOC_TEXT_MAX_RETRIES + 1) + ' attempts.';
+    el.style.color = '#b71c1c';
+    var btn = document.createElement('button');
+    btn.id = 'retry-' + secId;
+    btn.textContent = 'Retry Loading';
+    btn.style.cssText = 'display:block;margin-top:12px;padding:8px 20px;font-size:14px;font-weight:700;color:#fff;background:#b71c1c;border:none;border-radius:6px;cursor:pointer;';
+    btn.onclick = function () { loadDocText(secId, 0); };
+    el.parentElement.appendChild(btn);
+  });
+}
+
+// ── Key Questions Modal ──
+var kqHeaderColors = {
+  required_by_law: { bg: '#C0392B', text: '#fff' },
+  required_by_city: { bg: '#C0392B', text: '#fff' },
+  best_practice: { bg: '#1A5276', text: '#fff' },
+  community_choice: { bg: '#1E7B1E', text: '#fff' }
+};
+
+var kqSubtitles = {
+  required_by_law: 'Cannot be changed',
+  required_by_city: 'Cannot be changed',
+  best_practice: 'Change with caution',
+  community_choice: 'Open for discussion'
+};
+
+function showKeyQuestions(cls) {
+  var modal = document.getElementById('kq-modal');
+  var header = document.getElementById('kq-modal-header');
+  var colors = kqHeaderColors[cls] || { bg: '#555', text: '#fff' };
+  header.style.background = colors.bg;
+  header.style.color = colors.text;
+  document.getElementById('kq-modal-title').textContent = 'Key Questions:';
+  // Category badge with doc-matching background colors and sans-serif font
+  var kqBadgeBg = { required_by_law: '#FADBD8', required_by_city: '#FADBD8', best_practice: '#D6EAF8', community_choice: '#D5F5E3' };
+  var kqBadgeColor = { required_by_law: '#C0392B', required_by_city: '#C0392B', best_practice: '#1A5276', community_choice: '#1E7B1E' };
+  document.getElementById('kq-modal-category').innerHTML = '<span style="display:inline-block;padding:6px 16px;border-radius:6px;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;background:' + (kqBadgeBg[cls] || '#eee') + ';color:' + (kqBadgeColor[cls] || '#333') + ';">' + escHtml(classLabels[cls] || cls) + '</span>';
+  document.getElementById('kq-modal-subtitle').textContent = kqSubtitles[cls] || '';
+
+  var questions = keyQuestions[cls] || [];
+  var body = '<ol style="margin:0;padding-left:24px;">';
+  for (var i = 0; i < questions.length; i++) {
+    var parts = questions[i].split('?');
+    var bold = parts[0] + '?';
+    var rest = parts.slice(1).join('?');
+    body += '<li style="margin-bottom:14px;"><strong>' + escHtml(bold) + '</strong>' + escHtml(rest) + '</li>';
+  }
+  body += '</ol>';
+  if (cls === 'required_by_law' || cls === 'required_by_city') {
+    body += '<div style="margin-top:16px;padding:12px 16px;background:#FFF8E1;border-radius:6px;border:1px solid #FFE082;font-size:14px;color:#7A6100;"><strong>Note:</strong> This section is required and cannot be removed from the governing documents. Focus your review on how the language is written \u2014 is it clear, accurate, and complete? The provision itself will always remain.</div>';
+  }
+  document.getElementById('kq-modal-body').innerHTML = body;
   modal.style.display = '';
   document.body.style.overflow = 'hidden';
+}
 
-  try {
-    var data = await ReviewApi.getDocText(cycleId, secId);
-    document.getElementById('modal-body').textContent = data.text;
-  } catch (err) {
-    if (err.status === 404) {
-      document.getElementById('modal-body').textContent = 'Document text not available for this section.\n\nAn administrator needs to upload the document text via the Admin Console.';
-    } else {
-      document.getElementById('modal-body').textContent = 'Failed to load: ' + err.message;
-    }
+function closeKqModal() {
+  document.getElementById('kq-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+// ── Field Notes Modal (shows Field Guide content) ──
+// sectionFieldData is populated during loadArticle for use by the modal
+var sectionFieldData = {};
+
+function showFieldNotes(secId, artNum, sectionTitle, sectionNumber) {
+  var modal = document.getElementById('doctext-modal');
+  document.getElementById('modal-title').textContent = 'Art. ' + artNum + ', §' + sectionNumber + ' — ' + sectionTitle;
+  document.getElementById('modal-subtitle').textContent = 'Reviewers Field Guide Notes';
+
+  var fd = sectionFieldData[secId] || {};
+  var cls = fd.classification || 'best_practice';
+  var body = '';
+  body += '<div style="margin-bottom:16px;"><span class="sc-classification cls-' + cls + '" style="padding:6px 16px;border-radius:6px;font-family:Arial,Helvetica,sans-serif;font-size:13px;">' + escHtml(classLabels[cls] || cls) + '</span></div>';
+  var fnLabel = 'font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:6px;';
+  body += '<div style="margin-bottom:18px;"><div style="' + fnLabel + '">Why It\'s Here</div><div style="font-size:17px;line-height:1.7;">' + escHtml(fd.whyItsHere) + '</div></div>';
+  body += '<div style="margin-bottom:18px;"><div style="' + fnLabel + '">What You Can Do</div><div style="font-size:17px;line-height:1.7;">' + escHtml(fd.whatYouCanDo) + '</div></div>';
+  if (fd.communityImpact) {
+    body += '<div style="margin-bottom:8px;padding:14px 18px;background:#FFF3E0;border:1px solid #FFE0B2;border-radius:8px;">';
+    body += '<div style="' + fnLabel + 'color:#E65100;">&#9733; Community Impact</div>';
+    body += '<div style="font-size:17px;line-height:1.7;color:#E65100;">' + escHtml(fd.communityImpact) + '</div>';
+    body += '</div>';
   }
+
+  document.getElementById('modal-body').innerHTML = body;
+  modal.style.display = '';
+  document.body.style.overflow = 'hidden';
 }
 
 function closeDocTextModal() {
@@ -367,9 +948,9 @@ function closeDocTextModal() {
   document.body.style.overflow = '';
 }
 
-// Close modal on Escape key
+// Close modals on Escape key
 document.addEventListener('keydown', function (e) {
-  if (e.key === 'Escape') closeDocTextModal();
+  if (e.key === 'Escape') { closeDocTextModal(); closeKqModal(); }
 });
 
 // ── Approve All Sections (with modal + retry) ──
@@ -421,7 +1002,7 @@ async function approveAllSections() {
   var cards = document.querySelectorAll('.section-card');
   var toApprove = [];
   cards.forEach(function (card) {
-    var approveBtn = card.querySelector('.vote-btn.approve');
+    var approveBtn = card.querySelector('.vote-btn-sm.approve');
     if (approveBtn && !approveBtn.classList.contains('selected')) {
       toApprove.push({ card: card, btn: approveBtn });
     }
@@ -466,19 +1047,16 @@ async function approveAllSections() {
     var titleEl = item.card.querySelector('.sc-title');
     var secLabel = titleEl ? titleEl.textContent : secId;
 
-    var notesEl = document.getElementById('notes-' + secId);
-    var notes = notesEl ? notesEl.value : undefined;
-
     progressEl.textContent = 'Saving ' + (i + 1) + ' of ' + toApprove.length + '…';
     barEl.style.width = Math.round(((i + 1) / toApprove.length) * 100) + '%';
 
-    var result = await saveVoteWithRetry(cycleId, secId, 'approve', notes);
+    var result = await saveVoteWithRetry(cycleId, secId, 'approve', undefined);
 
     if (result.ok) {
-      // Update UI
-      var allBtns = item.card.querySelectorAll('.vote-btn');
+      // Update UI — sync all vote buttons (compact + full) for this section
+      var allBtns = document.querySelectorAll('[data-sec-id="' + secId + '"]');
       allBtns.forEach(function (b) { b.classList.remove('selected'); });
-      item.btn.classList.add('selected');
+      allBtns.forEach(function (b) { if (b.dataset.vote === 'approve') b.classList.add('selected'); });
       setStatus(secId, 'saved', 'Saved ✓');
       var voteStatusEl = document.getElementById('vote-status-' + secId);
       if (voteStatusEl) { voteStatusEl.textContent = 'Approved'; voteStatusEl.style.color = '#1e7e34'; voteStatusEl.style.background = '#e6f4ea'; }
@@ -521,13 +1099,7 @@ async function approveAllSections() {
   document.getElementById('approve-all-status').textContent = '';
 
   // Update progress text
-  var votedCount = 0;
-  document.querySelectorAll('.section-card').forEach(function (c) {
-    if (c.querySelector('.vote-btn.selected')) votedCount++;
-  });
-  var totalCards = document.querySelectorAll('.section-card').length;
-  document.getElementById('article-progress').textContent =
-    votedCount + ' of ' + totalCards + ' sections voted in this article';
+  updateProgressCount();
 }
 
 var guardCheck = setInterval(function () {

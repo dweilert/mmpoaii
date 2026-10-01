@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Document Relationship Report — MMPOAII HOA</title>
+<link rel="stylesheet" href="/css/site.css">
+<style>
+  :root {
+    --ccr-color:    #4a3878;
+    --ccr-bg:       #ede8f8;
+    --bylaw-color:  #1565c0;
+    --bylaw-bg:     #e3f2fd;
+    --rule-color:   #2e7d32;
+    --rule-bg:      #e8f5e9;
+    --orphan-color: #b71c1c;
+    --orphan-bg:    #ffebee;
+  }
+
+  body { background: #f6f5fb; }
+
+  .report-wrap { max-width: 1500px; margin: 24px auto; padding: 0 16px; }
+
+  .report-banner {
+    background: var(--purple-800); color: #fff;
+    padding: 18px 24px; border-radius: var(--r2);
+    margin-bottom: 14px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .report-banner h2 { font-family: var(--serif); margin: 0 0 4px; font-size: 22px; }
+  .report-banner p  { opacity: .85; font-size: 13px; margin: 0; }
+
+  .report-toolbar {
+    background: #fff; border: 1px solid var(--border); border-radius: var(--r2);
+    padding: 12px 14px; margin-bottom: 14px;
+    display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+  }
+  .filter-group { display: flex; gap: 6px; align-items: center; }
+  .filter-label { font-size: 12px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: .4px; }
+  .filter-btn {
+    padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer;
+    background: #fafafa; color: var(--text); border: 1px solid var(--border);
+    border-radius: var(--r);
+  }
+  .filter-btn:hover  { background: #f0f0f0; }
+  .filter-btn.active { background: var(--purple-800); color: #fff; border-color: var(--purple-800); }
+
+  .stats-row {
+    display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 14px;
+  }
+  .stat-card {
+    background: #fff; border: 1px solid var(--border); border-radius: var(--r2);
+    padding: 10px 16px; min-width: 130px; flex: 1 1 auto;
+  }
+  .stat-num { font-size: 20px; font-weight: 700; }
+  .stat-lbl { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: .5px; }
+  .stat-card.ccrs .stat-num   { color: var(--ccr-color); }
+  .stat-card.bylaws .stat-num { color: var(--bylaw-color); }
+  .stat-card.rules .stat-num  { color: var(--rule-color); }
+  .stat-card.orphans .stat-num { color: var(--orphan-color); }
+
+  /* ── Graph layout ── */
+  .graph-shell {
+    position: relative;
+    background: #fff; border: 1px solid var(--border); border-radius: var(--r2);
+    padding: 12px;
+  }
+
+  .graph-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 28px;
+    position: relative;
+    z-index: 2; /* above the SVG overlay */
+  }
+
+  .graph-col-header {
+    position: sticky; top: 0;
+    background: #fff;
+    padding: 10px 6px;
+    border-bottom: 2px solid var(--border);
+    z-index: 5;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .graph-col-header h3 {
+    margin: 0; font-size: 14px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .5px;
+  }
+  .graph-col.ccrs   .graph-col-header h3 { color: var(--ccr-color); }
+  .graph-col.bylaws .graph-col-header h3 { color: var(--bylaw-color); }
+  .graph-col.rules  .graph-col-header h3 { color: var(--rule-color); }
+  .col-count { font-size: 11px; color: var(--text3); }
+
+  .article-group { margin: 6px 0 12px; }
+  .article-label {
+    font-size: 11px; font-weight: 700; color: var(--text3);
+    padding: 4px 6px; text-transform: uppercase; letter-spacing: .4px;
+    border-bottom: 1px dashed var(--border); margin-bottom: 4px;
+  }
+
+  .node {
+    background: #fff; border: 2px solid transparent;
+    border-radius: 6px; padding: 6px 8px;
+    margin-bottom: 4px; cursor: pointer; font-size: 12px;
+    transition: all .12s;
+    position: relative;
+  }
+  .node:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,.12); transform: translateY(-1px);
+  }
+
+  .graph-col.ccrs   .node { background: var(--ccr-bg);   border-color: var(--ccr-color); }
+  .graph-col.bylaws .node { background: var(--bylaw-bg); border-color: var(--bylaw-color); }
+  .graph-col.rules  .node { background: var(--rule-bg);  border-color: var(--rule-color); }
+
+  .node.orphan {
+    background: var(--orphan-bg) !important;
+    border-color: var(--orphan-color) !important;
+  }
+
+  .node.dimmed { opacity: 0.25; }
+  .node.highlighted {
+    box-shadow: 0 0 0 3px #ff9800;
+    transform: translateY(-2px);
+    z-index: 10;
+  }
+  .node-id     { font-weight: 700; font-size: 11px; display: inline-block; }
+  .node-title  { color: var(--text2); margin-left: 4px; }
+  .node-meta   { font-size: 10px; color: var(--text3); margin-top: 2px; }
+  .node-view-btn {
+    position: absolute; top: 4px; right: 4px;
+    width: 22px; height: 22px;
+    background: rgba(255, 255, 255, .85);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 12px; line-height: 1;
+    cursor: pointer; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text2);
+    transition: all .12s;
+  }
+  .node-view-btn:hover {
+    background: var(--purple-800); color: #fff; border-color: var(--purple-800);
+  }
+  .node { padding-right: 32px; } /* leave room for the view-btn */
+  .orphan-reason {
+    font-size: 10px; color: var(--orphan-color); font-weight: 600;
+    margin-top: 3px; padding-top: 3px;
+    border-top: 1px dashed rgba(183, 28, 28, .25);
+  }
+
+  /* ── SVG connection overlay ── */
+  .graph-svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .graph-svg path {
+    fill: none;
+    stroke: rgba(74, 56, 120, 0.55);
+    stroke-width: 1.5;
+    transition: stroke .15s, stroke-width .15s;
+  }
+  .graph-svg path.highlight {
+    stroke: #ff6f00; stroke-width: 3;
+  }
+  .graph-svg path.dimmed { stroke: rgba(0,0,0,0.04); }
+
+  .legend {
+    margin-top: 12px; font-size: 11px; color: var(--text3);
+    display: flex; flex-wrap: wrap; gap: 14px; justify-content: center;
+    padding: 8px;
+  }
+  .legend-swatch { display: inline-block; width: 12px; height: 12px; vertical-align: middle; border-radius: 3px; margin: 0 4px -2px; }
+  .swatch-ccrs   { background: var(--ccr-bg);    border: 1px solid var(--ccr-color); }
+  .swatch-bylaws { background: var(--bylaw-bg);  border: 1px solid var(--bylaw-color); }
+  .swatch-rules  { background: var(--rule-bg);   border: 1px solid var(--rule-color); }
+  .swatch-orphan { background: var(--orphan-bg); border: 1px solid var(--orphan-color); }
+
+  .loading-state { padding: 60px; text-align: center; color: var(--text3); }
+  .spinner {
+    display: inline-block; width: 20px; height: 20px;
+    border: 3px solid #ddd; border-top-color: var(--purple-800);
+    border-radius: 50%; animation: spin .8s linear infinite;
+    vertical-align: middle; margin-right: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Modal popup ── */
+  .modal-backdrop {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.55); z-index: 9000;
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-backdrop.show { display: flex; }
+  .modal-card {
+    background: #fff; border-radius: var(--r2);
+    max-width: 720px; width: 100%; max-height: 85vh;
+    display: flex; flex-direction: column; overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,.25);
+  }
+  .modal-head {
+    padding: 14px 18px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .modal-head h3 { margin: 0; font-size: 17px; flex: 1; }
+  .modal-close {
+    background: transparent; border: none; font-size: 24px;
+    color: var(--text3); cursor: pointer; padding: 0; line-height: 1;
+  }
+  .modal-close:hover { color: var(--text); }
+  .modal-body {
+    padding: 16px 18px; overflow-y: auto; font-size: 14px; line-height: 1.6;
+    white-space: pre-wrap;
+  }
+  .modal-meta { font-size: 12px; color: var(--text3); padding: 0 18px 12px; }
+
+  .modal-tag {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    padding: 2px 8px; border-radius: 10px;
+    text-transform: uppercase; letter-spacing: .4px;
+  }
+  .tag-ccrs   { background: var(--ccr-bg);   color: var(--ccr-color); }
+  .tag-bylaws { background: var(--bylaw-bg); color: var(--bylaw-color); }
+  .tag-rules  { background: var(--rule-bg);  color: var(--rule-color); }
+
+  /* Print */
+  @media print {
+    body { background: #fff !important; }
+    .site-header, .site-footer, .report-toolbar, .modal-backdrop { display: none !important; }
+    .report-wrap { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+    .graph-cols { display: block; }
+    .graph-col { page-break-inside: avoid; margin-bottom: 24px; }
+    .graph-svg { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="inner">
+    <a href="/" class="site-logo">
+      <div class="logo-mark">🏡</div>
+      <div class="logo-text">
+        <div class="logo-name" data-hoa-name>MMPOAII HOA</div>
+        <div class="logo-sub">Document Relationship Report</div>
+      </div>
+    </a>
+    <nav class="site-nav">
+      <a href="#" id="back-link">← Back</a>
+      <div class="nav-user">
+        <div class="avatar" id="nav-avatar">?</div>
+        <div>
+          <div class="uname" data-user-name>Loading…</div>
+          <div class="urole" data-user-role></div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="HoaGuard.logout()">Sign Out</button>
+    </nav>
+  </div>
+</header>
+
+<div id="page-content">
+<div class="report-wrap">
+
+  <div class="report-banner">
+    <div>
+      <h2>Document Relationship Report</h2>
+      <p>How the CC&amp;Rs, Bylaws, and Rules of Conduct connect — and where the gaps are.</p>
+    </div>
+    <button class="filter-btn" onclick="window.print()">Print / Save PDF</button>
+  </div>
+
+  <div class="report-toolbar" style="flex-direction:column;align-items:stretch;gap:10px;">
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+      <div class="filter-group">
+        <span class="filter-label">View:</span>
+        <button class="filter-btn active" data-mode="all"     onclick="setMode('all')">All sections</button>
+        <button class="filter-btn"        data-mode="orphans" onclick="setMode('orphans')">Orphans only</button>
+        <button class="filter-btn"        data-mode="strong"  onclick="setMode('strong')">Strong matches (≥30%)</button>
+      </div>
+      <div class="filter-group" style="margin-left:auto;">
+        <span class="filter-label" id="focus-hint">Click a section to focus its connections · Click 📄 to view text</span>
+        <button class="filter-btn" id="clear-focus-btn" style="display:none;" onclick="clearFocus()">✕ Clear focus</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;border-top:1px solid var(--border);padding-top:10px;">
+      <div class="filter-group">
+        <span class="filter-label">Documents:</span>
+        <button class="filter-btn active" data-doc="ccrs"   onclick="toggleDoc('ccrs')">CC&Rs</button>
+        <button class="filter-btn active" data-doc="bylaws" onclick="toggleDoc('bylaws')">Bylaws</button>
+        <button class="filter-btn active" data-doc="rules"  onclick="toggleDoc('rules')">Rules</button>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Articles:</span>
+        <input type="text" id="article-filter" placeholder="e.g. 4 or 1-3 or 2,5,7"
+               style="padding:6px 10px;font-size:12px;border:1px solid var(--border);border-radius:var(--r);width:160px;"
+               oninput="onFilterChange()">
+      </div>
+      <div class="filter-group" style="flex:1;min-width:200px;">
+        <span class="filter-label">Keyword:</span>
+        <input type="text" id="keyword-filter" placeholder="e.g. parking, assessment, voting…"
+               style="padding:6px 10px;font-size:12px;border:1px solid var(--border);border-radius:var(--r);flex:1;min-width:160px;"
+               oninput="onFilterChange()">
+      </div>
+      <button class="filter-btn" onclick="clearFilters()" id="clear-filters-btn">Clear filters</button>
+    </div>
+  </div>
+
+  <div id="stats-row" class="stats-row"></div>
+
+  <div id="graph-area"><div class="loading-state"><span class="spinner"></span> Loading relationships…</div></div>
+
+  <div class="legend" style="flex-direction:column;gap:6px;">
+    <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;">
+      <span><span class="legend-swatch swatch-ccrs"></span>CC&Rs</span>
+      <span><span class="legend-swatch swatch-bylaws"></span>Bylaws</span>
+      <span><span class="legend-swatch swatch-rules"></span>Rules of Conduct</span>
+      <span><span class="legend-swatch swatch-orphan"></span>Orphan</span>
+    </div>
+    <div style="text-align:center;font-size:11px;color:var(--text3);max-width:920px;margin:0 auto;line-height:1.5;">
+      <strong>Hierarchy:</strong> CC&Rs are the top-level covenants, Bylaws operationalize them, and Rules of Conduct further detail Bylaws or CC&Rs.
+      A <strong>Bylaw</strong> is an orphan if no CC&R authorizes it.
+      A <strong>Rule of Conduct</strong> is an orphan if no Bylaw or CC&R backs it.
+      A <strong>CC&R</strong> is an orphan if no Bylaw or Rule implements it.
+      CC&R sections in the <strong>Definitions</strong> article are exempt — they're glossary entries, not enforceable covenants.
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- Modal popup -->
+<div class="modal-backdrop" id="modal" onclick="if(event.target===this) closeModal()">
+  <div class="modal-card">
+    <div class="modal-head">
+      <span class="modal-tag" id="modal-tag"></span>
+      <h3 id="modal-title">Section Title</h3>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-meta" id="modal-meta"></div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div data-hoa-name>MMPOAII HOA</div>
+  <div>Community Portal</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6/dist/amazon-cognito-identity.min.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/guard.js"></script>
+<script src="/js/review-api.js"></script>
+<script>
+HoaGuard.protect(['board', 'reviewers']);
+
+function setBackLink() {
+  var user = HoaGuard.getUser();
+  var link = document.getElementById('back-link');
+  if (!user || !user.groups) { link.href = '/'; return; }
+  if (user.groups.includes('board'))      link.href = '/board/index.html';
+  else if (user.groups.includes('reviewers')) link.href = '/review/index.html';
+  else link.href = '/';
+}
+
+var guardCheck = setInterval(function () {
+  if (HoaGuard.getUser()) {
+    clearInterval(guardCheck);
+    setBackLink();
+    var uname = document.querySelector('[data-user-name]');
+    if (uname && uname.textContent !== 'Loading…') {
+      document.getElementById('nav-avatar').textContent = uname.textContent.charAt(0).toUpperCase();
+    }
+    // Defensive: ensure page-content is interactive even if guard's _hideLoading didn't fire
+    var pc = document.getElementById('page-content');
+    if (pc) pc.style.visibility = 'visible';
+    var gl = document.getElementById('guard-loading');
+    if (gl) gl.style.display = 'none';
+    loadGraph();
+  }
+}, 100);
+
+function escHtml(s) {
+  var d = document.createElement('div');
+  d.textContent = s == null ? '' : String(s);
+  return d.innerHTML;
+}
+
+var GRAPH = null;       // { sections: { ccrs, bylaws, rules }, links: [...], counts }
+var MODE = 'all';       // 'all' | 'orphans' | 'strong'
+var SELECTED_NODE = null; // {cycleKey, secId}
+var DOC_VISIBLE = { ccrs: true, bylaws: true, rules: true };
+var ARTICLE_FILTER = ''; // raw string, e.g. "4" or "1-3" or "2,5,7"
+var KEYWORD_FILTER = ''; // case-insensitive substring
+
+async function loadGraph() {
+  try {
+    GRAPH = await ReviewApi.getAllLinks();
+    renderStats();
+    renderGraph();
+  } catch (err) {
+    document.getElementById('graph-area').innerHTML =
+      '<div class="loading-state">Could not load relationships: ' + escHtml(err.message || '') + '</div>';
+  }
+}
+
+function setMode(mode) {
+  MODE = mode;
+  SELECTED_NODE = null;
+  document.querySelectorAll('.filter-btn[data-mode]').forEach(function (btn) {
+    btn.classList.toggle('active', btn.dataset.mode === mode);
+  });
+  renderStats();
+  renderGraph();
+}
+
+function toggleDoc(key) {
+  DOC_VISIBLE[key] = !DOC_VISIBLE[key];
+  // Don't allow all three to be off — re-enable if user just turned off the last one
+  if (!DOC_VISIBLE.ccrs && !DOC_VISIBLE.bylaws && !DOC_VISIBLE.rules) {
+    DOC_VISIBLE[key] = true;
+  }
+  document.querySelector('.filter-btn[data-doc="' + key + '"]').classList.toggle('active', DOC_VISIBLE[key]);
+  SELECTED_NODE = null;
+  renderStats();
+  renderGraph();
+}
+
+function onFilterChange() {
+  ARTICLE_FILTER = document.getElementById('article-filter').value.trim();
+  KEYWORD_FILTER = document.getElementById('keyword-filter').value.trim();
+  SELECTED_NODE = null;
+  renderStats();
+  renderGraph();
+}
+
+function clearFilters() {
+  ARTICLE_FILTER = '';
+  KEYWORD_FILTER = '';
+  document.getElementById('article-filter').value = '';
+  document.getElementById('keyword-filter').value = '';
+  DOC_VISIBLE = { ccrs: true, bylaws: true, rules: true };
+  document.querySelectorAll('.filter-btn[data-doc]').forEach(function (b) { b.classList.add('active'); });
+  SELECTED_NODE = null;
+  renderStats();
+  renderGraph();
+}
+
+// Parse an article filter like "4" or "1-3" or "2,5,7" — returns null = "no filter"
+function parseArticleFilter(str) {
+  if (!str) return null;
+  var allowed = new Set();
+  var parts = str.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+  for (var i = 0; i < parts.length; i++) {
+    var p = parts[i];
+    var m = p.match(/^(\d+)\s*-\s*(\d+)$/);
+    if (m) {
+      var lo = parseInt(m[1], 10);
+      var hi = parseInt(m[2], 10);
+      if (lo <= hi) for (var n = lo; n <= hi; n++) allowed.add(n);
+    } else if (/^\d+$/.test(p)) {
+      allowed.add(parseInt(p, 10));
+    }
+  }
+  return allowed.size === 0 ? null : allowed;
+}
+
+// Returns true if the section passes the article + keyword + doc filters.
+function passesUserFilters(node) {
+  if (!DOC_VISIBLE[node.cycleKey]) return false;
+  var artSet = parseArticleFilter(ARTICLE_FILTER);
+  if (artSet && !artSet.has(parseInt(node.articleNumber, 10))) return false;
+  if (KEYWORD_FILTER) {
+    var hay = ((node.sectionTitle || '') + ' ' + (node.articleTitle || '')).toLowerCase();
+    if (hay.indexOf(KEYWORD_FILTER.toLowerCase()) === -1) return false;
+  }
+  return true;
+}
+
+// Compute outgoing-link sets for each section
+function computeLinkSets() {
+  var byKey = {}; // 'ccrs:ART-01#SEC-01' -> Set of 'bylaws:...' or 'rules:...' keys
+  GRAPH.links.forEach(function (l) {
+    var k = l.srcCycleKey + ':' + l.srcSec;
+    if (!byKey[k]) byKey[k] = new Set();
+    byKey[k].add(l.tgtCycleKey + ':' + l.tgtSec);
+  });
+  return byKey;
+}
+
+// Returns the set of OTHER document keys this section is connected to,
+// counting both incoming and outgoing links.
+function connectedDocs(node) {
+  var docs = new Set();
+  for (var i = 0; i < GRAPH.links.length; i++) {
+    var l = GRAPH.links[i];
+    if (l.srcCycleKey === node.cycleKey && l.srcSec === node.secId &&
+        l.tgtCycleKey !== node.cycleKey) {
+      docs.add(l.tgtCycleKey);
+    }
+    if (l.tgtCycleKey === node.cycleKey && l.tgtSec === node.secId &&
+        l.srcCycleKey !== node.cycleKey) {
+      docs.add(l.srcCycleKey);
+    }
+  }
+  return docs;
+}
+
+// CC&R "Definitions" sections are glossary entries — exempt from orphan check.
+function isDefinitionSection(node) {
+  return (node.articleTitle || '').toLowerCase().indexOf('definition') !== -1;
+}
+
+// Hierarchy-based orphan definition:
+//   - CC&R orphan: no Bylaws or Rules implement it (Definitions exempt)
+//   - Bylaw orphan: no CC&R covenant authorizes it
+//   - Rule orphan: no Bylaw AND no CC&R supports it
+function isOrphan(node) {
+  if (node.cycleKey === 'ccrs' && isDefinitionSection(node)) return false;
+  var docs = connectedDocs(node);
+  if (node.cycleKey === 'ccrs')   return !docs.has('bylaws') && !docs.has('rules');
+  if (node.cycleKey === 'bylaws') return !docs.has('ccrs');
+  if (node.cycleKey === 'rules')  return !docs.has('bylaws') && !docs.has('ccrs');
+  return false;
+}
+
+// Short human-readable explanation of why a section is an orphan.
+function orphanReason(node) {
+  if (!isOrphan(node)) return '';
+  if (node.cycleKey === 'ccrs')   return 'No Bylaw or Rule implements this covenant';
+  if (node.cycleKey === 'bylaws') return 'No CC&R covenant authorizes this Bylaw';
+  if (node.cycleKey === 'rules')  return 'No Bylaw or CC&R backs this Rule';
+  return '';
+}
+
+function filterLinks(links) {
+  if (MODE === 'strong') {
+    return links.filter(function (l) { return (l.score || 0) >= 0.30; });
+  }
+  return links;
+}
+
+function renderStats() {
+  var s = GRAPH.sections;
+  // Apply user filters first
+  var visible = {
+    ccrs:   s.ccrs.filter(passesUserFilters),
+    bylaws: s.bylaws.filter(passesUserFilters),
+    rules:  s.rules.filter(passesUserFilters),
+  };
+  // Apply mode filter (orphans-only narrows further)
+  if (MODE === 'orphans') {
+    visible.ccrs   = visible.ccrs.filter(isOrphan);
+    visible.bylaws = visible.bylaws.filter(isOrphan);
+    visible.rules  = visible.rules.filter(isOrphan);
+  }
+  var orphans = visible.ccrs.filter(isOrphan).length +
+                visible.bylaws.filter(isOrphan).length +
+                visible.rules.filter(isOrphan).length;
+
+  // Count visible links: must be between visible nodes and pass strong filter if active
+  var visibleIds = new Set();
+  ['ccrs','bylaws','rules'].forEach(function (k) {
+    visible[k].forEach(function (n) { visibleIds.add(n.cycleKey + ':' + n.secId); });
+  });
+  var totalLinks = filterLinks(GRAPH.links).filter(function (l) {
+    return visibleIds.has(l.srcCycleKey + ':' + l.srcSec) &&
+           visibleIds.has(l.tgtCycleKey + ':' + l.tgtSec);
+  }).length;
+
+  function statCard(key, count, total, label) {
+    var cls = key ? ' ' + key : '';
+    var num = total != null && total !== count ? count + ' / ' + total : count;
+    return '<div class="stat-card' + cls + '"><div class="stat-num">' + num + '</div><div class="stat-lbl">' + label + '</div></div>';
+  }
+  document.getElementById('stats-row').innerHTML =
+    statCard('ccrs',    visible.ccrs.length,   s.ccrs.length,   'CC&Rs sections') +
+    statCard('bylaws',  visible.bylaws.length, s.bylaws.length, 'Bylaws sections') +
+    statCard('rules',   visible.rules.length,  s.rules.length,  'Rules sections') +
+    statCard('',        totalLinks,            null,            'Visible links') +
+    statCard('orphans', orphans,               null,            'Orphans (no cross-doc links)');
+}
+
+function renderGraph() {
+  var s = GRAPH.sections;
+
+  function nodeHtml(node) {
+    var orphan = isOrphan(node);
+    var passesUser = passesUserFilters(node);
+    var hidden = !passesUser || (MODE === 'orphans' && !orphan);
+    var classes = ['node'];
+    if (orphan) classes.push('orphan');
+    var idAttr = node.cycleKey + ':' + node.secId;
+    var reasonHtml = orphan
+      ? '<div class="orphan-reason">⚠ ' + escHtml(orphanReason(node)) + '</div>'
+      : '';
+    return (
+      '<div class="' + classes.join(' ') + '" data-id="' + escHtml(idAttr) + '" ' +
+      'data-cycle="' + escHtml(node.cycleId) + '" data-sec="' + escHtml(node.secId) + '"' +
+      (hidden ? ' style="display:none;"' : '') + '>' +
+        '<button class="node-view-btn" title="View full text" data-action="view">📄</button>' +
+        '<span class="node-id">Art ' + node.articleNumber + ' §' + node.sectionNumber + '</span>' +
+        '<span class="node-title">' + escHtml(node.sectionTitle) + '</span>' +
+        reasonHtml +
+      '</div>'
+    );
+  }
+
+  function colHtml(key, label, nodes) {
+    // Group by article
+    var byArt = {};
+    nodes.forEach(function (n) {
+      var artKey = n.articleNumber + '|' + (n.articleTitle || '');
+      if (!byArt[artKey]) byArt[artKey] = [];
+      byArt[artKey].push(n);
+    });
+    var artKeys = Object.keys(byArt).sort(function (a, b) {
+      return parseInt(a, 10) - parseInt(b, 10);
+    });
+
+    var inner = '';
+    artKeys.forEach(function (ak) {
+      var parts = ak.split('|');
+      var num = parts[0];
+      var title = parts.slice(1).join('|');
+      inner += '<div class="article-group">';
+      inner +=   '<div class="article-label">Art ' + num + (title ? ' — ' + escHtml(title) : '') + '</div>';
+      byArt[ak].forEach(function (n) { inner += nodeHtml(n); });
+      inner += '</div>';
+    });
+
+    var visibleCount = nodes.filter(function (n) {
+      var passesUser = passesUserFilters(n);
+      var orphanHidden = (MODE === 'orphans' && !isOrphan(n));
+      return passesUser && !orphanHidden;
+    }).length;
+
+    var colHidden = !DOC_VISIBLE[key];
+    return (
+      '<div class="graph-col ' + key + '" id="col-' + key + '"' +
+      (colHidden ? ' style="display:none;"' : '') + '>' +
+        '<div class="graph-col-header"><h3>' + label + '</h3>' +
+          '<span class="col-count">' + visibleCount + ' / ' + nodes.length + ' sections</span>' +
+        '</div>' + inner +
+      '</div>'
+    );
+  }
+
+  var visibleCols = ['ccrs','bylaws','rules'].filter(function (k) { return DOC_VISIBLE[k]; }).length;
+  var gridStyle = 'grid-template-columns: repeat(' + visibleCols + ', 1fr);';
+  var html =
+    '<div class="graph-shell">' +
+      '<svg class="graph-svg" id="graph-svg"></svg>' +
+      '<div class="graph-cols" id="graph-cols" style="' + gridStyle + '">' +
+        colHtml('ccrs',   'CC&Rs',            s.ccrs)   +
+        colHtml('bylaws', 'Bylaws',           s.bylaws) +
+        colHtml('rules',  'Rules of Conduct', s.rules)  +
+      '</div>' +
+    '</div>';
+
+  document.getElementById('graph-area').innerHTML = html;
+
+  // Allow layout to settle, then draw connections
+  requestAnimationFrame(drawConnections);
+}
+
+function drawConnections() {
+  try {
+    var svg = document.getElementById('graph-svg');
+    if (!svg) { console.warn('[draw] no svg'); return; }
+    var shell = svg.parentElement;
+    var rect = shell.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) {
+      console.warn('[draw] shell has zero dims, retrying in 100ms');
+      setTimeout(drawConnections, 100);
+      return;
+    }
+    svg.setAttribute('viewBox', '0 0 ' + rect.width + ' ' + rect.height);
+    svg.setAttribute('width', rect.width);
+    svg.setAttribute('height', rect.height);
+    svg.innerHTML = '';
+
+    if (MODE === 'orphans') {
+      console.log('[draw] skip — orphans mode');
+      return;
+    }
+
+    var links = filterLinks(GRAPH.links);
+
+    function nodeEl(cycleKey, secId) {
+      // querySelector with ALL nodes — pick the one that matches dataset
+      var all = document.querySelectorAll('.graph-col.' + cycleKey + ' .node');
+      for (var i = 0; i < all.length; i++) {
+        if (all[i].dataset.sec === secId) return all[i];
+      }
+      return null;
+    }
+
+    function nodeBox(cycleKey, secId) {
+      var el = nodeEl(cycleKey, secId);
+      if (!el) return null;
+      // Skip if hidden
+      if (el.offsetParent === null) return null;
+      var r = el.getBoundingClientRect();
+      return {
+        x1: r.left  - rect.left,
+        x2: r.right - rect.left,
+        y:  r.top + r.height / 2 - rect.top,
+      };
+    }
+
+    var ns = 'http://www.w3.org/2000/svg';
+    var drawn = 0;
+    links.forEach(function (l) {
+      var a = nodeBox(l.srcCycleKey, l.srcSec);
+      var b = nodeBox(l.tgtCycleKey, l.tgtSec);
+      if (!a || !b) return;
+      var sx, ex;
+      if (a.x1 < b.x1) { sx = a.x2; ex = b.x1; }
+      else             { sx = a.x1; ex = b.x2; }
+      var sy = a.y, ey = b.y;
+      var dx = (ex - sx) / 2;
+      var path = document.createElementNS(ns, 'path');
+      path.setAttribute('d',
+        'M ' + sx + ' ' + sy +
+        ' C ' + (sx + dx) + ' ' + sy + ', ' +
+                (ex - dx) + ' ' + ey + ', ' +
+                ex + ' ' + ey
+      );
+      path.setAttribute('data-src', l.srcCycleKey + ':' + l.srcSec);
+      path.setAttribute('data-tgt', l.tgtCycleKey + ':' + l.tgtSec);
+      svg.appendChild(path);
+      drawn++;
+    });
+    console.log('[draw] svg=' + Math.round(rect.width) + 'x' + Math.round(rect.height) +
+                ', links=' + links.length + ', drawn=' + drawn);
+
+    // Apply highlight ONLY if a node is currently selected (otherwise we'd
+    // re-trigger renderGraph -> drawConnections in an infinite loop).
+    if (SELECTED_NODE) updatePathHighlights();
+  } catch (err) {
+    console.error('[draw] error:', err);
+  }
+}
+
+// Just toggles the .highlight/.dimmed classes on existing SVG paths
+// without re-rendering the graph. Safe to call from anywhere.
+function updatePathHighlights() {
+  var svg = document.getElementById('graph-svg');
+  if (!svg) return;
+  if (!SELECTED_NODE) {
+    svg.querySelectorAll('path').forEach(function (p) {
+      p.classList.remove('highlight'); p.classList.remove('dimmed');
+    });
+    return;
+  }
+  svg.querySelectorAll('path').forEach(function (p) {
+    var src = p.getAttribute('data-src');
+    var tgt = p.getAttribute('data-tgt');
+    if (src === SELECTED_NODE || tgt === SELECTED_NODE) {
+      p.classList.add('highlight'); p.classList.remove('dimmed');
+    } else {
+      p.classList.remove('highlight'); p.classList.add('dimmed');
+    }
+  });
+}
+
+window.addEventListener('resize', function () {
+  if (GRAPH) drawConnections();
+});
+
+// Event delegation — survives re-renders, no inline-onclick string-escape headaches.
+// Attached once to a stable parent (the page-content wrapper).
+document.getElementById('page-content').addEventListener('click', function (e) {
+  // 📄 view-text icon
+  var viewBtn = e.target.closest('.node-view-btn');
+  if (viewBtn) {
+    var node = viewBtn.closest('.node');
+    if (node) openModal(node.dataset.cycle, node.dataset.sec);
+    return; // do not bubble to focus toggle
+  }
+
+  // Click on a node body → toggle focus
+  var bodyNode = e.target.closest('.node');
+  if (bodyNode && bodyNode.dataset.id) {
+    var idAttr = bodyNode.dataset.id;
+    SELECTED_NODE = (SELECTED_NODE === idAttr) ? null : idAttr;
+    applyHighlight();
+    return;
+  }
+
+  // Click outside any node (and outside chrome) clears focus
+  if (!e.target.closest('.modal-card') &&
+      !e.target.closest('.report-toolbar') &&
+      !e.target.closest('.report-banner') &&
+      !e.target.closest('.legend')) {
+    if (SELECTED_NODE) {
+      SELECTED_NODE = null;
+      applyHighlight();
+    }
+  }
+});
+
+function applyHighlight() {
+  var nodes = document.querySelectorAll('.node');
+  var groups = document.querySelectorAll('.article-group');
+  var svg = document.getElementById('graph-svg');
+  var clearBtn = document.getElementById('clear-focus-btn');
+  var hint = document.getElementById('focus-hint');
+
+  if (!SELECTED_NODE) {
+    // Re-render to fully respect mode + user filters
+    renderGraph();
+    if (clearBtn) clearBtn.style.display = 'none';
+    if (hint) hint.textContent = 'Click a section to focus its connections · Click 📄 to view text';
+    return;
+  }
+
+  // Find connected node ids (both directions)
+  var connected = new Set();
+  connected.add(SELECTED_NODE);
+  GRAPH.links.forEach(function (l) {
+    var src = l.srcCycleKey + ':' + l.srcSec;
+    var tgt = l.tgtCycleKey + ':' + l.tgtSec;
+    if (src === SELECTED_NODE) connected.add(tgt);
+    if (tgt === SELECTED_NODE) connected.add(src);
+  });
+
+  // Hide unrelated nodes; highlight selected
+  nodes.forEach(function (n) {
+    var id = n.dataset.id;
+    if (id === SELECTED_NODE) {
+      n.classList.add('highlighted');
+      n.style.display = '';
+    } else if (connected.has(id)) {
+      n.classList.remove('highlighted');
+      n.style.display = '';
+    } else {
+      n.classList.remove('highlighted');
+      n.style.display = 'none';
+    }
+  });
+
+  // Hide article groups that have no visible nodes
+  hideEmptyGroups();
+
+  if (clearBtn) clearBtn.style.display = '';
+  if (hint) {
+    var connectedCount = connected.size - 1;
+    hint.textContent = connectedCount === 0
+      ? 'This section has no cross-document connections (orphan).'
+      : 'Showing ' + connectedCount + ' connected section' + (connectedCount === 1 ? '' : 's') + '.';
+  }
+
+  // Lines need to be redrawn after the layout shrinks
+  requestAnimationFrame(drawConnections);
+}
+
+function hideEmptyGroups() {
+  document.querySelectorAll('.article-group').forEach(function (g) {
+    var visibleNodes = g.querySelectorAll('.node:not([style*="display: none"])');
+    g.style.display = visibleNodes.length === 0 ? 'none' : '';
+  });
+}
+
+function clearFocus() {
+  SELECTED_NODE = null;
+  applyHighlight();
+}
+
+
+// ── Modal ──
+async function openModal(cycle, secId) {
+  var modal = document.getElementById('modal');
+  document.getElementById('modal-title').textContent = 'Loading…';
+  document.getElementById('modal-meta').textContent  = '';
+  document.getElementById('modal-body').innerHTML    = '<span class="spinner"></span> Loading…';
+  document.getElementById('modal-tag').textContent   = '';
+  document.getElementById('modal-tag').className     = 'modal-tag';
+  modal.classList.add('show');
+  try {
+    var data = await ReviewApi.getDocSection(cycle, secId);
+    var cycleKey =
+      cycle === 'Cycle-02-CCRs' ? 'ccrs' :
+      cycle === 'Cycle-02-Bylaws' ? 'bylaws' :
+      cycle === 'Cycle-02-Rules' ? 'rules' : '';
+    var tag = document.getElementById('modal-tag');
+    tag.className = 'modal-tag tag-' + cycleKey;
+    tag.textContent = data.docLabel || '';
+    document.getElementById('modal-title').textContent =
+      'Art. ' + data.articleNumber + ' §' + data.sectionNumber + ' — ' + (data.sectionTitle || '');
+    var meta = data.articleTitle ? ('Article: ' + data.articleTitle) : '';
+    document.getElementById('modal-meta').textContent = meta;
+    document.getElementById('modal-body').textContent = data.text || '(no text available)';
+  } catch (err) {
+    document.getElementById('modal-body').textContent = 'Could not load section: ' + (err.message || '');
+  }
+}
+function closeModal() { document.getElementById('modal').classList.remove('show'); }
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>

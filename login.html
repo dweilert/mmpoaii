@@ -34,7 +34,6 @@
         <div class="login-logo">🔐</div>
         <h1 id="card-title">Community Portal</h1>
         <p id="card-sub">Sign in to access your portal</p>
-        <div id="area-badge" class="area-badge" style="display:none"></div>
       </div>
 
       <div class="error-msg" id="signin-error"></div>
@@ -186,9 +185,6 @@
 <script src="/js/config.js"></script>
 <script src="/js/auth.js"></script>
 <script>
-// ── Determine destination from URL parameter ──────────────────────────────────
-const urlParams  = new URLSearchParams(window.location.search);
-const targetArea = urlParams.get('area') || '';   // 'board' or 'homeowners'
 let   pendingCognitoUser   = null;
 let   pendingUserAttributes = {};
 let   forgotUsername        = '';
@@ -206,13 +202,6 @@ document.addEventListener('DOMContentLoaded', function () {
   const emailEl = document.getElementById('foot-email');
   emailEl.textContent = c.hoaEmail || 'board@mmpoaii.com';
   emailEl.href = 'mailto:' + (c.hoaEmail || 'board@mmpoaii.com');
-
-  const badge = document.getElementById('area-badge');
-  if (targetArea === 'board') {
-    badge.textContent = 'Board Member Access'; badge.className = 'area-badge board'; badge.style.display = 'inline-block';
-  } else if (targetArea === 'homeowners') {
-    badge.textContent = 'Homeowner Access'; badge.className = 'area-badge homeowners'; badge.style.display = 'inline-block';
-  }
 
   document.title = 'Sign In — ' + (c.hoaName || 'MMPOAII HOA');
 

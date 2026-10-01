@@ -2,7 +2,7 @@
 
 const { PutCommand, GetCommand, UpdateCommand } = require('@aws-sdk/lib-dynamodb');
 const { ddb, TABLE_NAME } = require('./shared/dynamo');
-const { requireGroup, getUserSub, ok, forbidden, badRequest, serverError } = require('./shared/auth');
+const { requireGroup, getUserSub, getClaims, ok, forbidden, badRequest, serverError } = require('./shared/auth');
 const { logAudit } = require('./shared/audit');
 
 const VALID_VOTES = ['approve', 'disapprove', 'discuss'];
@@ -39,8 +39,8 @@ exports.handler = async (event) => {
   if (vote && !VALID_VOTES.includes(vote)) {
     return badRequest(`vote must be one of: ${VALID_VOTES.join(', ')}`);
   }
-  if (!vote && notes === undefined) {
-    return badRequest('Provide vote and/or notes');
+  if (!vote && (notes === undefined || !notes.trim())) {
+    return badRequest('Provide vote and/or a comment');
   }
 
   const userSub = getUserSub(event);
@@ -74,11 +74,20 @@ exports.handler = async (event) => {
       names['#vote'] = 'vote';
       values[':vote'] = vote;
     }
-    if (notes !== undefined) {
-      updateParts.push('#notes = :notes');
-      names['#notes'] = 'notes';
-      values[':notes'] = notes;
+    // Append comment to the comments list (no longer writes legacy notes field)
+    if (notes !== undefined && notes.trim()) {
+      updateParts.push('#comments = list_append(if_not_exists(#comments, :emptyList), :newComment)');
+      names['#comments'] = 'comments';
+      values[':emptyList'] = [];
+      values[':newComment'] = [{ text: notes.trim(), at: now }];
     }
+
+    // Store display name for comment visibility
+    const claims = getClaims(event);
+    const displayName = claims.name || claims.given_name || claims.email || 'Reviewer';
+    updateParts.push('#displayName = :displayName');
+    names['#displayName'] = 'displayName';
+    values[':displayName'] = displayName;
 
     // Also write GSI1 keys so we can query by user
     updateParts.push('GSI1PK = :gsi1pk', 'GSI1SK = :gsi1sk');

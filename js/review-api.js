@@ -98,6 +98,13 @@ const ReviewApi = (function () {
     return apiFetch('GET', '/cycles/' + encodeURIComponent(cycleId) + '/articles/' + encodeURIComponent(articleId));
   }
 
+  /** GET /cycles/{cycleId}/articles/{articleId}/comments — all reviewers' comments */
+  function getArticleComments(cycleId, articleId) {
+    // Cache-bust to ensure polling always gets fresh data
+    var cb = '_t=' + Date.now();
+    return apiFetch('GET', '/cycles/' + encodeURIComponent(cycleId) + '/articles/' + encodeURIComponent(articleId) + '/comments?' + cb);
+  }
+
   /** PUT /cycles/{cycleId}/votes/{sectionId} — save vote/notes */
   function saveVote(cycleId, sectionId, vote, notes) {
     var body = {};
@@ -153,12 +160,38 @@ const ReviewApi = (function () {
     return apiFetch('PUT', '/cycles/' + encodeURIComponent(cycleId) + '/status', { status });
   }
 
+  /** GET /docs/search?q=... — full-text search across CC&Rs, Bylaws, Rules */
+  function searchDocs(q) {
+    return apiFetch('GET', '/docs/search?q=' + encodeURIComponent(q));
+  }
+
+  /** GET /docs/section?cycle=...&secId=... — single section text */
+  function getDocSection(cycle, secId) {
+    return apiFetch('GET', '/docs/section?cycle=' + encodeURIComponent(cycle) + '&secId=' + encodeURIComponent(secId));
+  }
+
+  /** GET /docs/links?cycle=...&secId=... — related sections in other docs */
+  function getDocLinks(cycle, secId) {
+    return apiFetch('GET', '/docs/links?cycle=' + encodeURIComponent(cycle) + '&secId=' + encodeURIComponent(secId));
+  }
+
+  /** POST /docs/links/rebuild — admin only */
+  function rebuildLinks() {
+    return apiFetch('POST', '/docs/links/rebuild', {});
+  }
+
+  /** GET /docs/links/all — complete relationship graph (board/reviewers) */
+  function getAllLinks() {
+    return apiFetch('GET', '/docs/links/all');
+  }
+
   return {
     listCycles,
     createCycle,
     seedCycle,
     listArticles,
     getArticle,
+    getArticleComments,
     saveVote,
     submitBallot,
     getAggregate,
@@ -170,6 +203,11 @@ const ReviewApi = (function () {
     deleteCycle,
     setThreshold,
     closeCycle,
+    searchDocs,
+    getDocSection,
+    getDocLinks,
+    rebuildLinks,
+    getAllLinks,
   };
 
 })();

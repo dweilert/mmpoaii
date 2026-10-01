@@ -26,6 +26,11 @@ Parameters:
     Default: mmpoa-review-seeds
     Description: S3 bucket for seed JSON files (created outside this stack or set to existing bucket)
 
+  OwnerReportsBucketName:
+    Type: String
+    Default: mmpoa-owner-reports
+    Description: S3 bucket holding owner balance report PDFs (created outside this stack)
+
 # ---------------------------------------------------------------------------
 # Globals — shared Lambda config
 # ---------------------------------------------------------------------------
@@ -41,6 +46,7 @@ Globals:
         TABLE_NAME: !Ref ReviewTable
         COGNITO_USER_POOL_ID: !Ref CognitoUserPoolId
         SEED_BUCKET: !Ref SeedBucketName
+        OWNER_REPORTS_BUCKET: !Ref OwnerReportsBucketName
         ALLOWED_ORIGIN: 'https://mmpoaii.org'
 
 # ---------------------------------------------------------------------------
@@ -243,6 +249,24 @@ Resources:
             Path: /cycles/{cycleId}/articles/{articleId}
             Method: GET
 
+  # GET /cycles/{cycleId}/articles/{articleId}/comments
+  ArticleCommentsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mmpoa-review-article-comments
+      Handler: article-comments.handler
+      CodeUri: lambdas/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref ReviewTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ReviewApi
+            Path: /cycles/{cycleId}/articles/{articleId}/comments
+            Method: GET
+
   # PUT /cycles/{cycleId}/votes/{sectionId}
   VoteSaveFunction:
     Type: AWS::Serverless::Function
@@ -406,6 +430,118 @@ Resources:
           Properties:
             RestApiId: !Ref ReviewApi
             Path: /seeds
+            Method: GET
+
+  # GET /docs/search — full-text search across the three official docs
+  DocsSearchFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mmpoa-docs-search
+      Handler: docs-search.handler
+      CodeUri: lambdas/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref ReviewTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ReviewApi
+            Path: /docs/search
+            Method: GET
+
+  # GET /docs/section — fetch a single section's full text
+  DocsSectionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mmpoa-docs-section
+      Handler: docs-section.handler
+      CodeUri: lambdas/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref ReviewTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ReviewApi
+            Path: /docs/section
+            Method: GET
+
+  # GET /docs/links — return related sections in other documents
+  LinksGetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mmpoa-docs-links-get
+      Handler: links-get.handler
+      CodeUri: lambdas/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref ReviewTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ReviewApi
+            Path: /docs/links
+            Method: GET
+
+  # GET /docs/links/all — complete graph for audit report (board/reviewers)
+  LinksAllFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mmpoa-docs-links-all
+      Handler: links-all.handler
+      CodeUri: lambdas/
+      Timeout: 30
+      MemorySize: 512
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref ReviewTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ReviewApi
+            Path: /docs/links/all
+            Method: GET
+
+  # POST /docs/links/rebuild — admin-only, recompute auto-linkages
+  LinksBuildFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mmpoa-docs-links-build
+      Handler: links-build.handler
+      CodeUri: lambdas/
+      Timeout: 60
+      MemorySize: 512
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ReviewTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ReviewApi
+            Path: /docs/links/rebuild
+            Method: POST
+
+  # GET /owner-report — returns pre-signed S3 URL to caller's most recent balance PDF
+  OwnerReportGetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mmpoa-owner-report-get
+      Handler: owner-report-get.handler
+      CodeUri: lambdas/
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref OwnerReportsBucketName
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ReviewApi
+            Path: /owner-report
             Method: GET
 
 # ---------------------------------------------------------------------------
