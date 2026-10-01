@@ -1,6 +1,6 @@
 'use strict';
 
-const { QueryCommand, GetCommand } = require('@aws-sdk/lib-dynamodb');
+const { QueryCommand } = require('@aws-sdk/lib-dynamodb');
 const { ddb, TABLE_NAME } = require('./shared/dynamo');
 const {
   requireGroup,
@@ -12,15 +12,17 @@ const {
 } = require('./shared/auth');
 
 /**
- * GET /cycles/{cycleId}/articles/{articleNumber}/versions
+ * GET /cycles/{cycleId}/articles/{articleId}/versions
  *
- * Returns the current version number and the metadata for all archived
- * (prior) versions. The current (live) version is in CONTENT#/DOCTEXT# —
- * clients already have it from article-detail.
+ * Per-section version history. For each section returns its current version
+ * (from the live CONTENT row) and the list of archived prior versions.
  *
  * Response: {
- *   cycleId, articleNumber, articleTitle, currentVersion,
- *   versions: [{ version, versionedAt, versionedBy, sectionCount }]
+ *   cycleId, articleNumber,
+ *   sections: [
+ *     { sectionNumber, currentVersion,
+ *       versions: [{ version, versionedAt, versionedBy }] }
+ *   ]
  * }
  *
  * Group: reviewers
@@ -33,56 +35,59 @@ exports.handler = async (event) => {
   }
 
   const cycleId = event.pathParameters?.cycleId;
-  const articleNumberRaw = event.pathParameters?.articleId;
-  if (!cycleId || !articleNumberRaw) return badRequest('cycleId and articleId are required');
-  const articleNumber = parseInt(articleNumberRaw, 10);
+  const articleIdRaw = event.pathParameters?.articleId;
+  if (!cycleId || !articleIdRaw) return badRequest('cycleId and articleId are required');
+  const articleNumber = parseInt(articleIdRaw, 10);
   if (!Number.isInteger(articleNumber) || articleNumber < 1 || articleNumber > 999) {
-    return badRequest('articleNumber must be an integer 1–999');
+    return badRequest('articleId must be an integer 1–999');
   }
   const artKey = `ART-${String(articleNumber).padStart(2, '0')}`;
 
   try {
-    const [metaResp, versionResp] = await Promise.all([
-      ddb.send(new GetCommand({
+    const [contentResp, versionResp] = await Promise.all([
+      ddb.send(new QueryCommand({
         TableName: TABLE_NAME,
-        Key: { PK: `CYCLE#${cycleId}`, SK: `ARTMETA#${artKey}` },
+        KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
+        ExpressionAttributeValues: { ':pk': `CYCLE#${cycleId}`, ':sk': `CONTENT#${artKey}#` },
+        ProjectionExpression: 'sectionNumber, version',
       })),
       ddb.send(new QueryCommand({
         TableName: TABLE_NAME,
         KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
-        ExpressionAttributeValues: {
-          ':pk': `CYCLE#${cycleId}`,
-          ':sk': `VERSION#${artKey}#`,
-        },
-        ProjectionExpression: 'SK, version, versionedAt, versionedBy',
+        ExpressionAttributeValues: { ':pk': `CYCLE#${cycleId}`, ':sk': `VERSION#${artKey}#` },
+        ProjectionExpression: 'SK, version, versionedAt, versionedBy, sectionNumber',
       })),
     ]);
 
-    const currentVersion = metaResp.Item?.currentVersion || 1;
-    const articleTitle = metaResp.Item?.articleTitle || null;
-
-    // Group VERSION rows by version number — one entry per version
-    const byVersion = new Map();
+    // Archived versions grouped by section number
+    const archivedBySection = new Map();
     for (const i of (versionResp.Items || [])) {
-      const v = i.version;
-      if (!byVersion.has(v)) {
-        byVersion.set(v, {
-          version: v,
-          versionedAt: i.versionedAt,
-          versionedBy: i.versionedBy,
-          sectionCount: 0,
-        });
-      }
-      byVersion.get(v).sectionCount++;
+      // SK = VERSION#ART-XX#SEC-YY#Vnnn
+      const m = i.SK.match(/#SEC-(\d+)#V/);
+      const secNum = m ? parseInt(m[1], 10) : i.sectionNumber;
+      if (secNum == null) continue;
+      if (!archivedBySection.has(secNum)) archivedBySection.set(secNum, []);
+      archivedBySection.get(secNum).push({
+        version: i.version,
+        versionedAt: i.versionedAt,
+        versionedBy: i.versionedBy,
+      });
     }
 
-    const versions = [...byVersion.values()].sort((a, b) => a.version - b.version);
+    const sections = (contentResp.Items || [])
+      .map(c => ({
+        sectionNumber: c.sectionNumber,
+        currentVersion: c.version || 1,
+        versions: (archivedBySection.get(c.sectionNumber) || [])
+          .sort((a, b) => a.version - b.version),
+      }))
+      .sort((a, b) => a.sectionNumber - b.sectionNumber);
 
     console.log(
       `[article-versions-list] user=${getUserSub(event)} cycle=${cycleId} ` +
-      `article=${articleNumber} currentVersion=${currentVersion} archived=${versions.length}`,
+      `article=${articleNumber} sections=${sections.length}`,
     );
-    return ok({ cycleId, articleNumber, articleTitle, currentVersion, versions });
+    return ok({ cycleId, articleNumber, sections });
   } catch (err) {
     console.error('[article-versions-list] error:', err);
     return serverError();

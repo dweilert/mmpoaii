@@ -192,18 +192,19 @@ const ReviewApi = (function () {
       '/articles/' + encodeURIComponent(articleId) + '/versions', payload);
   }
 
-  /** GET /cycles/{cycleId}/articles/{articleId}/versions — list archived versions */
+  /** GET /cycles/{cycleId}/articles/{articleId}/versions — per-section version history */
   function listArticleVersions(cycleId, articleId) {
     return apiFetch('GET',
       '/cycles/' + encodeURIComponent(cycleId) +
       '/articles/' + encodeURIComponent(articleId) + '/versions');
   }
 
-  /** GET /cycles/{cycleId}/articles/{articleId}/versions/{version} — one archived snapshot */
-  function getArticleVersion(cycleId, articleId, version) {
+  /** GET …/articles/{articleId}/sections/{sectionNumber}/versions/{version} — one section snapshot */
+  function getSectionVersion(cycleId, articleId, sectionNumber, version) {
     return apiFetch('GET',
       '/cycles/' + encodeURIComponent(cycleId) +
       '/articles/' + encodeURIComponent(articleId) +
+      '/sections/' + encodeURIComponent(sectionNumber) +
       '/versions/' + encodeURIComponent(version));
   }
 
@@ -232,7 +233,7 @@ const ReviewApi = (function () {
     getAllLinks,
     createArticleVersion,
     listArticleVersions,
-    getArticleVersion,
+    getSectionVersion,
   };
 
 })();

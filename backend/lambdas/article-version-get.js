@@ -1,6 +1,6 @@
 'use strict';
 
-const { QueryCommand } = require('@aws-sdk/lib-dynamodb');
+const { GetCommand } = require('@aws-sdk/lib-dynamodb');
 const { ddb, TABLE_NAME } = require('./shared/dynamo');
 const {
   requireGroup,
@@ -13,16 +13,15 @@ const {
 } = require('./shared/auth');
 
 /**
- * GET /cycles/{cycleId}/articles/{articleNumber}/versions/{version}
+ * GET /cycles/{cycleId}/articles/{articleId}/sections/{sectionNumber}/versions/{version}
  *
- * Returns the archived snapshot of CONTENT + DOCTEXT for one past version,
- * so the reviewer modal can render the old copy for diffing.
+ * Returns the archived snapshot of ONE section at ONE prior version
+ * (field-guide copy + document text), for the reviewer diff modal.
  *
  * Response: {
- *   cycleId, articleNumber, version, articleTitle,
+ *   cycleId, articleNumber, sectionNumber, version,
  *   versionedAt, versionedBy, supersededByVersion,
- *   sections: [{ sectionNumber, sectionTitle, classification,
- *                whyItsHere, whatYouCanDo, communityImpact, text }]
+ *   sectionTitle, classification, whyItsHere, whatYouCanDo, communityImpact, text
  * }
  *
  * Group: reviewers
@@ -35,77 +34,59 @@ exports.handler = async (event) => {
   }
 
   const cycleId = event.pathParameters?.cycleId;
-  const articleNumberRaw = event.pathParameters?.articleId;
+  const articleIdRaw = event.pathParameters?.articleId;
+  const sectionRaw = event.pathParameters?.sectionNumber;
   const versionRaw = event.pathParameters?.version;
-  if (!cycleId || !articleNumberRaw || !versionRaw) {
-    return badRequest('cycleId, articleId, and version are required');
+  if (!cycleId || !articleIdRaw || !sectionRaw || !versionRaw) {
+    return badRequest('cycleId, articleId, sectionNumber, and version are required');
   }
-  const articleNumber = parseInt(articleNumberRaw, 10);
+  const articleNumber = parseInt(articleIdRaw, 10);
+  const sectionNumber = parseInt(sectionRaw, 10);
   const version = parseInt(versionRaw, 10);
-  if (!Number.isInteger(articleNumber) || articleNumber < 1 || articleNumber > 999) {
-    return badRequest('articleNumber must be an integer 1–999');
+  if (![articleNumber, sectionNumber, version].every(n => Number.isInteger(n) && n >= 1 && n <= 999)) {
+    return badRequest('articleId, sectionNumber, and version must be integers 1–999');
   }
-  if (!Number.isInteger(version) || version < 1 || version > 999) {
-    return badRequest('version must be an integer 1–999');
-  }
+
   const artKey = `ART-${String(articleNumber).padStart(2, '0')}`;
+  const secTag = `SEC-${String(sectionNumber).padStart(2, '0')}`;
   const vTag = `V${String(version).padStart(3, '0')}`;
 
   try {
     const [contentResp, doctextResp] = await Promise.all([
-      ddb.send(new QueryCommand({
+      ddb.send(new GetCommand({
         TableName: TABLE_NAME,
-        KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
-        ExpressionAttributeValues: {
-          ':pk': `CYCLE#${cycleId}`,
-          ':sk': `VERSION#${artKey}#${vTag}#`,
-        },
+        Key: { PK: `CYCLE#${cycleId}`, SK: `VERSION#${artKey}#${secTag}#${vTag}` },
       })),
-      ddb.send(new QueryCommand({
+      ddb.send(new GetCommand({
         TableName: TABLE_NAME,
-        KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
-        ExpressionAttributeValues: {
-          ':pk': `CYCLE#${cycleId}`,
-          ':sk': `DOCTEXTVERSION#${artKey}#${vTag}#`,
-        },
+        Key: { PK: `CYCLE#${cycleId}`, SK: `DOCTEXTVERSION#${artKey}#${secTag}#${vTag}` },
       })),
     ]);
 
-    const content = contentResp.Items || [];
-    if (content.length === 0) {
-      return notFound(`Version ${version} not found for article ${articleNumber}`);
+    const c = contentResp.Item;
+    if (!c) {
+      return notFound(`Version ${version} not found for article ${articleNumber} section ${sectionNumber}`);
     }
-    const doctext = doctextResp.Items || [];
-    const doctextByNum = new Map(doctext.map(i => [i.sectionNumber, i.text || '']));
-
-    const sections = content
-      .map(c => ({
-        sectionNumber: c.sectionNumber,
-        sectionTitle: c.sectionTitle || '',
-        classification: c.classification || 'best_practice',
-        whyItsHere: c.whyItsHere || '',
-        whatYouCanDo: c.whatYouCanDo || '',
-        communityImpact: c.communityImpact || null,
-        text: doctextByNum.get(c.sectionNumber) || '',
-      }))
-      .sort((a, b) => a.sectionNumber - b.sectionNumber);
-
-    const first = content[0];
-    const articleTitle = first.articleTitle;
+    const d = doctextResp.Item;
 
     console.log(
       `[article-version-get] user=${getUserSub(event)} cycle=${cycleId} ` +
-      `article=${articleNumber} version=${version} sections=${sections.length}`,
+      `article=${articleNumber} section=${sectionNumber} version=${version}`,
     );
     return ok({
       cycleId,
       articleNumber,
+      sectionNumber,
       version,
-      articleTitle,
-      versionedAt: first.versionedAt,
-      versionedBy: first.versionedBy,
-      supersededByVersion: first.supersededByVersion,
-      sections,
+      versionedAt: c.versionedAt,
+      versionedBy: c.versionedBy,
+      supersededByVersion: c.supersededByVersion,
+      sectionTitle: c.sectionTitle || '',
+      classification: c.classification || 'best_practice',
+      whyItsHere: c.whyItsHere || '',
+      whatYouCanDo: c.whatYouCanDo || '',
+      communityImpact: c.communityImpact || null,
+      text: (d && d.text) || '',
     });
   } catch (err) {
     console.error('[article-version-get] error:', err);

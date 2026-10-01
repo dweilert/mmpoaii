@@ -3,9 +3,7 @@
 const {
   QueryCommand,
   BatchWriteCommand,
-  UpdateCommand,
   GetCommand,
-  DeleteCommand,
 } = require('@aws-sdk/lib-dynamodb');
 const { ddb, TABLE_NAME } = require('./shared/dynamo');
 const {
@@ -21,6 +19,11 @@ const { logAudit } = require('./shared/audit');
 
 // Keep DynamoDB items well under 400 KB; doctext uses 350 KB cap
 const MAX_TEXT_BYTES = 350 * 1024;
+
+// Field-guide fields that are compared to decide whether a section changed
+const FG_FIELDS = ['sectionTitle', 'classification', 'whyItsHere', 'whatYouCanDo', 'communityImpact'];
+
+function vtag(n) { return `V${String(n).padStart(3, '0')}`; }
 
 async function batchWriteWithRetry(items) {
   if (items.length === 0) return;
@@ -47,25 +50,25 @@ async function chunkedBatchWrite(items) {
   }
 }
 
-async function chunkedBatchDelete(keys) {
-  const requests = keys.map(k => ({ DeleteRequest: { Key: k } }));
-  await chunkedBatchWrite(requests);
-}
+function norm(v) { return (v == null ? '' : String(v)); }
 
 /**
- * POST /cycles/{cycleId}/articles/{articleNumber}/versions
+ * POST /cycles/{cycleId}/articles/{articleId}/versions
  *
- * Create a new version of an article. The CURRENT CONTENT and DOCTEXT rows
- * are snapshotted to VERSION# / DOCTEXTVERSION# with the OLD version number,
- * then overwritten in place with the new values. VOTE# rows are not touched.
+ * Publish edits to an article's sections. Versioning is PER SECTION: only the
+ * sections whose field-guide copy or document text actually changed get a new
+ * version. For each changed section, the CURRENT CONTENT+DOCTEXT rows are
+ * snapshotted to VERSION# / DOCTEXTVERSION# under that section's current
+ * version number, then overwritten in place with the new values and the
+ * section's `version` attribute is incremented. Unchanged sections are left
+ * completely alone. VOTE# rows are never touched.
+ *
+ * Section cardinality is locked (no adds/removes) so votes stay bound.
  *
  * Body: {
- *   expectedCurrentVersion: 1,
  *   articleTitle: "…",
- *   sections: [
- *     { sectionNumber, sectionTitle, classification, whyItsHere,
- *       whatYouCanDo, communityImpact, text }
- *   ]
+ *   sections: [{ sectionNumber, sectionTitle, classification, whyItsHere,
+ *                whatYouCanDo, communityImpact, text }]
  * }
  *
  * Group: review-admins
@@ -78,11 +81,11 @@ exports.handler = async (event) => {
   }
 
   const cycleId = event.pathParameters?.cycleId;
-  const articleNumberRaw = event.pathParameters?.articleId;
-  if (!cycleId || !articleNumberRaw) return badRequest('cycleId and articleId are required');
-  const articleNumber = parseInt(articleNumberRaw, 10);
+  const articleIdRaw = event.pathParameters?.articleId;
+  if (!cycleId || !articleIdRaw) return badRequest('cycleId and articleId are required');
+  const articleNumber = parseInt(articleIdRaw, 10);
   if (!Number.isInteger(articleNumber) || articleNumber < 1 || articleNumber > 999) {
-    return badRequest('articleNumber must be an integer 1–999');
+    return badRequest('articleId must be an integer 1–999');
   }
 
   let body;
@@ -92,7 +95,7 @@ exports.handler = async (event) => {
     return badRequest('Invalid JSON body');
   }
 
-  const { expectedCurrentVersion, articleTitle, sections } = body;
+  const { articleTitle, sections } = body;
   if (!Array.isArray(sections) || sections.length === 0) {
     return badRequest('sections array is required');
   }
@@ -111,18 +114,12 @@ exports.handler = async (event) => {
       ddb.send(new QueryCommand({
         TableName: TABLE_NAME,
         KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
-        ExpressionAttributeValues: {
-          ':pk': `CYCLE#${cycleId}`,
-          ':sk': `CONTENT#${artKey}#`,
-        },
+        ExpressionAttributeValues: { ':pk': `CYCLE#${cycleId}`, ':sk': `CONTENT#${artKey}#` },
       })),
       ddb.send(new QueryCommand({
         TableName: TABLE_NAME,
         KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
-        ExpressionAttributeValues: {
-          ':pk': `CYCLE#${cycleId}`,
-          ':sk': `DOCTEXT#${artKey}#`,
-        },
+        ExpressionAttributeValues: { ':pk': `CYCLE#${cycleId}`, ':sk': `DOCTEXT#${artKey}#` },
       })),
     ]);
     currentContent = c.Items || [];
@@ -137,195 +134,148 @@ exports.handler = async (event) => {
   }
 
   // 2. Enforce section-count lock
-  const currentSectionNumbers = currentContent
-    .map(i => i.sectionNumber)
-    .sort((a, b) => a - b);
-  const incomingSectionNumbers = sections
-    .map(s => s.sectionNumber)
-    .sort((a, b) => a - b);
-
-  if (currentSectionNumbers.length !== incomingSectionNumbers.length) {
+  const currentNums = currentContent.map(i => i.sectionNumber).sort((a, b) => a - b);
+  const incomingNums = sections.map(s => s.sectionNumber).sort((a, b) => a - b);
+  if (currentNums.length !== incomingNums.length ||
+      !currentNums.every((n, i) => n === incomingNums[i])) {
     return badRequest(
-      `Section count mismatch: current=${currentSectionNumbers.length} ` +
-      `incoming=${incomingSectionNumbers.length}. Section cardinality is ` +
-      `locked to protect existing votes.`,
-    );
-  }
-  for (let i = 0; i < currentSectionNumbers.length; i++) {
-    if (currentSectionNumbers[i] !== incomingSectionNumbers[i]) {
-      return badRequest(
-        `Section numbers must match current: ` +
-        `current=[${currentSectionNumbers.join(',')}] ` +
-        `incoming=[${incomingSectionNumbers.join(',')}]`,
-      );
-    }
-  }
-
-  // 3. Determine current/next version numbers
-  const artMetaKey = { PK: `CYCLE#${cycleId}`, SK: `ARTMETA#${artKey}` };
-  let currentVersion;
-  try {
-    const meta = await ddb.send(new GetCommand({ TableName: TABLE_NAME, Key: artMetaKey }));
-    currentVersion = meta.Item?.currentVersion || 1;
-  } catch (err) {
-    console.error('[article-version-create] meta load error:', err);
-    return serverError();
-  }
-
-  if (typeof expectedCurrentVersion === 'number' && expectedCurrentVersion !== currentVersion) {
-    return badRequest(
-      `expectedCurrentVersion=${expectedCurrentVersion} but server has ${currentVersion}. ` +
-      `Someone else likely published a new version — reload and try again.`,
+      `Section set must match current [${currentNums.join(',')}]; ` +
+      `got [${incomingNums.join(',')}]. Section cardinality is locked to protect votes.`,
     );
   }
 
-  const newVersion = currentVersion + 1;
-  const archivedVersion = currentVersion;
-  const vTag = `V${String(archivedVersion).padStart(3, '0')}`;
-
-  // 4. Snapshot current rows into VERSION# / DOCTEXTVERSION#
-  const snapshotPuts = [];
-  for (const item of currentContent) {
-    const secTag = item.SK.split('#').pop(); // SEC-XX
-    snapshotPuts.push({ PutRequest: { Item: {
-      ...item,
-      SK: `VERSION#${artKey}#${vTag}#${secTag}`,
-      version: archivedVersion,
-      versionedAt: now,
-      versionedBy: userSub,
-      supersededByVersion: newVersion,
-    }}});
-  }
-  for (const item of currentDoctext) {
-    const secTag = item.SK.split('#').pop();
-    snapshotPuts.push({ PutRequest: { Item: {
-      ...item,
-      SK: `DOCTEXTVERSION#${artKey}#${vTag}#${secTag}`,
-      version: archivedVersion,
-      versionedAt: now,
-      versionedBy: userSub,
-      supersededByVersion: newVersion,
-    }}});
-  }
-
-  const snapshotDeleteKeys = snapshotPuts.map(p => ({ PK: p.PutRequest.Item.PK, SK: p.PutRequest.Item.SK }));
-
-  try {
-    await chunkedBatchWrite(snapshotPuts);
-  } catch (err) {
-    console.error('[article-version-create] snapshot failed:', err);
-    return serverError('Failed to snapshot current version');
-  }
-
-  // 5. Overwrite CONTENT + DOCTEXT with new values
-  const overwritePuts = [];
-  const doctextByNum = new Map(currentDoctext.map(i => [i.sectionNumber, i]));
   const contentByNum = new Map(currentContent.map(i => [i.sectionNumber, i]));
+  const doctextByNum = new Map(currentDoctext.map(i => [i.sectionNumber, i]));
+
+  // 3. For each submitted section, decide whether it changed
+  const snapshotPuts = [];
+  const overwritePuts = [];
+  const metaPuts = [];
+  const changedSections = [];
 
   for (const s of sections) {
-    const secTag = `SEC-${String(s.sectionNumber).padStart(2, '0')}`;
-    const existingContent = contentByNum.get(s.sectionNumber);
+    const num = s.sectionNumber;
+    const secTag = `SEC-${String(num).padStart(2, '0')}`;
+    const curContent = contentByNum.get(num);
+    const curDoctext = doctextByNum.get(num);
+    const curVersion = (curContent && curContent.version) || 1;
 
-    // CONTENT row (overwrite in place)
+    // Determine change: any field-guide field OR the doctext differs
+    let changed = false;
+    for (const f of FG_FIELDS) {
+      if (norm(curContent[f]) !== norm(s[f])) { changed = true; break; }
+    }
+    let newText = s.text || '';
+    if (Buffer.byteLength(newText, 'utf8') > MAX_TEXT_BYTES) {
+      newText = Buffer.from(newText, 'utf8').slice(0, MAX_TEXT_BYTES).toString('utf8');
+    }
+    if (!changed && norm(curDoctext ? curDoctext.text : '') !== norm(newText)) {
+      changed = true;
+    }
+    if (!changed) continue; // leave this section untouched
+
+    const newVersion = curVersion + 1;
+    changedSections.push({ sectionNumber: num, archivedVersion: curVersion, newVersion });
+
+    // 3a. Snapshot current CONTENT + DOCTEXT under the current version number
+    snapshotPuts.push({ PutRequest: { Item: {
+      ...curContent,
+      SK: `VERSION#${artKey}#${secTag}#${vtag(curVersion)}`,
+      version: curVersion,
+      versionedAt: now,
+      versionedBy: userSub,
+      supersededByVersion: newVersion,
+    }}});
+    if (curDoctext) {
+      snapshotPuts.push({ PutRequest: { Item: {
+        ...curDoctext,
+        SK: `DOCTEXTVERSION#${artKey}#${secTag}#${vtag(curVersion)}`,
+        version: curVersion,
+        versionedAt: now,
+        versionedBy: userSub,
+        supersededByVersion: newVersion,
+      }}});
+    }
+
+    // 3b. Overwrite CONTENT + DOCTEXT in place with the new values
     overwritePuts.push({ PutRequest: { Item: {
       PK: `CYCLE#${cycleId}`,
       SK: `CONTENT#${artKey}#${secTag}`,
-      document: existingContent?.document || 'UNKNOWN',
+      document: curContent.document || 'UNKNOWN',
       articleNumber,
       articleTitle,
-      sectionNumber: s.sectionNumber,
+      sectionNumber: num,
       sectionTitle: s.sectionTitle || '',
       classification: s.classification || 'best_practice',
       whyItsHere: s.whyItsHere || '',
       whatYouCanDo: s.whatYouCanDo || '',
       communityImpact: s.communityImpact || null,
-      seededAt: existingContent?.seededAt || now,
-      seededBy: existingContent?.seededBy || userSub,
+      seededAt: curContent.seededAt || now,
+      seededBy: curContent.seededBy || userSub,
       version: newVersion,
       updatedAt: now,
       updatedBy: userSub,
     }}});
-
-    // DOCTEXT row (overwrite in place)
-    let text = s.text || '';
-    if (Buffer.byteLength(text, 'utf8') > MAX_TEXT_BYTES) {
-      text = Buffer.from(text, 'utf8').slice(0, MAX_TEXT_BYTES).toString('utf8');
-      console.warn(`[article-version-create] truncated ${artKey}#${secTag}`);
-    }
-    const existingDoctext = doctextByNum.get(s.sectionNumber);
     overwritePuts.push({ PutRequest: { Item: {
       PK: `CYCLE#${cycleId}`,
       SK: `DOCTEXT#${artKey}#${secTag}`,
       articleNumber,
       articleTitle,
-      sectionNumber: s.sectionNumber,
+      sectionNumber: num,
       sectionTitle: s.sectionTitle || '',
-      text,
-      uploadedAt: existingDoctext?.uploadedAt || now,
-      uploadedBy: existingDoctext?.uploadedBy || userSub,
+      text: newText,
+      uploadedAt: (curDoctext && curDoctext.uploadedAt) || now,
+      uploadedBy: (curDoctext && curDoctext.uploadedBy) || userSub,
       version: newVersion,
       updatedAt: now,
       updatedBy: userSub,
     }}});
   }
 
+  // Also apply an article-title change to unchanged sections? No — title lives on
+  // every CONTENT row. If only the title changed, treat each section as changed
+  // above via sectionTitle? No: articleTitle is article-wide. Update it on all rows
+  // without versioning, since it is not section copy. Keep it simple: update title
+  // on changed rows only (already done). If the admin changed ONLY the article
+  // title, nothing is versioned — reflect the new title on all CONTENT rows.
+  const titleChanged = currentContent.some(i => norm(i.articleTitle) !== norm(articleTitle));
+  if (titleChanged) {
+    for (const item of currentContent) {
+      if (changedSections.find(cs => cs.sectionNumber === item.sectionNumber)) continue;
+      overwritePuts.push({ PutRequest: { Item: { ...item, articleTitle, updatedAt: now, updatedBy: userSub } } });
+    }
+  }
+
+  if (changedSections.length === 0 && !titleChanged) {
+    return created({ cycleId, articleNumber, changedSections: [], message: 'No changes detected' });
+  }
+
+  // 4. Write snapshots first, then overwrites. Roll back snapshots on failure.
+  try {
+    await chunkedBatchWrite(snapshotPuts);
+  } catch (err) {
+    console.error('[article-version-create] snapshot failed:', err);
+    return serverError('Failed to snapshot current versions');
+  }
   try {
     await chunkedBatchWrite(overwritePuts);
   } catch (err) {
-    console.error('[article-version-create] overwrite failed, rolling back snapshot:', err);
-    // Compensating action: delete the snapshot rows we just wrote
-    try {
-      await chunkedBatchDelete(snapshotDeleteKeys);
-    } catch (rollbackErr) {
-      console.error('[article-version-create] rollback also failed:', rollbackErr);
-    }
-    return serverError('Failed to apply new version — snapshot rolled back');
-  }
-
-  // 6. Bump ARTMETA.currentVersion with a conditional check
-  try {
-    await ddb.send(new UpdateCommand({
-      TableName: TABLE_NAME,
-      Key: artMetaKey,
-      UpdateExpression:
-        'SET currentVersion = :new, articleTitle = :title, articleNumber = :num, ' +
-        'updatedAt = :now, updatedBy = :user',
-      ConditionExpression:
-        'attribute_not_exists(currentVersion) OR currentVersion = :expected',
-      ExpressionAttributeValues: {
-        ':new': newVersion,
-        ':expected': archivedVersion,
-        ':title': articleTitle,
-        ':num': articleNumber,
-        ':now': now,
-        ':user': userSub,
-      },
-    }));
-  } catch (err) {
-    if (err.name === 'ConditionalCheckFailedException') {
-      return badRequest('Concurrent version bump detected — reload and retry');
-    }
-    console.error('[article-version-create] meta update failed:', err);
-    return serverError('Failed to update article metadata');
+    console.error('[article-version-create] overwrite failed, rolling back snapshots:', err);
+    const delKeys = snapshotPuts.map(p => ({ DeleteRequest: { Key: { PK: p.PutRequest.Item.PK, SK: p.PutRequest.Item.SK } } }));
+    try { await chunkedBatchWrite(delKeys); } catch (e2) { console.error('[article-version-create] rollback failed:', e2); }
+    return serverError('Failed to apply edits — snapshots rolled back');
   }
 
   console.log(
-    `[article-version-create] user=${userSub} cycle=${cycleId} ` +
-    `article=${articleNumber} archived=V${archivedVersion} new=V${newVersion}`,
+    `[article-version-create] user=${userSub} cycle=${cycleId} article=${articleNumber} ` +
+    `versionedSections=${changedSections.map(c => c.sectionNumber).join(',') || 'none'} titleChanged=${titleChanged}`,
   );
   await logAudit('ARTICLE_VERSION_CREATE', userSub, {
     cycleId,
     articleNumber,
-    archivedVersion,
-    newVersion,
-    sectionCount: sections.length,
+    changedSections,
+    titleChanged,
   });
 
-  return created({
-    cycleId,
-    articleNumber,
-    archivedVersion,
-    newVersion,
-    sectionCount: sections.length,
-  });
+  return created({ cycleId, articleNumber, changedSections, titleChanged });
 };
