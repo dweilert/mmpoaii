@@ -772,6 +772,7 @@ async function loadExistingCycles() {
         var closeColor  = isOpen ? '#7a6100' : '#1e7e34';
         html += '<td style="padding:6px 8px;display:flex;gap:6px;flex-wrap:wrap;">';
         html += '<button onclick="setCycleStatus(' + i + ',\'' + (isOpen ? 'closed' : 'open') + '\')" style="background:none;border:1px solid ' + closeBorder + ';color:' + closeColor + ';padding:3px 10px;border-radius:var(--r1);font-size:12px;font-weight:600;cursor:pointer;">' + closeLabel + '</button>';
+        html += '<a href="/review/article-editor.html?cycleId=' + encodeURIComponent(c.cycleId) + '" style="text-decoration:none;background:none;border:1px solid var(--purple-300,#c9bce6);color:var(--purple-800);padding:3px 10px;border-radius:var(--r1);font-size:12px;font-weight:600;cursor:pointer;">Edit Articles →</a>';
         // Delete disabled: a delete + recreate during a live review silently drops
         // sections if the replacement Field Guide parses differently. Removed to
         // prevent in-cycle data loss. Re-enable only through a non-admin path.

@@ -40,7 +40,10 @@
   </div>
 
   <div class="article-header">
-    <h2 id="article-title" style="margin:0 0 8px;">Loading…</h2>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 8px;">
+      <h2 id="article-title" style="margin:0;">Loading…</h2>
+      <span id="version-bar"></span>
+    </div>
     <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
       <div id="approve-all-bar" style="display:none;align-items:center;gap:10px;flex-shrink:0;">
         <button onclick="approveAllSections()" id="approve-all-btn" style="background:#e6f4ea;color:#1e7e34;border:1px solid #a8d5b8;padding:8px 18px;font-size:13px;font-weight:600;line-height:1;border-radius:var(--r);cursor:pointer;">Approve All Sections</button>
@@ -132,7 +135,27 @@
   </div>
 </div>
 
+<!-- Version History Modal -->
+<div id="version-modal" style="display:none;position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,.5);overflow-y:auto;" onclick="if(event.target===this)closeVersionModal()">
+  <div style="max-width:1040px;margin:40px auto;background:#fff;border-radius:var(--r2);box-shadow:0 8px 32px rgba(0,0,0,.2);overflow:hidden;">
+    <div style="background:var(--purple-800);color:#fff;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div id="vm-title" style="font-family:Arial,Helvetica,sans-serif;font-size:17px;font-weight:700;">Version History</div>
+        <div id="vm-subtitle" style="font-size:13px;opacity:.8;margin-top:2px;"></div>
+      </div>
+      <button onclick="closeVersionModal()" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer;padding:0 4px;line-height:1;">&times;</button>
+    </div>
+    <div id="vm-tabs" style="display:flex;gap:6px;flex-wrap:wrap;padding:12px 24px 0;border-bottom:1px solid var(--border);background:var(--surf2,#f7f7f9);"></div>
+    <div style="padding:10px 24px 6px;font-size:12px;color:var(--text3);background:var(--surf2,#f7f7f9);">
+      <span style="background:#ffecec;padding:1px 4px;border-radius:3px;">removed</span> was in the older version ·
+      <span style="background:#e4f6e4;padding:1px 4px;border-radius:3px;">added</span> is in the current version
+    </div>
+    <div id="vm-body" style="padding:16px 24px 24px;max-height:70vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6/dist/amazon-cognito-identity.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/diff@5.2.0/dist/diff.min.js"></script>
 <script src="/js/config.js"></script>
 <script src="/js/auth.js"></script>
 <script src="/js/guard.js"></script>
@@ -202,10 +225,15 @@ var docTypeLabels = {
   'Rules of Conduct': 'Rules'
 };
 
+// Holds the current (live) article payload + version metadata for the diff modal
+var currentArticleData = null;
+var articleVersionInfo = null;
+
 async function loadArticle() {
   try {
     var data = await ReviewApi.getArticle(cycleId, articleId);
     var artNum = parseInt(articleId, 10);
+    currentArticleData = data;
 
     // Fetch document type from cycle metadata
     var docPrefix = '';
@@ -332,6 +360,9 @@ async function loadArticle() {
     // Load other reviewers' comments + start polling
     loadReviewerComments(artNum);
     startCommentPolling(artNum);
+
+    // Load version info — show "View prior versions" when an older version exists
+    loadVersionBadge(artNum);
 
   } catch (err) {
     document.getElementById('sections-container').innerHTML =
@@ -948,9 +979,199 @@ function closeDocTextModal() {
   document.body.style.overflow = '';
 }
 
+// ── Article version history ─────────────────────────────────────────────────
+async function loadVersionBadge(artNum) {
+  var bar = document.getElementById('version-bar');
+  if (!bar) return;
+  try {
+    var info = await ReviewApi.listArticleVersions(cycleId, artNum);
+    articleVersionInfo = info;
+    var cv = info.currentVersion || 1;
+    if (cv <= 1 || !info.versions || info.versions.length === 0) {
+      bar.innerHTML = '';
+      return;
+    }
+    var priorCount = info.versions.length;
+    bar.innerHTML =
+      '<span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;background:#efeaf7;color:var(--purple-800);">v' + cv + '</span>' +
+      '<button onclick="openVersionModal()" style="margin-left:8px;padding:5px 14px;font-size:12px;font-weight:600;border:1px solid var(--purple-300,#c9bce6);color:var(--purple-800);background:#fafafa;border-radius:var(--r);cursor:pointer;white-space:nowrap;">View prior version' + (priorCount > 1 ? 's (' + priorCount + ')' : '') + '</button>';
+  } catch (e) {
+    bar.innerHTML = '';
+  }
+}
+
+function openVersionModal() {
+  if (!articleVersionInfo || !articleVersionInfo.versions.length) return;
+  var artNum = parseInt(articleId, 10);
+  document.getElementById('vm-title').textContent =
+    'Article ' + artNum + ' — Version History';
+  document.getElementById('vm-subtitle').textContent =
+    'Current version is v' + articleVersionInfo.currentVersion +
+    '. Compare any earlier version against it. Votes are unaffected by versioning.';
+
+  var versions = articleVersionInfo.versions.slice().sort(function (a, b) {
+    return b.version - a.version; // newest archived first
+  });
+  var tabsHtml = '';
+  for (var i = 0; i < versions.length; i++) {
+    var v = versions[i];
+    tabsHtml +=
+      '<button class="vm-tab" data-version="' + v.version + '" onclick="showVersionTab(' + v.version + ', this)" ' +
+      'style="padding:8px 16px;font-size:13px;font-weight:600;border:1px solid var(--border);border-bottom:none;' +
+      'border-radius:var(--r1) var(--r1) 0 0;background:#fff;color:var(--text2);cursor:pointer;">v' + v.version + '</button>';
+  }
+  document.getElementById('vm-tabs').innerHTML = tabsHtml;
+  document.getElementById('vm-body').innerHTML =
+    '<div class="empty-state"><div class="es-icon">⏳</div><div class="es-text">Loading…</div></div>';
+
+  document.getElementById('version-modal').style.display = '';
+  document.body.style.overflow = 'hidden';
+
+  // Auto-select the most recent archived version
+  showVersionTab(versions[0].version);
+}
+
+function closeVersionModal() {
+  document.getElementById('version-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+async function showVersionTab(version, btn) {
+  // Highlight active tab
+  var tabs = document.querySelectorAll('.vm-tab');
+  for (var i = 0; i < tabs.length; i++) {
+    var active = parseInt(tabs[i].getAttribute('data-version'), 10) === version;
+    tabs[i].style.background = active ? 'var(--purple-800)' : '#fff';
+    tabs[i].style.color = active ? '#fff' : 'var(--text2)';
+  }
+  var bodyEl = document.getElementById('vm-body');
+  bodyEl.innerHTML = '<div class="empty-state"><div class="es-icon">⏳</div><div class="es-text">Loading version ' + version + '…</div></div>';
+
+  try {
+    var old = await ReviewApi.getArticleVersion(cycleId, parseInt(articleId, 10), version);
+    renderVersionDiff(old);
+  } catch (err) {
+    bodyEl.innerHTML = '<div class="alert alert-error">Failed to load version: ' + escHtml(err.message) + '</div>';
+  }
+}
+
+// Word-level diff. Returns HTML with <del>/<ins> spans (old=removed, new=added).
+function diffHtml(oldText, newText) {
+  oldText = oldText == null ? '' : String(oldText);
+  newText = newText == null ? '' : String(newText);
+  if (typeof Diff === 'undefined' || !Diff.diffWords) {
+    // Fallback: no diff library — show plain
+    return { oldHtml: escHtml(oldText), newHtml: escHtml(newText) };
+  }
+  var parts = Diff.diffWords(oldText, newText);
+  var oldHtml = '', newHtml = '';
+  for (var i = 0; i < parts.length; i++) {
+    var p = parts[i];
+    var safe = escHtml(p.value);
+    if (p.added) {
+      newHtml += '<span style="background:#e4f6e4;">' + safe + '</span>';
+    } else if (p.removed) {
+      oldHtml += '<span style="background:#ffecec;">' + safe + '</span>';
+    } else {
+      oldHtml += safe;
+      newHtml += safe;
+    }
+  }
+  return { oldHtml: oldHtml, newHtml: newHtml };
+}
+
+function renderVersionDiff(old) {
+  var cur = currentArticleData;
+  var curByNum = {};
+  (cur.sections || []).forEach(function (s) { curByNum[s.sectionNumber] = s; });
+  // current doctext is rendered into #doctext-ART-..#SEC-.. elements
+  var artNum = parseInt(articleId, 10);
+
+  var fields = [
+    { key: 'sectionTitle', label: 'Section Title' },
+    { key: 'classification', label: 'Classification' },
+    { key: 'whyItsHere', label: 'Why It’s Here' },
+    { key: 'whatYouCanDo', label: 'What You Can Do' },
+    { key: 'communityImpact', label: 'Community Impact' },
+    { key: 'text', label: 'Governing Document Text' }
+  ];
+
+  var html = '';
+  html += '<div style="font-size:13px;color:var(--text3);margin-bottom:14px;">' +
+    'Version ' + old.version + ' — archived ' + fmtDate(old.versionedAt) +
+    (old.versionedBy ? ' by ' + escHtml(old.versionedBy) : '') + '</div>';
+
+  var oldByNum = {};
+  (old.sections || []).forEach(function (s) { oldByNum[s.sectionNumber] = s; });
+
+  var allNums = Object.keys(curByNum).map(Number).sort(function (a, b) { return a - b; });
+
+  for (var n = 0; n < allNums.length; n++) {
+    var num = allNums[n];
+    var curS = curByNum[num] || {};
+    var oldS = oldByNum[num] || {};
+    // current doctext from the DOM (already loaded)
+    var secId = 'ART-' + pad(artNum) + '#SEC-' + pad(num);
+    var curTextEl = document.getElementById('doctext-' + secId);
+    var curText = curTextEl ? curTextEl.textContent : '';
+    if (curText === 'Loading document text…') curText = '';
+
+    var curVals = {
+      sectionTitle: curS.sectionTitle || '',
+      classification: curS.classification || '',
+      whyItsHere: curS.whyItsHere || '',
+      whatYouCanDo: curS.whatYouCanDo || '',
+      communityImpact: curS.communityImpact || '',
+      text: curText || ''
+    };
+    var oldVals = {
+      sectionTitle: oldS.sectionTitle || '',
+      classification: oldS.classification || '',
+      whyItsHere: oldS.whyItsHere || '',
+      whatYouCanDo: oldS.whatYouCanDo || '',
+      communityImpact: oldS.communityImpact || '',
+      text: oldS.text || ''
+    };
+
+    html += '<div style="border:1px solid var(--border);border-radius:var(--r);margin-bottom:16px;overflow:hidden;">';
+    html += '<div style="background:var(--surf2,#f7f7f9);padding:8px 14px;font-weight:700;font-size:14px;">Section ' + num + '</div>';
+    html += '<div style="padding:12px 14px;">';
+
+    for (var f = 0; f < fields.length; f++) {
+      var fk = fields[f].key;
+      var changed = curVals[fk] !== oldVals[fk];
+      var d = diffHtml(oldVals[fk], curVals[fk]);
+      var mono = fk === 'text' ? 'font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;white-space:pre-wrap;' : 'font-size:13px;';
+      html += '<div style="margin-bottom:14px;">';
+      html += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--text3);margin-bottom:4px;">' +
+        escHtml(fields[f].label) + (changed ? ' <span style="color:#c77;">(changed)</span>' : '') + '</div>';
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">';
+      html += '<div style="border:1px solid var(--border);border-radius:var(--r1);padding:8px 10px;' + mono + 'line-height:1.5;">' +
+        '<div style="font-size:10px;color:var(--text3);margin-bottom:4px;">v' + old.version + ' (older)</div>' +
+        (d.oldHtml || '<span style="color:var(--text3);">—</span>') + '</div>';
+      html += '<div style="border:1px solid var(--border);border-radius:var(--r1);padding:8px 10px;' + mono + 'line-height:1.5;">' +
+        '<div style="font-size:10px;color:var(--text3);margin-bottom:4px;">current (v' + (articleVersionInfo.currentVersion) + ')</div>' +
+        (d.newHtml || '<span style="color:var(--text3);">—</span>') + '</div>';
+      html += '</div></div>';
+    }
+
+    html += '</div></div>';
+  }
+
+  document.getElementById('vm-body').innerHTML = html;
+}
+
+function fmtDate(iso) {
+  if (!iso) return 'unknown date';
+  try {
+    var d = new Date(iso);
+    return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  } catch (e) { return iso; }
+}
+
 // Close modals on Escape key
 document.addEventListener('keydown', function (e) {
-  if (e.key === 'Escape') { closeDocTextModal(); closeKqModal(); }
+  if (e.key === 'Escape') { closeDocTextModal(); closeKqModal(); closeVersionModal(); }
 });
 
 // ── Approve All Sections (with modal + retry) ──

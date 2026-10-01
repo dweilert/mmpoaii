@@ -185,6 +185,28 @@ const ReviewApi = (function () {
     return apiFetch('GET', '/docs/links/all');
   }
 
+  /** POST /cycles/{cycleId}/articles/{articleId}/versions — admin: publish a new article version */
+  function createArticleVersion(cycleId, articleId, payload) {
+    return apiFetch('POST',
+      '/cycles/' + encodeURIComponent(cycleId) +
+      '/articles/' + encodeURIComponent(articleId) + '/versions', payload);
+  }
+
+  /** GET /cycles/{cycleId}/articles/{articleId}/versions — list archived versions */
+  function listArticleVersions(cycleId, articleId) {
+    return apiFetch('GET',
+      '/cycles/' + encodeURIComponent(cycleId) +
+      '/articles/' + encodeURIComponent(articleId) + '/versions');
+  }
+
+  /** GET /cycles/{cycleId}/articles/{articleId}/versions/{version} — one archived snapshot */
+  function getArticleVersion(cycleId, articleId, version) {
+    return apiFetch('GET',
+      '/cycles/' + encodeURIComponent(cycleId) +
+      '/articles/' + encodeURIComponent(articleId) +
+      '/versions/' + encodeURIComponent(version));
+  }
+
   return {
     listCycles,
     createCycle,
@@ -208,6 +230,9 @@ const ReviewApi = (function () {
     getDocLinks,
     rebuildLinks,
     getAllLinks,
+    createArticleVersion,
+    listArticleVersions,
+    getArticleVersion,
   };
 
 })();
