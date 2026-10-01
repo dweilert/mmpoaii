@@ -285,7 +285,7 @@ Resources:
             Path: /cycles/{cycleId}/articles/{articleId}/versions
             Method: GET
 
-  # GET /cycles/{cycleId}/articles/{articleId}/versions/{version}
+  # GET /cycles/{cycleId}/articles/{articleId}/sections/{sectionNumber}/versions/{version}
   ArticleVersionGetFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -300,7 +300,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref ReviewApi
-            Path: /cycles/{cycleId}/articles/{articleId}/versions/{version}
+            Path: /cycles/{cycleId}/articles/{articleId}/sections/{sectionNumber}/versions/{version}
             Method: GET
 
   # GET /cycles/{cycleId}/articles/{articleId}/comments

@@ -78,9 +78,10 @@
   <!-- Editor view -->
   <div id="ae-edit-view" style="display:none;">
     <div class="ae-note">
-      Editing creates <strong>version <span id="ae-next-version">?</span></strong> of this article.
-      Section count is locked at <span id="ae-sec-count">?</span> to protect existing votes.
-      The current version stays available to reviewers.
+      On save, <strong>only the sections you actually change get a new version</strong> —
+      a one-line edit to one section versions that section alone. Section count is locked
+      at <span id="ae-sec-count">?</span> to protect existing votes. Prior versions stay
+      viewable by reviewers, and <strong>no votes are changed or reset.</strong>
     </div>
 
     <div class="ae-field">
@@ -127,7 +128,7 @@ var classLabels = {
   community_choice: 'Community Choice'
 };
 
-var editState = null; // { articleId, expectedCurrentVersion, sections: [...] }
+var editState = null; // { articleId, sections: [...] }
 
 function escHtml(s) {
   var d = document.createElement('div');
@@ -152,18 +153,21 @@ async function loadArticles() {
         '<div class="empty-state"><div class="es-text">No articles in this cycle.</div></div>';
       return;
     }
-    // Fetch version info per article in parallel to show the badge
+    // Fetch per-section version info in parallel to show the badge
     var versionInfos = await Promise.all(arts.map(function (a) {
       return ReviewApi.listArticleVersions(cycleId, a.articleNumber).catch(function () {
-        return { currentVersion: 1 };
+        return { sections: [] };
       });
     }));
 
     var html = '';
     for (var i = 0; i < arts.length; i++) {
       var a = arts[i];
-      var cv = versionInfos[i].currentVersion || 1;
-      var badge = cv > 1 ? '<span class="ae-badge">v' + cv + '</span>' : '';
+      var secs = versionInfos[i].sections || [];
+      var versionedCount = secs.filter(function (s) { return (s.currentVersion || 1) > 1; }).length;
+      var badge = versionedCount > 0
+        ? '<span class="ae-badge">' + versionedCount + ' section' + (versionedCount > 1 ? 's' : '') + ' revised</span>'
+        : '';
       html +=
         '<div class="ae-art-row">' +
           '<div class="num">' + a.articleNumber + '</div>' +
@@ -186,6 +190,8 @@ async function openEditor(articleNumber) {
   try {
     var article = await ReviewApi.getArticle(cycleId, articleNumber);
     var versionInfo = await ReviewApi.listArticleVersions(cycleId, articleNumber);
+    var verByNum = {};
+    (versionInfo.sections || []).forEach(function (s) { verByNum[s.sectionNumber] = s.currentVersion || 1; });
     var sections = (article.sections || []).slice().sort(function (a, b) {
       return a.sectionNumber - b.sectionNumber;
     });
@@ -197,25 +203,23 @@ async function openEditor(articleNumber) {
         return (r && r.text) || '';
       }).catch(function () { return ''; });
     }));
-    for (var i = 0; i < sections.length; i++) sections[i].text = texts[i];
+    for (var i = 0; i < sections.length; i++) {
+      sections[i].text = texts[i];
+      sections[i].currentVersion = verByNum[sections[i].sectionNumber] || 1;
+    }
 
-    editState = {
-      articleId: articleNumber,
-      expectedCurrentVersion: versionInfo.currentVersion || 1,
-      sections: sections
-    };
+    editState = { articleId: articleNumber, sections: sections };
 
-    renderEditor(article.articleTitle, sections, (versionInfo.currentVersion || 1) + 1);
+    renderEditor(article.articleTitle, sections);
     clearMsg();
   } catch (err) {
     showMsg('err', 'Failed to open editor: ' + err.message);
   }
 }
 
-function renderEditor(articleTitle, sections, nextVersion) {
+function renderEditor(articleTitle, sections) {
   document.getElementById('ae-list-view').style.display = 'none';
   document.getElementById('ae-edit-view').style.display = 'block';
-  document.getElementById('ae-next-version').textContent = nextVersion;
   document.getElementById('ae-sec-count').textContent = sections.length;
   document.getElementById('ae-article-title').value = articleTitle || '';
 
@@ -230,7 +234,9 @@ function renderEditor(articleTitle, sections, nextVersion) {
     }
     html +=
       '<div class="ae-sec-card" data-secnum="' + s.sectionNumber + '">' +
-        '<h4>Section ' + s.sectionNumber + ' <span style="font-weight:400;color:var(--text3);font-size:13px;">(locked)</span></h4>' +
+        '<h4>Section ' + s.sectionNumber +
+          ((s.currentVersion || 1) > 1 ? ' <span class="ae-badge">v' + s.currentVersion + '</span>' : '') +
+          ' <span style="font-weight:400;color:var(--text3);font-size:13px;">(number locked)</span></h4>' +
         '<div class="ae-field"><label>Section Title</label>' +
           '<input type="text" class="f-title" value="' + escHtml(s.sectionTitle) + '" /></div>' +
         '<div class="ae-field"><label>Classification</label>' +
@@ -288,13 +294,21 @@ async function saveNewVersion() {
 
   try {
     var result = await ReviewApi.createArticleVersion(cycleId, editState.articleId, {
-      expectedCurrentVersion: editState.expectedCurrentVersion,
       articleTitle: articleTitle,
       sections: sections
     });
-    showMsg('ok', 'Saved. Article ' + editState.articleId +
-      ' is now version ' + result.newVersion +
-      ' (version ' + result.archivedVersion + ' archived). Votes preserved.');
+    var changed = result.changedSections || [];
+    var msg;
+    if (changed.length === 0 && !result.titleChanged) {
+      msg = 'No changes detected — nothing was versioned.';
+    } else if (changed.length === 0 && result.titleChanged) {
+      msg = 'Article title updated. No section content changed, so no section was versioned.';
+    } else {
+      var parts = changed.map(function (c) { return '§' + c.sectionNumber + ' → v' + c.newVersion; });
+      msg = 'Saved. Versioned ' + changed.length + ' section' + (changed.length > 1 ? 's' : '') +
+        ' (' + parts.join(', ') + '). Votes preserved.';
+    }
+    showMsg('ok', msg);
     editState = null;
     document.getElementById('ae-edit-view').style.display = 'none';
     document.getElementById('ae-list-view').style.display = 'block';
