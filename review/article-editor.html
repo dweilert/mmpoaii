@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Article Editor — MMPOAII</title>
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/review.css">
+<style>
+  .ae-wrap { max-width: 920px; margin: 0 auto; padding: 20px 16px 60px; }
+  .ae-note { background:#fff8e1; border:1px solid #ffe082; border-radius:var(--r); padding:12px 16px; font-size:13px; color:#7a6100; margin-bottom:18px; }
+  .ae-art-row { display:flex; align-items:center; gap:12px; padding:12px 16px; border:1px solid var(--border); border-radius:var(--r); margin-bottom:8px; background:#fff; }
+  .ae-art-row .num { width:34px; height:34px; flex-shrink:0; border-radius:50%; background:var(--purple-100,#efeaf7); color:var(--purple-800); display:flex; align-items:center; justify-content:center; font-weight:700; }
+  .ae-art-row .title { flex:1; font-weight:600; }
+  .ae-badge { font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; background:#efeaf7; color:var(--purple-800); }
+  .ae-sec-card { border:1px solid var(--border); border-radius:var(--r); padding:16px 18px; margin-bottom:14px; background:#fff; }
+  .ae-sec-card h4 { margin:0 0 12px; font-family:var(--serif); font-size:16px; color:var(--text); }
+  .ae-field { margin-bottom:12px; }
+  .ae-field label { display:block; font-size:12px; font-weight:700; color:var(--text2); margin-bottom:4px; text-transform:uppercase; letter-spacing:.03em; }
+  .ae-field input[type=text], .ae-field select, .ae-field textarea {
+    width:100%; box-sizing:border-box; padding:8px 10px; font-size:14px; border:1px solid var(--border); border-radius:var(--r1); font-family:inherit; }
+  .ae-field textarea { resize:vertical; line-height:1.5; }
+  .ae-field textarea.mono { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:13px; white-space:pre; }
+  .ae-btn { padding:10px 22px; font-size:14px; font-weight:700; border-radius:var(--r1); cursor:pointer; border:none; }
+  .ae-btn-primary { background:var(--green-600,#1e7e34); color:#fff; }
+  .ae-btn-secondary { background:#fafafa; border:1px solid #bbb; color:#555; }
+  .ae-msg { font-size:14px; margin:12px 0; padding:10px 14px; border-radius:var(--r); }
+  .ae-msg-err { background:#fde8e8; border:1px solid #f5aaaa; color:#b71c1c; }
+  .ae-msg-ok { background:#e6f4ea; border:1px solid #a8d5b8; color:#1e7e34; }
+  .ae-msg-info { background:#eef2fb; border:1px solid #c5d4f0; color:#2b4a8b; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="inner">
+    <a href="/" class="site-logo">
+      <div class="logo-mark">🏡</div>
+      <div class="logo-text">
+        <div class="logo-name" data-hoa-name>MMPOAII HOA</div>
+        <div class="logo-sub">Article Editor</div>
+      </div>
+    </a>
+    <nav class="site-nav">
+      <a href="/review/admin.html" id="back-link">← Admin Console</a>
+      <div class="nav-user">
+        <div class="avatar" id="nav-avatar">?</div>
+        <div>
+          <div class="uname" data-user-name>Loading…</div>
+          <div class="urole" data-user-role></div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="HoaGuard.logout()">Sign Out</button>
+    </nav>
+  </div>
+</header>
+
+<div id="page-content">
+<div class="ae-wrap">
+
+  <h2 id="ae-heading" style="font-family:var(--serif);margin-bottom:6px;">Article Editor</h2>
+  <p id="ae-sub" style="opacity:.8;font-size:14px;margin-bottom:18px;"></p>
+
+  <div id="ae-message"></div>
+
+  <!-- Article list view -->
+  <div id="ae-list-view">
+    <div class="ae-note">
+      Select an article to edit. Saving creates a <strong>new version</strong>. The
+      previous version is retained and remains viewable by reviewers. <strong>No votes
+      are changed or reset.</strong> Section count cannot change.
+    </div>
+    <div id="ae-article-list">
+      <div class="empty-state"><div class="es-icon">⏳</div><div class="es-text">Loading articles…</div></div>
+    </div>
+  </div>
+
+  <!-- Editor view -->
+  <div id="ae-edit-view" style="display:none;">
+    <div class="ae-note">
+      Editing creates <strong>version <span id="ae-next-version">?</span></strong> of this article.
+      Section count is locked at <span id="ae-sec-count">?</span> to protect existing votes.
+      The current version stays available to reviewers.
+    </div>
+
+    <div class="ae-field">
+      <label for="ae-article-title">Article Title</label>
+      <input type="text" id="ae-article-title" />
+    </div>
+
+    <div id="ae-sections"></div>
+
+    <div style="display:flex;gap:10px;margin-top:18px;">
+      <button class="ae-btn ae-btn-primary" id="ae-save-btn" onclick="saveNewVersion()">Save New Version</button>
+      <button class="ae-btn ae-btn-secondary" onclick="backToList()">Cancel</button>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<footer class="site-footer">
+  <div data-hoa-name>MMPOAII HOA</div>
+  <div>Document Review System — Confidential: For Review Committee Use Only</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6/dist/amazon-cognito-identity.min.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/guard.js"></script>
+<script src="/js/review-api.js"></script>
+<script>
+HoaGuard.protect('review-admins');
+
+var params = new URLSearchParams(window.location.search);
+var cycleId = params.get('cycleId');
+if (!cycleId) { window.location.href = '/review/admin.html'; }
+
+document.getElementById('back-link').href = '/review/admin.html';
+document.getElementById('ae-heading').textContent = 'Article Editor';
+document.getElementById('ae-sub').textContent = 'Cycle: ' + cycleId;
+
+var classLabels = {
+  required_by_law: 'Required by Texas Law',
+  required_by_city: 'Required by City of Austin',
+  best_practice: 'Recommended Best Practice',
+  community_choice: 'Community Choice'
+};
+
+var editState = null; // { articleId, expectedCurrentVersion, sections: [...] }
+
+function escHtml(s) {
+  var d = document.createElement('div');
+  d.textContent = s == null ? '' : String(s);
+  return d.innerHTML;
+}
+
+function showMsg(kind, text) {
+  var cls = kind === 'err' ? 'ae-msg-err' : (kind === 'ok' ? 'ae-msg-ok' : 'ae-msg-info');
+  document.getElementById('ae-message').innerHTML =
+    '<div class="ae-msg ' + cls + '">' + escHtml(text) + '</div>';
+}
+function clearMsg() { document.getElementById('ae-message').innerHTML = ''; }
+
+// ── Article list ──────────────────────────────────────────────────────────
+async function loadArticles() {
+  try {
+    var data = await ReviewApi.listArticles(cycleId);
+    var arts = data.articles || [];
+    if (arts.length === 0) {
+      document.getElementById('ae-article-list').innerHTML =
+        '<div class="empty-state"><div class="es-text">No articles in this cycle.</div></div>';
+      return;
+    }
+    // Fetch version info per article in parallel to show the badge
+    var versionInfos = await Promise.all(arts.map(function (a) {
+      return ReviewApi.listArticleVersions(cycleId, a.articleNumber).catch(function () {
+        return { currentVersion: 1 };
+      });
+    }));
+
+    var html = '';
+    for (var i = 0; i < arts.length; i++) {
+      var a = arts[i];
+      var cv = versionInfos[i].currentVersion || 1;
+      var badge = cv > 1 ? '<span class="ae-badge">v' + cv + '</span>' : '';
+      html +=
+        '<div class="ae-art-row">' +
+          '<div class="num">' + a.articleNumber + '</div>' +
+          '<div class="title">' + escHtml(a.articleTitle) + ' ' + badge + '</div>' +
+          '<div style="font-size:12px;color:var(--text3);">' + a.totalSections + ' sections</div>' +
+          '<button class="ae-btn ae-btn-secondary" style="padding:6px 14px;font-size:13px;" ' +
+            'onclick="openEditor(' + a.articleNumber + ')">Edit</button>' +
+        '</div>';
+    }
+    document.getElementById('ae-article-list').innerHTML = html;
+  } catch (err) {
+    showMsg('err', 'Failed to load articles: ' + err.message);
+  }
+}
+
+// ── Editor ──────────────────────────────────────────────────────────────────
+async function openEditor(articleNumber) {
+  clearMsg();
+  showMsg('info', 'Loading article ' + articleNumber + '…');
+  try {
+    var article = await ReviewApi.getArticle(cycleId, articleNumber);
+    var versionInfo = await ReviewApi.listArticleVersions(cycleId, articleNumber);
+    var sections = (article.sections || []).slice().sort(function (a, b) {
+      return a.sectionNumber - b.sectionNumber;
+    });
+
+    // Load current doctext for each section in parallel
+    var texts = await Promise.all(sections.map(function (s) {
+      var sid = 'ART-' + String(articleNumber).padStart(2, '0') + '#SEC-' + String(s.sectionNumber).padStart(2, '0');
+      return ReviewApi.getDocText(cycleId, sid).then(function (r) {
+        return (r && r.text) || '';
+      }).catch(function () { return ''; });
+    }));
+    for (var i = 0; i < sections.length; i++) sections[i].text = texts[i];
+
+    editState = {
+      articleId: articleNumber,
+      expectedCurrentVersion: versionInfo.currentVersion || 1,
+      sections: sections
+    };
+
+    renderEditor(article.articleTitle, sections, (versionInfo.currentVersion || 1) + 1);
+    clearMsg();
+  } catch (err) {
+    showMsg('err', 'Failed to open editor: ' + err.message);
+  }
+}
+
+function renderEditor(articleTitle, sections, nextVersion) {
+  document.getElementById('ae-list-view').style.display = 'none';
+  document.getElementById('ae-edit-view').style.display = 'block';
+  document.getElementById('ae-next-version').textContent = nextVersion;
+  document.getElementById('ae-sec-count').textContent = sections.length;
+  document.getElementById('ae-article-title').value = articleTitle || '';
+
+  var html = '';
+  for (var i = 0; i < sections.length; i++) {
+    var s = sections[i];
+    var opts = '';
+    for (var key in classLabels) {
+      opts += '<option value="' + key + '"' +
+        (s.classification === key ? ' selected' : '') + '>' +
+        escHtml(classLabels[key]) + '</option>';
+    }
+    html +=
+      '<div class="ae-sec-card" data-secnum="' + s.sectionNumber + '">' +
+        '<h4>Section ' + s.sectionNumber + ' <span style="font-weight:400;color:var(--text3);font-size:13px;">(locked)</span></h4>' +
+        '<div class="ae-field"><label>Section Title</label>' +
+          '<input type="text" class="f-title" value="' + escHtml(s.sectionTitle) + '" /></div>' +
+        '<div class="ae-field"><label>Classification</label>' +
+          '<select class="f-class">' + opts + '</select></div>' +
+        '<div class="ae-field"><label>Why It’s Here</label>' +
+          '<textarea class="f-why" rows="3">' + escHtml(s.whyItsHere) + '</textarea></div>' +
+        '<div class="ae-field"><label>What You Can Do</label>' +
+          '<textarea class="f-what" rows="3">' + escHtml(s.whatYouCanDo) + '</textarea></div>' +
+        '<div class="ae-field"><label>Community Impact (optional)</label>' +
+          '<textarea class="f-impact" rows="2">' + escHtml(s.communityImpact || '') + '</textarea></div>' +
+        '<div class="ae-field"><label>Governing Document Text</label>' +
+          '<textarea class="f-text mono" rows="8">' + escHtml(s.text || '') + '</textarea></div>' +
+      '</div>';
+  }
+  document.getElementById('ae-sections').innerHTML = html;
+  window.scrollTo(0, 0);
+}
+
+function backToList() {
+  editState = null;
+  document.getElementById('ae-edit-view').style.display = 'none';
+  document.getElementById('ae-list-view').style.display = 'block';
+  clearMsg();
+  loadArticles();
+}
+
+async function saveNewVersion() {
+  if (!editState) return;
+  var btn = document.getElementById('ae-save-btn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  clearMsg();
+
+  var articleTitle = document.getElementById('ae-article-title').value.trim();
+  if (!articleTitle) {
+    showMsg('err', 'Article title is required.');
+    btn.disabled = false; btn.textContent = 'Save New Version';
+    return;
+  }
+
+  var cards = document.querySelectorAll('.ae-sec-card');
+  var sections = [];
+  for (var i = 0; i < cards.length; i++) {
+    var c = cards[i];
+    sections.push({
+      sectionNumber: parseInt(c.getAttribute('data-secnum'), 10),
+      sectionTitle: c.querySelector('.f-title').value.trim(),
+      classification: c.querySelector('.f-class').value,
+      whyItsHere: c.querySelector('.f-why').value.trim(),
+      whatYouCanDo: c.querySelector('.f-what').value.trim(),
+      communityImpact: c.querySelector('.f-impact').value.trim() || null,
+      text: c.querySelector('.f-text').value
+    });
+  }
+
+  try {
+    var result = await ReviewApi.createArticleVersion(cycleId, editState.articleId, {
+      expectedCurrentVersion: editState.expectedCurrentVersion,
+      articleTitle: articleTitle,
+      sections: sections
+    });
+    showMsg('ok', 'Saved. Article ' + editState.articleId +
+      ' is now version ' + result.newVersion +
+      ' (version ' + result.archivedVersion + ' archived). Votes preserved.');
+    editState = null;
+    document.getElementById('ae-edit-view').style.display = 'none';
+    document.getElementById('ae-list-view').style.display = 'block';
+    loadArticles();
+  } catch (err) {
+    showMsg('err', 'Save failed: ' + err.message);
+    btn.disabled = false;
+    btn.textContent = 'Save New Version';
+  }
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────
+var boot = setInterval(function () {
+  var user = HoaGuard.getUser && HoaGuard.getUser();
+  if (!user) return;
+  clearInterval(boot);
+  var av = document.getElementById('nav-avatar');
+  if (av && user.username) av.textContent = user.username.charAt(0).toUpperCase();
+  loadArticles();
+}, 100);
+</script>
+</body>
+</html>

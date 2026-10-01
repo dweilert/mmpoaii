@@ -249,6 +249,60 @@ Resources:
             Path: /cycles/{cycleId}/articles/{articleId}
             Method: GET
 
+  # POST /cycles/{cycleId}/articles/{articleId}/versions
+  ArticleVersionCreateFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mmpoa-review-article-version-create
+      Handler: article-version-create.handler
+      CodeUri: lambdas/
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ReviewTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ReviewApi
+            Path: /cycles/{cycleId}/articles/{articleId}/versions
+            Method: POST
+
+  # GET /cycles/{cycleId}/articles/{articleId}/versions
+  ArticleVersionsListFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mmpoa-review-article-versions-list
+      Handler: article-versions-list.handler
+      CodeUri: lambdas/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref ReviewTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ReviewApi
+            Path: /cycles/{cycleId}/articles/{articleId}/versions
+            Method: GET
+
+  # GET /cycles/{cycleId}/articles/{articleId}/versions/{version}
+  ArticleVersionGetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mmpoa-review-article-version-get
+      Handler: article-version-get.handler
+      CodeUri: lambdas/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref ReviewTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ReviewApi
+            Path: /cycles/{cycleId}/articles/{articleId}/versions/{version}
+            Method: GET
+
   # GET /cycles/{cycleId}/articles/{articleId}/comments
   ArticleCommentsFunction:
     Type: AWS::Serverless::Function
