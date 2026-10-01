@@ -199,8 +199,12 @@ function parseFieldGuideHtml(html) {
   var currentSection = null;
   var collectingField = null;
 
-  var articleRe  = /^Article\s+([IVXLCDM]+)\s*[—–\-]+\s*(.+)$/i;
-  var sectionRe  = /Art\.\s+[IVXLCDM]+,\s+§(\S+)\s*[—–\-]+\s*(.+)/i;
+  // Accept em-dash, en-dash, hyphen, period, or colon as the separator.
+  var articleRe        = /^Article\s+([IVXLCDM]+)\s*[—–\-\.:]+\s*(.+)$/i;
+  // Fallback: no separator at all (e.g. "ARTICLE II DEFINITIONS") — only safe
+  // on heading tags, since paragraphs can start with "Article XIII of the Declaration…"
+  var articleHeadingRe = /^Article\s+([IVXLCDM]+)\s+(.+)$/i;
+  var sectionRe        = /Art\.\s+[IVXLCDM]+,\s+§(\S+)\s*[—–\-\.:]+\s*(.+)/i;
   var classRe    = /(REQUIRED BY TEXAS LAW|REQUIRED BY CITY OF AUSTIN|RECOMMENDED BEST PRACTICE|COMMUNITY CHOICE)/i;
   var whyRe      = /^Why it.?s here:?\s*(.*)/i;
   var whatRe     = /^What you can do:?\s*(.*)/i;
@@ -231,7 +235,8 @@ function parseFieldGuideHtml(html) {
     var text = nodes[i].textContent.trim();
     if (!text) continue;
 
-    var artMatch = text.match(articleRe);
+    var isHeading = /^H[1-6]$/i.test(nodes[i].tagName);
+    var artMatch = text.match(articleRe) || (isHeading ? text.match(articleHeadingRe) : null);
     if (artMatch) {
       finishArticle();
       currentArticle = { articleNumber: romanToInt(artMatch[1]), articleTitle: cleanText(artMatch[2]), sections: [] };
@@ -284,8 +289,11 @@ function parseGovDocHtml(html) {
   var currentSection = null;
   var textParts = [];
 
-  var articleRe = /^ARTICLE\s+([IVXLCDM]+)\s*[-–—]\s*(.+)$/i;
-  var sectionRe = /^Section\s+(\S+?)\.?\s+(.+)$/i;
+  // Accept em-dash, en-dash, hyphen, period, or colon as the article separator;
+  // also allow no separator on heading tags (e.g. "ARTICLE II DEFINITIONS").
+  var articleRe        = /^ARTICLE\s+([IVXLCDM]+)\s*[-–—\.:]+\s*(.+)$/i;
+  var articleHeadingRe = /^ARTICLE\s+([IVXLCDM]+)\s+(.+)$/i;
+  var sectionRe        = /^Section\s+(\S+?)\.?\s+(.+)$/i;
 
   function finishSection() {
     if (currentSection && currentArticle) {
@@ -307,7 +315,8 @@ function parseGovDocHtml(html) {
     var text = nodes[i].textContent.trim();
     if (!text) continue;
 
-    var artMatch = text.match(articleRe);
+    var isHeading = /^H[1-6]$/i.test(nodes[i].tagName);
+    var artMatch = text.match(articleRe) || (isHeading ? text.match(articleHeadingRe) : null);
     if (artMatch) {
       finishArticle();
       currentArticle = { articleNumber: romanToInt(artMatch[1]), articleTitle: cleanText(artMatch[2]), sections: [] };
@@ -673,7 +682,10 @@ async function loadExistingCycles() {
         var closeColor  = isOpen ? '#7a6100' : '#1e7e34';
         html += '<td style="padding:6px 8px;display:flex;gap:6px;flex-wrap:wrap;">';
         html += '<button onclick="setCycleStatus(' + i + ',\'' + (isOpen ? 'closed' : 'open') + '\')" style="background:none;border:1px solid ' + closeBorder + ';color:' + closeColor + ';padding:3px 10px;border-radius:var(--r1);font-size:12px;font-weight:600;cursor:pointer;">' + closeLabel + '</button>';
-        html += '<button onclick="showDeleteModal(\'' + escHtml(c.cycleId) + '\',\'' + escHtml(c.title || c.cycleId) + '\')" style="background:none;border:1px solid #f5aaaa;color:#b71c1c;padding:3px 10px;border-radius:var(--r1);font-size:12px;font-weight:600;cursor:pointer;">Delete</button>';
+        // Delete disabled: a delete + recreate during a live review silently drops
+        // sections if the replacement Field Guide parses differently. Removed to
+        // prevent in-cycle data loss. Re-enable only through a non-admin path.
+        // html += '<button onclick="showDeleteModal(\'' + escHtml(c.cycleId) + '\',\'' + escHtml(c.title || c.cycleId) + '\')" style="background:none;border:1px solid #f5aaaa;color:#b71c1c;padding:3px 10px;border-radius:var(--r1);font-size:12px;font-weight:600;cursor:pointer;">Delete</button>';
         html += '</td>';
         html += '</tr>';
       }
