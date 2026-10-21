@@ -178,6 +178,21 @@
   </div>
 </div>
 
+<!-- Related documents modal -->
+<div id="related-modal" style="display:none;position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,.5);overflow-y:auto;" onclick="if(event.target===this)closeRelatedModal()">
+  <div style="max-width:720px;margin:50px auto;background:#fff;border-radius:var(--r2);box-shadow:0 8px 32px rgba(0,0,0,.2);overflow:hidden;">
+    <div style="background:var(--purple-800);color:#fff;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-family:Arial,Helvetica,sans-serif;font-size:17px;font-weight:700;">🔗 Related Documents</div>
+        <div id="rel-subtitle" style="font-size:13px;opacity:.85;margin-top:2px;"></div>
+      </div>
+      <button onclick="closeRelatedModal()" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer;padding:0 4px;line-height:1;">&times;</button>
+    </div>
+    <div style="padding:10px 24px 2px;font-size:12px;color:var(--text3);">Related sections in the other governing documents. Click one to open it in a pop-out window.</div>
+    <div id="rel-body" style="padding:14px 24px 24px;max-height:70vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6/dist/amazon-cognito-identity.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/diff@5.2.0/dist/diff.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
@@ -334,6 +349,7 @@ async function loadArticle() {
       html += '<div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">';
       html += '<button data-action="key-questions" data-classification="' + escAttr(cls) + '" style="white-space:nowrap;padding:7px 16px;font-size:13px;border:1px solid #bbb;color:#555;background:#fafafa;border-radius:var(--r);cursor:pointer;font-weight:600;">View Key Questions</button>';
       html += '<button data-action="field-notes" data-sec-id="' + escAttr(secId) + '" data-art-num="' + artNum + '" data-section-number="' + s.sectionNumber + '" data-section-title="' + escAttr(s.sectionTitle) + '" style="white-space:nowrap;padding:7px 16px;font-size:13px;border:1px solid #bbb;color:#555;background:#fafafa;border-radius:var(--r);cursor:pointer;font-weight:600;">View Field Notes</button>';
+      html += '<button data-action="related-docs" data-sec-id="' + escAttr(secId) + '" data-section-number="' + s.sectionNumber + '" data-section-title="' + escAttr(s.sectionTitle) + '" style="white-space:nowrap;padding:7px 16px;font-size:13px;border:1px solid #c9bce6;color:var(--purple-800);background:#f5f1fb;border-radius:var(--r);cursor:pointer;font-weight:600;">🔗 Related Docs</button>';
       if (isReviewAdmin()) {
         html += '<button data-action="edit-text" data-sec-id="' + escAttr(secId) + '" data-section-number="' + s.sectionNumber + '" data-section-title="' + escAttr(s.sectionTitle) + '" style="white-space:nowrap;padding:7px 16px;font-size:13px;border:1px solid #a8d5b8;color:#1e7e34;background:#e6f4ea;border-radius:var(--r);cursor:pointer;font-weight:600;">✎ Edit Text</button>';
       }
@@ -752,8 +768,115 @@ document.addEventListener('click', function (e) {
       parseInt(btn.dataset.sectionNumber, 10),
       btn.dataset.sectionTitle
     );
+  } else if (action === 'related-docs') {
+    openRelatedModal(
+      btn.dataset.secId,
+      parseInt(btn.dataset.sectionNumber, 10),
+      btn.dataset.sectionTitle
+    );
   }
 });
+
+// ── Related documents (cross-doc links) ─────────────────────────────────────
+async function openRelatedModal(secId, sectionNumber, sectionTitle) {
+  var artNum = parseInt(articleId, 10);
+  document.getElementById('rel-subtitle').textContent =
+    'Art. ' + artNum + ', §' + sectionNumber + (sectionTitle ? ' — ' + sectionTitle : '');
+  var body = document.getElementById('rel-body');
+  body.innerHTML = '<div class="empty-state"><div class="es-icon">⏳</div><div class="es-text">Finding related sections…</div></div>';
+  document.getElementById('related-modal').style.display = '';
+  document.body.style.overflow = 'hidden';
+
+  try {
+    var data = await ReviewApi.getDocLinks(cycleId, secId);
+    var links = data.links || [];
+    if (links.length === 0) {
+      body.innerHTML = '<div style="padding:8px 2px;color:var(--text3);font-size:15px;">' +
+        'No related sections are linked to this subsection in the CC&Rs, Bylaws, or Rules. ' +
+        'If you expected links here, flag it — the cross-document links may need to be rebuilt.</div>';
+      return;
+    }
+    // Group by target document
+    var groups = {};
+    links.forEach(function (l) {
+      (groups[l.tgtDocLabel] = groups[l.tgtDocLabel] || []).push(l);
+    });
+    var order = ['CC&Rs', 'Bylaws', 'Rules of Conduct'];
+    var labels = Object.keys(groups).sort(function (a, b) {
+      var ia = order.indexOf(a), ib = order.indexOf(b);
+      return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+    });
+    var html = '';
+    labels.forEach(function (label) {
+      html += '<div style="margin-bottom:16px;">';
+      html += '<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--purple-800);margin-bottom:6px;">' + escHtml(label) + '</div>';
+      groups[label].forEach(function (l) {
+        var title = l.sectionTitle || ('Section ' + l.sectionNumber);
+        html += '<button class="rel-link" ' +
+          'data-tgt-cycle="' + escAttr(l.tgtCycle) + '" data-tgt-sec="' + escAttr(l.tgtSec) + '" ' +
+          'data-label="' + escAttr(label) + '" ' +
+          'style="display:flex;width:100%;text-align:left;align-items:center;gap:10px;padding:10px 12px;margin-bottom:6px;border:1px solid var(--border);border-radius:var(--r);background:#fff;cursor:pointer;">' +
+          '<span style="flex-shrink:0;font-size:12px;font-weight:700;color:var(--purple-800);min-width:70px;">Art ' + l.articleNumber + ' §' + l.sectionNumber + '</span>' +
+          '<span style="flex:1;font-size:14px;color:var(--text);">' + escHtml(title) + '</span>' +
+          '<span style="flex-shrink:0;font-size:11px;color:var(--text3);">open ↗</span>' +
+          '</button>';
+      });
+      html += '</div>';
+    });
+    body.innerHTML = html;
+  } catch (err) {
+    body.innerHTML = '<div class="alert alert-error">Could not load related sections: ' + escHtml(err.message) + '</div>';
+  }
+}
+
+function closeRelatedModal() {
+  document.getElementById('related-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+// Delegate clicks on related-link rows → open a popout window with the text
+document.addEventListener('click', function (e) {
+  var row = e.target.closest('.rel-link');
+  if (!row) return;
+  openSectionPopout(row.dataset.tgtCycle, row.dataset.tgtSec, row.dataset.label);
+});
+
+async function openSectionPopout(tgtCycle, tgtSec, label) {
+  // Open the window synchronously (inside the click) so it isn't blocked.
+  var win = window.open('', '_blank', 'width=720,height=800,scrollbars=yes,resizable=yes');
+  if (!win) { alert('Please allow pop-ups to view the related section.'); return; }
+  win.document.write('<!doctype html><meta charset="utf-8"><title>Loading…</title>' +
+    '<body style="font-family:Georgia,serif;padding:40px;color:#333;">Loading…</body>');
+  try {
+    var d = await ReviewApi.getDocSection(tgtCycle, tgtSec);
+    var cls = d.classification ? '<div style="display:inline-block;margin:0 0 14px;padding:4px 12px;border-radius:12px;background:#eef;font-size:12px;font-weight:700;color:#3C3489;">' + escHtml(d.classification) + '</div>' : '';
+    var docText = isRichHtml(d.text) ? d.text : escHtml(d.text || '').replace(/\n/g, '<br>');
+    var why = d.whyItsHere ? '<h3 style="margin:22px 0 6px;font-size:14px;color:#555;">Why It’s Here</h3><div style="font-size:15px;line-height:1.6;">' + (isRichHtml(d.whyItsHere) ? d.whyItsHere : escHtml(d.whyItsHere).replace(/\n/g,'<br>')) + '</div>' : '';
+    var what = d.whatYouCanDo ? '<h3 style="margin:22px 0 6px;font-size:14px;color:#555;">What You Can Do</h3><div style="font-size:15px;line-height:1.6;">' + (isRichHtml(d.whatYouCanDo) ? d.whatYouCanDo : escHtml(d.whatYouCanDo).replace(/\n/g,'<br>')) + '</div>' : '';
+    var title = (d.docLabel || label) + ' — Article ' + d.articleNumber + ', §' + d.sectionNumber;
+    win.document.open();
+    win.document.write(
+      '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">' +
+      '<title>' + escHtml(title) + '</title></head>' +
+      '<body style="font-family:Georgia,serif;max-width:680px;margin:0 auto;padding:32px 28px;color:#222;line-height:1.7;">' +
+      '<div style="font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#3C3489;">' + escHtml(d.docLabel || label) + '</div>' +
+      '<h1 style="font-size:22px;margin:6px 0 2px;">Article ' + d.articleNumber + ', §' + d.sectionNumber + '</h1>' +
+      '<div style="font-size:17px;color:#555;margin-bottom:16px;">' + escHtml(d.sectionTitle || '') + '</div>' +
+      cls +
+      '<div style="font-size:17px;line-height:1.8;">' + docText + '</div>' +
+      why + what +
+      '<hr style="margin:28px 0 14px;border:none;border-top:1px solid #ddd;">' +
+      '<button onclick="window.close()" style="padding:8px 18px;font-size:14px;cursor:pointer;">Close</button>' +
+      '</body></html>'
+    );
+    win.document.close();
+    win.document.title = title;
+  } catch (err) {
+    win.document.open();
+    win.document.write('<!doctype html><meta charset="utf-8"><body style="font-family:sans-serif;padding:40px;color:#b00;">Failed to load section: ' + escHtml(err.message) + '</body>');
+    win.document.close();
+  }
+}
 
 // ── Admin: inline Edit Governing Document Text ──────────────────────────────
 var etQuill = null, etContext = null;
@@ -1314,7 +1437,7 @@ function fmtDate(iso) {
 
 // Close modals on Escape key
 document.addEventListener('keydown', function (e) {
-  if (e.key === 'Escape') { closeDocTextModal(); closeKqModal(); closeVersionModal(); closeEditTextModal(); }
+  if (e.key === 'Escape') { closeDocTextModal(); closeKqModal(); closeVersionModal(); closeEditTextModal(); closeRelatedModal(); }
 });
 
 // ── Approve All Sections (with modal + retry) ──
