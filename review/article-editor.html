@@ -104,6 +104,7 @@
       locked. Prior versions stay viewable by reviewers.
     </div>
     <div id="ae-edit-fields"></div>
+    <div id="ae-edit-msg"></div>
     <div style="display:flex;gap:10px;margin-top:18px;">
       <button class="ae-btn ae-btn-primary" id="ae-save-btn" onclick="saveSection()">Save This Subsection</button>
       <button class="ae-btn ae-btn-secondary" onclick="backToSections()">Cancel</button>
@@ -302,7 +303,7 @@ function quillHtml(q) {
   return q.root.innerHTML;
 }
 
-function openSection(sectionNumber) {
+async function openSection(sectionNumber) {
   var s = editState.sections.find(function (x) { return x.sectionNumber === sectionNumber; });
   if (!s) return;
   editState.editingSection = sectionNumber;
@@ -311,6 +312,7 @@ function openSection(sectionNumber) {
   var saveBtn = document.getElementById('ae-save-btn');
   saveBtn.disabled = false;
   saveBtn.textContent = 'Save This Subsection';
+  document.getElementById('ae-edit-msg').innerHTML = '';
 
   document.getElementById('ae-sections-view').style.display = 'none';
   document.getElementById('ae-list-view').style.display = 'none';
@@ -324,10 +326,12 @@ function openSection(sectionNumber) {
     opts += '<option value="' + key + '"' +
       (s.classification === key ? ' selected' : '') + '>' + escHtml(classLabels[key]) + '</option>';
   }
+  // Title is set via the .value property below (not a value="" attribute) so
+  // titles containing quotes — e.g. "Association" — can't break the markup.
   document.getElementById('ae-edit-fields').innerHTML =
     '<div class="ae-sec-card">' +
       '<div class="ae-field"><label>Subsection Title</label>' +
-        '<input type="text" class="f-title" value="' + escHtml(s.sectionTitle) + '" /></div>' +
+        '<input type="text" class="f-title" /></div>' +
       '<div class="ae-field"><label>Classification</label>' +
         '<select class="f-class">' + opts + '</select></div>' +
       '<div class="ae-field"><label>Governing Document Text</label>' +
@@ -339,9 +343,23 @@ function openSection(sectionNumber) {
       '<div class="ae-field"><label>Community Impact (optional)</label>' +
         '<div class="ae-editor" id="q-impact"></div></div>' +
     '</div>';
+  document.querySelector('#ae-edit-fields .f-title').value = s.sectionTitle || '';
+
+  // Always fetch the current Governing Document Text fresh so it can never be
+  // blank due to a preload gap. Fall back to whatever we already have.
+  var docText = s.text || '';
+  try {
+    var sid = 'ART-' + String(editState.articleNumber).padStart(2, '0') +
+              '#SEC-' + String(sectionNumber).padStart(2, '0');
+    var r = await ReviewApi.getDocText(cycleId, sid);
+    if (r && typeof r.text === 'string') { docText = r.text; s.text = r.text; }
+  } catch (e) { /* keep fallback */ }
+
+  // Guard against a stale open (user navigated away during the await)
+  if (editState.editingSection !== sectionNumber) return;
 
   quills = {
-    text: makeQuill('q-text', DOC_TOOLBAR, s.text || ''),
+    text: makeQuill('q-text', DOC_TOOLBAR, docText),
     why: makeQuill('q-why', NOTE_TOOLBAR, s.whyItsHere || ''),
     what: makeQuill('q-what', NOTE_TOOLBAR, s.whatYouCanDo || ''),
     impact: makeQuill('q-impact', NOTE_TOOLBAR, s.communityImpact || '')
@@ -371,6 +389,7 @@ async function saveSection() {
   btn.disabled = true;
   btn.textContent = 'Saving…';
   clearMsg();
+  document.getElementById('ae-edit-msg').innerHTML = '';
 
   var card = document.getElementById('ae-edit-fields');
   var edited = {
@@ -411,7 +430,11 @@ async function saveSection() {
     document.getElementById('ae-edit-view').style.display = 'none';
     renderSectionList(secNum); // back to the list, scrolled to + flashing this row
   } catch (err) {
-    showMsg('err', 'Save failed: ' + err.message);
+    // Stay in the edit session; show the error inline next to Save, in view.
+    var em = document.getElementById('ae-edit-msg');
+    em.innerHTML = '<div class="ae-msg ae-msg-err" style="margin-top:14px;">Save failed: ' +
+      escHtml(err.message) + '. Your edits are still here — fix and try again.</div>';
+    em.scrollIntoView({ behavior: 'smooth', block: 'center' });
     btn.disabled = false;
     btn.textContent = 'Save This Subsection';
   }
