@@ -307,6 +307,11 @@ function openSection(sectionNumber) {
   if (!s) return;
   editState.editingSection = sectionNumber;
 
+  // Reset the Save button — it may still read "Saving…" from a prior successful save.
+  var saveBtn = document.getElementById('ae-save-btn');
+  saveBtn.disabled = false;
+  saveBtn.textContent = 'Save This Subsection';
+
   document.getElementById('ae-sections-view').style.display = 'none';
   document.getElementById('ae-list-view').style.display = 'none';
   document.getElementById('ae-edit-view').style.display = 'block';
@@ -401,6 +406,8 @@ async function saveSection() {
     showMsg('ok', msg);
     quills = {};
     editState.editingSection = null;
+    btn.disabled = false;
+    btn.textContent = 'Save This Subsection';
     document.getElementById('ae-edit-view').style.display = 'none';
     renderSectionList(secNum); // back to the list, scrolled to + flashing this row
   } catch (err) {
