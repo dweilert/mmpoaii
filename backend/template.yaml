@@ -303,6 +303,24 @@ Resources:
             Path: /cycles/{cycleId}/articles/{articleId}/sections/{sectionNumber}/versions/{version}
             Method: GET
 
+  # POST /cycles/{cycleId}/articles/{articleId}/sections/{sectionNumber}/versions
+  SectionVersionCreateFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mmpoa-review-section-version-create
+      Handler: section-version-create.handler
+      CodeUri: lambdas/
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ReviewTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ReviewApi
+            Path: /cycles/{cycleId}/articles/{articleId}/sections/{sectionNumber}/versions
+            Method: POST
+
   # GET /cycles/{cycleId}/articles/{articleId}/comments
   ArticleCommentsFunction:
     Type: AWS::Serverless::Function

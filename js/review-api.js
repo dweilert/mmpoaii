@@ -199,6 +199,14 @@ const ReviewApi = (function () {
       '/articles/' + encodeURIComponent(articleId) + '/versions');
   }
 
+  /** POST …/articles/{articleId}/sections/{sectionNumber}/versions — fast single-subsection save */
+  function createSectionVersion(cycleId, articleId, sectionNumber, payload) {
+    return apiFetch('POST',
+      '/cycles/' + encodeURIComponent(cycleId) +
+      '/articles/' + encodeURIComponent(articleId) +
+      '/sections/' + encodeURIComponent(sectionNumber) + '/versions', payload);
+  }
+
   /** GET …/articles/{articleId}/sections/{sectionNumber}/versions/{version} — one section snapshot */
   function getSectionVersion(cycleId, articleId, sectionNumber, version) {
     return apiFetch('GET',
@@ -232,6 +240,7 @@ const ReviewApi = (function () {
     rebuildLinks,
     getAllLinks,
     createArticleVersion,
+    createSectionVersion,
     listArticleVersions,
     getSectionVersion,
   };
