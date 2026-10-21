@@ -104,6 +104,7 @@
       locked. Prior versions stay viewable by reviewers.
     </div>
     <div id="ae-edit-fields"></div>
+    <div id="ae-edit-msg"></div>
     <div style="display:flex;gap:10px;margin-top:18px;">
       <button class="ae-btn ae-btn-primary" id="ae-save-btn" onclick="saveSection()">Save This Subsection</button>
       <button class="ae-btn ae-btn-secondary" onclick="backToSections()">Cancel</button>
@@ -311,6 +312,7 @@ function openSection(sectionNumber) {
   var saveBtn = document.getElementById('ae-save-btn');
   saveBtn.disabled = false;
   saveBtn.textContent = 'Save This Subsection';
+  document.getElementById('ae-edit-msg').innerHTML = '';
 
   document.getElementById('ae-sections-view').style.display = 'none';
   document.getElementById('ae-list-view').style.display = 'none';
@@ -371,6 +373,7 @@ async function saveSection() {
   btn.disabled = true;
   btn.textContent = 'Saving…';
   clearMsg();
+  document.getElementById('ae-edit-msg').innerHTML = '';
 
   var card = document.getElementById('ae-edit-fields');
   var edited = {
@@ -411,7 +414,11 @@ async function saveSection() {
     document.getElementById('ae-edit-view').style.display = 'none';
     renderSectionList(secNum); // back to the list, scrolled to + flashing this row
   } catch (err) {
-    showMsg('err', 'Save failed: ' + err.message);
+    // Stay in the edit session; show the error inline next to Save, in view.
+    var em = document.getElementById('ae-edit-msg');
+    em.innerHTML = '<div class="ae-msg ae-msg-err" style="margin-top:14px;">Save failed: ' +
+      escHtml(err.message) + '. Your edits are still here — fix and try again.</div>';
+    em.scrollIntoView({ behavior: 'smooth', block: 'center' });
     btn.disabled = false;
     btn.textContent = 'Save This Subsection';
   }
