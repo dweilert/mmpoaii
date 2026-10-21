@@ -768,10 +768,12 @@ async function openEditTextModal(secId, sectionNumber, sectionTitle) {
   var saveBtn = document.getElementById('et-save');
   saveBtn.disabled = false; saveBtn.textContent = 'Save Text';
 
-  // Fresh editor each open
-  var mount = document.getElementById('et-editor');
-  mount.innerHTML = '';
-  etQuill = new Quill(mount, {
+  // Fresh editor each open. Quill inserts its toolbar as a sibling of the
+  // editor, so mount on a brand-new inner div inside the wrapper and clear the
+  // whole wrapper each time — otherwise toolbars stack up on repeated opens.
+  var wrap = document.getElementById('et-editor');
+  wrap.innerHTML = '<div id="et-quill"></div>';
+  etQuill = new Quill('#et-quill', {
     theme: 'snow',
     modules: { toolbar: [
       [{ header: [1, 2, 3, false] }],
