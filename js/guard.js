@@ -94,6 +94,12 @@ const HoaGuard = (function () {
     document.querySelectorAll('[data-user-role]').forEach(function (el) {
       el.textContent = isBoard ? 'Board Member' : 'Homeowner';
     });
+    // Logged-in users: the header logo/name returns to their portal, not the
+    // public home page. Board → board portal, everyone else → homeowner portal.
+    var portalUrl = isBoard ? '/board/index.html' : '/homeowners/index.html';
+    document.querySelectorAll('a.site-logo').forEach(function (a) {
+      a.href = portalUrl;
+    });
     // Set HOA name wherever it appears. Inject both a full and short version
     // so CSS can swap between them responsively.
     var fullName  = HOA_CONFIG.hoaName || '';
