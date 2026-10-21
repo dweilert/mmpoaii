@@ -6,6 +6,7 @@
 <title>Article Editor — MMPOAII</title>
 <link rel="stylesheet" href="/css/site.css">
 <link rel="stylesheet" href="/css/review.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css">
 <style>
   .ae-wrap { max-width: 920px; margin: 0 auto; padding: 20px 16px 60px; }
   .ae-note { background:#fff8e1; border:1px solid #ffe082; border-radius:var(--r); padding:12px 16px; font-size:13px; color:#7a6100; margin-bottom:18px; }
@@ -28,6 +29,12 @@
   .ae-msg-err { background:#fde8e8; border:1px solid #f5aaaa; color:#b71c1c; }
   .ae-msg-ok { background:#e6f4ea; border:1px solid #a8d5b8; color:#1e7e34; }
   .ae-msg-info { background:#eef2fb; border:1px solid #c5d4f0; color:#2b4a8b; }
+  .ae-editor { background:#fff; }
+  .ae-editor .ql-container { min-height:120px; font-size:14px; font-family:inherit; border-bottom-left-radius:var(--r1); border-bottom-right-radius:var(--r1); }
+  .ae-editor .ql-toolbar { border-top-left-radius:var(--r1); border-top-right-radius:var(--r1); }
+  .ae-editor .ql-editor { min-height:120px; line-height:1.5; }
+  @keyframes ae-flash { 0% { background:#fff6cc; } 100% { background:#fff; } }
+  .ae-art-row.ae-flash { animation: ae-flash 1.6s ease-out; }
 </style>
 </head>
 <body>
@@ -115,6 +122,7 @@
 <script src="/js/config.js"></script>
 <script src="/js/auth.js"></script>
 <script src="/js/guard.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
 <script src="/js/review-api.js"></script>
 <script>
 HoaGuard.protect('review-admins');
@@ -222,7 +230,7 @@ async function openArticle(articleNumber) {
   }
 }
 
-function renderSectionList() {
+function renderSectionList(flashSection) {
   document.getElementById('ae-list-view').style.display = 'none';
   document.getElementById('ae-edit-view').style.display = 'none';
   document.getElementById('ae-sections-view').style.display = 'block';
@@ -233,7 +241,7 @@ function renderSectionList() {
   editState.sections.forEach(function (s) {
     var badge = (s.currentVersion || 1) > 1 ? '<span class="ae-badge">v' + s.currentVersion + '</span>' : '';
     html +=
-      '<div class="ae-art-row">' +
+      '<div class="ae-art-row" id="ae-row-' + s.sectionNumber + '">' +
         '<div class="num">' + s.sectionNumber + '</div>' +
         '<div class="title">' + escHtml(s.sectionTitle || '(untitled)') + ' ' + badge + '</div>' +
         '<div style="font-size:12px;color:var(--text3);">' + escHtml(classLabels[s.classification] || s.classification || '') + '</div>' +
@@ -242,10 +250,58 @@ function renderSectionList() {
       '</div>';
   });
   document.getElementById('ae-section-list').innerHTML = html;
+
+  // Return the viewer to the row that was just edited, highlighted.
+  if (flashSection != null) {
+    var row = document.getElementById('ae-row-' + flashSection);
+    if (row) {
+      row.classList.add('ae-flash');
+      row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+  }
   window.scrollTo(0, 0);
 }
 
 // ── Level 3: edit one subsection ────────────────────────────────────────────
+var quills = {}; // { why, what, impact, text } Quill instances for the open section
+
+// Toolbars
+var DOC_TOOLBAR = [
+  [{ header: [1, 2, 3, false] }],
+  ['bold', 'italic', 'underline'],
+  [{ list: 'ordered' }, { list: 'bullet' }],
+  [{ indent: '-1' }, { indent: '+1' }],
+  ['blockquote', 'link'],
+  ['clean']
+];
+var NOTE_TOOLBAR = [
+  ['bold', 'italic', 'underline'],
+  [{ list: 'ordered' }, { list: 'bullet' }],
+  ['link', 'clean']
+];
+
+function looksHtml(v) { return typeof v === 'string' && /<[a-z][\s\S]*>/i.test(v); }
+
+function makeQuill(mountId, toolbar, value) {
+  var q = new Quill('#' + mountId, {
+    theme: 'snow',
+    modules: { toolbar: toolbar }
+  });
+  if (looksHtml(value)) {
+    q.clipboard.dangerouslyPasteHTML(value);
+  } else if (value) {
+    q.setText(value); // plain legacy content → keep line breaks
+  }
+  return q;
+}
+
+// Quill's empty document is '<p><br></p>'. Normalize that to ''.
+function quillHtml(q) {
+  if (q.getText().trim() === '') return '';
+  return q.root.innerHTML;
+}
+
 function openSection(sectionNumber) {
   var s = editState.sections.find(function (x) { return x.sectionNumber === sectionNumber; });
   if (!s) return;
@@ -269,15 +325,22 @@ function openSection(sectionNumber) {
         '<input type="text" class="f-title" value="' + escHtml(s.sectionTitle) + '" /></div>' +
       '<div class="ae-field"><label>Classification</label>' +
         '<select class="f-class">' + opts + '</select></div>' +
-      '<div class="ae-field"><label>Why It’s Here</label>' +
-        '<textarea class="f-why" rows="3">' + escHtml(s.whyItsHere) + '</textarea></div>' +
-      '<div class="ae-field"><label>What You Can Do</label>' +
-        '<textarea class="f-what" rows="3">' + escHtml(s.whatYouCanDo) + '</textarea></div>' +
-      '<div class="ae-field"><label>Community Impact (optional)</label>' +
-        '<textarea class="f-impact" rows="2">' + escHtml(s.communityImpact || '') + '</textarea></div>' +
       '<div class="ae-field"><label>Governing Document Text</label>' +
-        '<textarea class="f-text mono" rows="10">' + escHtml(s.text || '') + '</textarea></div>' +
+        '<div class="ae-editor" id="q-text"></div></div>' +
+      '<div class="ae-field"><label>Why It’s Here</label>' +
+        '<div class="ae-editor" id="q-why"></div></div>' +
+      '<div class="ae-field"><label>What You Can Do</label>' +
+        '<div class="ae-editor" id="q-what"></div></div>' +
+      '<div class="ae-field"><label>Community Impact (optional)</label>' +
+        '<div class="ae-editor" id="q-impact"></div></div>' +
     '</div>';
+
+  quills = {
+    text: makeQuill('q-text', DOC_TOOLBAR, s.text || ''),
+    why: makeQuill('q-why', NOTE_TOOLBAR, s.whyItsHere || ''),
+    what: makeQuill('q-what', NOTE_TOOLBAR, s.whatYouCanDo || ''),
+    impact: makeQuill('q-impact', NOTE_TOOLBAR, s.communityImpact || '')
+  };
   window.scrollTo(0, 0);
 }
 
@@ -291,12 +354,14 @@ function backToArticles() {
 }
 
 function backToSections() {
+  quills = {};
   document.getElementById('ae-edit-view').style.display = 'none';
   renderSectionList();
 }
 
 async function saveSection() {
   if (!editState || editState.editingSection == null) return;
+  var secNum = editState.editingSection;
   var btn = document.getElementById('ae-save-btn');
   btn.disabled = true;
   btn.textContent = 'Saving…';
@@ -306,48 +371,21 @@ async function saveSection() {
   var edited = {
     sectionTitle: card.querySelector('.f-title').value.trim(),
     classification: card.querySelector('.f-class').value,
-    whyItsHere: card.querySelector('.f-why').value.trim(),
-    whatYouCanDo: card.querySelector('.f-what').value.trim(),
-    communityImpact: card.querySelector('.f-impact').value.trim() || null,
-    text: card.querySelector('.f-text').value
+    whyItsHere: quillHtml(quills.why),
+    whatYouCanDo: quillHtml(quills.what),
+    communityImpact: quillHtml(quills.impact) || null,
+    text: quillHtml(quills.text)
   };
 
-  // Build the full section set (cardinality lock), with ONLY the edited one changed.
-  var sections = editState.sections.map(function (s) {
-    if (s.sectionNumber === editState.editingSection) {
-      return {
-        sectionNumber: s.sectionNumber,
-        sectionTitle: edited.sectionTitle,
-        classification: edited.classification,
-        whyItsHere: edited.whyItsHere,
-        whatYouCanDo: edited.whatYouCanDo,
-        communityImpact: edited.communityImpact,
-        text: edited.text
-      };
-    }
-    return {
-      sectionNumber: s.sectionNumber,
-      sectionTitle: s.sectionTitle,
-      classification: s.classification,
-      whyItsHere: s.whyItsHere,
-      whatYouCanDo: s.whatYouCanDo,
-      communityImpact: s.communityImpact || null,
-      text: s.text || ''
-    };
-  });
-
   try {
-    var result = await ReviewApi.createArticleVersion(cycleId, editState.articleNumber, {
-      articleTitle: editState.articleTitle,
-      sections: sections
-    });
-    var changed = result.changedSections || [];
-    var mine = changed.find(function (c) { return c.sectionNumber === editState.editingSection; });
+    // Fast path: send only this subsection; the Lambda touches only this row.
+    var result = await ReviewApi.createSectionVersion(
+      cycleId, editState.articleNumber, secNum, edited);
+
     var msg;
-    if (mine) {
-      msg = '§' + mine.sectionNumber + ' saved as v' + mine.newVersion + '. Votes preserved; other subsections untouched.';
-      // Reflect new local state so the section list shows the bumped version
-      var local = editState.sections.find(function (x) { return x.sectionNumber === editState.editingSection; });
+    if (result.changed) {
+      msg = '§' + secNum + ' saved as v' + result.newVersion + '. Votes preserved; other subsections untouched.';
+      var local = editState.sections.find(function (x) { return x.sectionNumber === secNum; });
       if (local) {
         local.sectionTitle = edited.sectionTitle;
         local.classification = edited.classification;
@@ -355,15 +393,16 @@ async function saveSection() {
         local.whatYouCanDo = edited.whatYouCanDo;
         local.communityImpact = edited.communityImpact;
         local.text = edited.text;
-        local.currentVersion = mine.newVersion;
+        local.currentVersion = result.newVersion;
       }
     } else {
-      msg = 'No changes detected in §' + editState.editingSection + ' — nothing was versioned.';
+      msg = 'No changes detected in §' + secNum + ' — nothing was versioned.';
     }
     showMsg('ok', msg);
+    quills = {};
     editState.editingSection = null;
     document.getElementById('ae-edit-view').style.display = 'none';
-    renderSectionList();
+    renderSectionList(secNum); // back to the list, scrolled to + flashing this row
   } catch (err) {
     showMsg('err', 'Save failed: ' + err.message);
     btn.disabled = false;

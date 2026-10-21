@@ -128,7 +128,7 @@
       </div>
       <button onclick="closeDocTextModal()" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer;padding:0 4px;line-height:1;">&times;</button>
     </div>
-    <div id="modal-body" style="padding:24px;font-size:18px;line-height:1.75;color:var(--text);white-space:pre-wrap;font-family:Arial,Helvetica,sans-serif;"></div>
+    <div id="modal-body" style="padding:24px;font-size:18px;line-height:1.75;color:var(--text);font-family:Arial,Helvetica,sans-serif;"></div>
   </div>
 </div>
 
@@ -654,6 +654,28 @@ function escHtml(s) {
   return d.innerHTML;
 }
 
+// Content authored in the rich editor is stored as HTML. Legacy content is
+// plain text. Render HTML as-is; render plain text escaped with line breaks.
+function isRichHtml(v) { return typeof v === 'string' && /<[a-z][\s\S]*>/i.test(v); }
+function richMarkup(v) {
+  if (v == null || v === '') return '';
+  if (isRichHtml(v)) return v;
+  return escHtml(v).replace(/\n/g, '<br>');
+}
+function setRich(el, v) {
+  if (!el) return;
+  if (isRichHtml(v)) el.innerHTML = v;
+  else { el.textContent = v || ''; }
+}
+// Plain-text view of a value (strip tags) — used for readable word-diffs.
+function plainText(v) {
+  if (v == null) return '';
+  if (!isRichHtml(v)) return String(v);
+  var d = document.createElement('div');
+  d.innerHTML = v;
+  return d.textContent || '';
+}
+
 // Escape for HTML attribute context — handles & " < > and ' (textContent->innerHTML
 // alone leaves " and ' unescaped, which breaks attribute parsing for titles
 // like "Association" or "Owner's Easements").
@@ -866,7 +888,8 @@ function loadDocText(secId, attempt) {
   if (existing) existing.remove();
 
   return ReviewApi.getDocText(cycleId, secId).then(function (d) {
-    el.textContent = d.text;
+    if (isRichHtml(d.text)) { el.innerHTML = d.text; el.style.whiteSpace = 'normal'; }
+    else { el.textContent = d.text; el.style.whiteSpace = 'pre-wrap'; }
     el.style.color = 'var(--text)';
   }).catch(function (err) {
     if (err.status === 404) {
@@ -958,12 +981,12 @@ function showFieldNotes(secId, artNum, sectionTitle, sectionNumber) {
   var body = '';
   body += '<div style="margin-bottom:16px;"><span class="sc-classification cls-' + cls + '" style="padding:6px 16px;border-radius:6px;font-family:Arial,Helvetica,sans-serif;font-size:13px;">' + escHtml(classLabels[cls] || cls) + '</span></div>';
   var fnLabel = 'font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:6px;';
-  body += '<div style="margin-bottom:18px;"><div style="' + fnLabel + '">Why It\'s Here</div><div style="font-size:17px;line-height:1.7;">' + escHtml(fd.whyItsHere) + '</div></div>';
-  body += '<div style="margin-bottom:18px;"><div style="' + fnLabel + '">What You Can Do</div><div style="font-size:17px;line-height:1.7;">' + escHtml(fd.whatYouCanDo) + '</div></div>';
-  if (fd.communityImpact) {
+  body += '<div style="margin-bottom:18px;"><div style="' + fnLabel + '">Why It\'s Here</div><div class="rich" style="font-size:17px;line-height:1.7;">' + richMarkup(fd.whyItsHere) + '</div></div>';
+  body += '<div style="margin-bottom:18px;"><div style="' + fnLabel + '">What You Can Do</div><div class="rich" style="font-size:17px;line-height:1.7;">' + richMarkup(fd.whatYouCanDo) + '</div></div>';
+  if (fd.communityImpact && plainText(fd.communityImpact).trim()) {
     body += '<div style="margin-bottom:8px;padding:14px 18px;background:#FFF3E0;border:1px solid #FFE0B2;border-radius:8px;">';
     body += '<div style="' + fnLabel + 'color:#E65100;">&#9733; Community Impact</div>';
-    body += '<div style="font-size:17px;line-height:1.7;color:#E65100;">' + escHtml(fd.communityImpact) + '</div>';
+    body += '<div class="rich" style="font-size:17px;line-height:1.7;color:#E65100;">' + richMarkup(fd.communityImpact) + '</div>';
     body += '</div>';
   }
 
@@ -1090,21 +1113,22 @@ function renderSectionDiff(old) {
   var curText = curTextEl ? curTextEl.textContent : '';
   if (curText === 'Loading document text…') curText = '';
 
+  // Diff on readable text — strip any HTML so the comparison shows words, not tags.
   var curVals = {
-    sectionTitle: curS.sectionTitle || '',
+    sectionTitle: plainText(curS.sectionTitle),
     classification: curS.classification || '',
-    whyItsHere: curS.whyItsHere || '',
-    whatYouCanDo: curS.whatYouCanDo || '',
-    communityImpact: curS.communityImpact || '',
+    whyItsHere: plainText(curS.whyItsHere),
+    whatYouCanDo: plainText(curS.whatYouCanDo),
+    communityImpact: plainText(curS.communityImpact),
     text: curText || ''
   };
   var oldVals = {
-    sectionTitle: old.sectionTitle || '',
+    sectionTitle: plainText(old.sectionTitle),
     classification: old.classification || '',
-    whyItsHere: old.whyItsHere || '',
-    whatYouCanDo: old.whatYouCanDo || '',
-    communityImpact: old.communityImpact || '',
-    text: old.text || ''
+    whyItsHere: plainText(old.whyItsHere),
+    whatYouCanDo: plainText(old.whatYouCanDo),
+    communityImpact: plainText(old.communityImpact),
+    text: plainText(old.text)
   };
 
   var fields = [
